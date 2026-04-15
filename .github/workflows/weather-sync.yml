@@ -2,8 +2,9 @@ name: TJFWeather Data Sync
 
 on:
   schedule:
-    - cron: '15,45 * * * *' # Runs at minute 15 and 45 of every hour for fresher data
-  workflow_dispatch: # Allows you to trigger it manually via a button
+    # Runs at minute 15 and 45 of every hour for fast updates
+    - cron: '15,45 * * * *' 
+  workflow_dispatch: # Allows you to trigger it manually
 
 jobs:
   build-and-cache:
@@ -23,7 +24,7 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Run Weather Engine
+      - name: Run Weather Engine (NWS, MOS, ASOS, Alerts)
         run: python build_cache.py
 
       - name: Commit and Push New Data
@@ -31,5 +32,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add static/
-          git commit -m "Automated Weather Data Sync (NWS/MOS/ASOS)" || echo "No changes to commit"
+          git commit -m "Automated Weather Data Sync [NWS & MOS]" || echo "No changes to commit"
           git push
