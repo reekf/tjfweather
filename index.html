@@ -1723,7 +1723,7 @@
 
             return `
             <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; line-height: 1.6;">
-                <div style="font-weight: bold; color: var(--accent); margin-bottom: 5px;">Expert Meteorologist Forecast</div>
+                <div style="font-weight: bold; color: var(--accent); margin-bottom: 5px;">EXPERT METEOROLOGIST FORECAST</div>
                 <div style="opacity: 0.85; margin-bottom: 10px;">These localized forecasts are actively monitored and adjusted by expert meteorologists at the National Weather Service (NWS) ${wfoText}.</div>
                 ${learnMoreText}
                 <div style="display: flex; gap: 15px; flex-wrap: wrap;">
@@ -1812,9 +1812,9 @@
                                                 qpfStr = `<div style="color:transparent; font-size:10px; margin-top:2px;">0%</div>`;
                                             }
                                         }
-                                        tempsHtml += `<div style="background:rgba(255,255,255,0.1); padding:6px 10px; border-radius:8px; text-align:center;">
-                                            <div style="font-size:10px; opacity:0.6; font-weight:bold;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
-                                            <div style="font-size:14px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
+                                        tempsHtml += `<div class="lf-hour-col">
+                                            <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
+                                            <div class="hr-temp" style="font-size:14px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
                                             ${qpfStr}
                                         </div>`;
                                     }
@@ -1887,9 +1887,9 @@
                                         qpfStr = `<div style="color:transparent; font-size:10px; margin-top:2px;">0%</div>`;
                                     }
                                 }
-                                tempsHtml += `<div style="background:rgba(255,255,255,0.1); padding:6px 10px; border-radius:8px; text-align:center;">
-                                    <div style="font-size:10px; opacity:0.6; font-weight:bold;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
-                                    <div style="font-size:14px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
+                                tempsHtml += `<div class="lf-hour-col">
+                                    <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
+                                    <div class="hr-temp" style="font-size:14px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
                                     ${qpfStr}
                                 </div>`;
                             }
@@ -1933,7 +1933,6 @@
                     let loc = data[0];
                     let newCityId = loc.display_name.split(',')[0];
                     
-                    // Add to list if not exists
                     if(!LF_CITIES.find(c => c.id === newCityId)) {
                         LF_CITIES.unshift({
                             id: newCityId,
@@ -1953,7 +1952,6 @@
         }
 
         async function fetchMOSData() {
-            // Isolating try catches so one missing file doesn't break the rest
             try {
                 let nbmRes = await fetch('static/nbm_timeseries_latest.json?t=' + Date.now());
                 if(nbmRes.ok) mosDataCache.nbm = await nbmRes.json();
@@ -1979,6 +1977,17 @@
             let cityObj = LF_CITIES.find(c => c.id === cityId);
             if (!cityObj) return;
 
+            // Load Alerts
+            let cityAlerts = nwsAlerts.filter(f => isPointInNWSFeature(cityObj.lon, cityObj.lat, f));
+            let alertsHtml = "";
+            if (cityAlerts.length > 0) {
+                alertsHtml = `
+                <div class="glass home-alerts-panel" style="padding: 20px; margin-bottom: 20px; border-color: var(--danger); background: rgba(255, 71, 87, 0.1);">
+                    <h3 style="margin: 0 0 12px; font-size: 14px; text-transform: uppercase; color: var(--danger); font-weight: 900;">ACTIVE WEATHER ALERTS</h3>
+                    ${cityAlerts.map(alertBadgeHTML).join('')}
+                </div>`;
+            }
+
             let asosHtml = "";
             try {
                 let asosRes = await fetch('static/asos_conditions.json?t=' + Date.now());
@@ -2002,15 +2011,18 @@
             } catch(e) {}
 
             let nwsHtml = "";
+            let hourlyHtml = "";
+            let dailyHtml = "";
             let gridId = "NWS";
+            
             try {
                 let safeName = cityId.replace(/ /g, "_");
                 let nwsRes = await fetch(`static/nws/${safeName}.json?t=${Date.now()}`);
                 let nwsData = null;
+                
                 if(nwsRes.ok) {
                     nwsData = await nwsRes.json();
                 } else {
-                    // Fallback to direct NOAA fetch if not cached
                     let ptData = await robustNWSFetch(`https://api.weather.gov/points/${cityObj.lat},${cityObj.lon}`);
                     if(ptData && ptData.properties) {
                         gridId = ptData.properties.gridId;
@@ -2021,7 +2033,84 @@
                 }
                 
                 if (nwsData && nwsData.daily && nwsData.daily.properties) {
-                    let period = nwsData.daily.properties.periods[0];
+                    let dailyPeriods = nwsData.daily.properties.periods;
+                    let hourlyPeriods = (nwsData.hourly && nwsData.hourly.properties) ? nwsData.hourly.properties.periods : [];
+                    
+                    // Build Hourly Scroll HTML
+                    if (hourlyPeriods.length > 0) {
+                        let hCols = hourlyPeriods.slice(0, 24).map(p => {
+                            let tDate = new Date(p.startTime);
+                            let qpfVal = p.quantitativePrecipitation?.value;
+                            let qpfStr = '';
+                            if (qpfVal > 0) {
+                                let inches = (qpfVal / 25.4).toFixed(2);
+                                qpfStr = `<div style="color:#2ecc71; font-size:11px; font-weight:900; margin-top:4px;">${inches}"</div>`;
+                            } else {
+                                let pop = p.probabilityOfPrecipitation?.value || 0;
+                                if (pop > 0) {
+                                    qpfStr = `<div style="color:#2ecc71; font-size:10px; font-weight:bold; margin-top:4px;">${pop}%</div>`;
+                                } else {
+                                    qpfStr = `<div style="color:transparent; font-size:10px; margin-top:4px;">0%</div>`;
+                                }
+                            }
+                            return `<div class="lf-hour-col">
+                                <div class="hr-label">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
+                                <div class="hr-temp" style="color:var(--accent);">${p.temperature}&deg;</div>
+                                ${qpfStr}
+                            </div>`;
+                        }).join('');
+                        
+                        hourlyHtml = `
+                        <div class="glass" style="padding: 20px; margin-bottom: 20px;">
+                            <div style="font-size:10px; opacity:0.8; letter-spacing:1px; margin-bottom:12px;">24-HOUR FORECAST</div>
+                            <div class="lf-hourly-scroll">${hCols}</div>
+                        </div>`;
+                    }
+                    
+                    // Build Daily List HTML
+                    if (dailyPeriods.length > 0) {
+                        let dRows = "";
+                        let dayIdx = 0;
+                        while(dayIdx < dailyPeriods.length) {
+                            let p1 = dailyPeriods[dayIdx];
+                            let p2 = (dayIdx + 1 < dailyPeriods.length) ? dailyPeriods[dayIdx+1] : null;
+                            
+                            if (p1.isDaytime) {
+                                let hi = p1.temperature;
+                                let lo = (p2 && !p2.isDaytime) ? p2.temperature : '--';
+                                dRows += `
+                                <div class="lf-daily-row">
+                                    <div style="flex:1; font-weight:800;">${p1.name}</div>
+                                    <div style="flex:2; font-size:13px; opacity:0.8; padding: 0 10px;">${p1.shortForecast}</div>
+                                    <div style="text-align:right; width: 80px;">
+                                        <span class="day-hi">${hi}&deg;</span> <span style="opacity:0.3; margin:0 4px;">|</span> <span class="day-lo">${lo}&deg;</span>
+                                    </div>
+                                </div>`;
+                                dayIdx += (p2 && !p2.isDaytime) ? 2 : 1;
+                            } else {
+                                let hi = '--';
+                                let lo = p1.temperature;
+                                dRows += `
+                                <div class="lf-daily-row">
+                                    <div style="flex:1; font-weight:800;">${p1.name}</div>
+                                    <div style="flex:2; font-size:13px; opacity:0.8; padding: 0 10px;">${p1.shortForecast}</div>
+                                    <div style="text-align:right; width: 80px;">
+                                        <span class="day-hi">${hi}&deg;</span> <span style="opacity:0.3; margin:0 4px;">|</span> <span class="day-lo">${lo}&deg;</span>
+                                    </div>
+                                </div>`;
+                                dayIdx++;
+                            }
+                        }
+                        
+                        dailyHtml = `
+                        <div class="glass" style="padding: 20px; margin-bottom: 20px;">
+                            <div style="font-size:10px; opacity:0.8; letter-spacing:1px; margin-bottom:12px;">7-DAY FORECAST</div>
+                            ${dRows}
+                        </div>`;
+                    }
+
+                    // Expert Forecast Text
+                    let period = dailyPeriods[0];
                     nwsHtml = `
                     <div class="glass" style="padding: 20px; margin-bottom: 20px; background: rgba(0, 210, 255, 0.05);">
                         <div style="font-size:10px; opacity:0.8; letter-spacing:1px; color: var(--accent);">EXPERT HUMAN FORECAST</div>
@@ -2108,9 +2197,12 @@
 
             main.innerHTML = `
                 <h2 style="font-size: 32px; margin-top: 0; margin-bottom: 20px;">${cityObj.display}</h2>
+                ${alertsHtml}
                 ${asosHtml}
-                ${nwsHtml}
                 ${spcHtml}
+                ${hourlyHtml}
+                ${dailyHtml}
+                ${nwsHtml}
                 ${mosHtml}
             `;
         }
