@@ -2,7 +2,7 @@ name: TJFWeather Data Sync
 
 on:
   schedule:
-    - cron: '15 * * * *' # Runs at minute 15 of every hour
+    - cron: '15,45 * * * *' # Runs at minute 15 and 45 of every hour for fresher data
   workflow_dispatch: # Allows you to trigger it manually via a button
 
 jobs:
@@ -19,11 +19,6 @@ jobs:
           python-version: '3.10'
           cache: 'pip'
 
-      - name: Install System Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libeccodes0 # Required for reading GRIB files
-
       - name: Install Python Packages
         run: |
           pip install -r requirements.txt
@@ -36,5 +31,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add static/
-          git commit -m "Automated Weather Data Sync" || echo "No changes to commit"
+          git commit -m "Automated Weather Data Sync (NWS/MOS/ASOS)" || echo "No changes to commit"
           git push
