@@ -21,7 +21,6 @@
             --text: #ffffff;
             --accent: #00d2ff;
             --border: rgba(255, 255, 255, 0.15);
-            --hud-text: #00ff00;
             --danger: #ff4757;
             --warning: #ffa502;
             --info: #70a1ff;
@@ -254,190 +253,6 @@
             opacity: 1;
         }
 
-        .sidebar-left,
-        .sidebar-right {
-            position: absolute;
-            top: 10px;
-            z-index: 1500;
-            padding: 20px;
-            border-radius: 20px;
-        }
-
-        .sidebar-left {
-            left: 10px;
-            width: 300px;
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-
-        .sidebar-right {
-            right: 10px;
-            width: 260px;
-        }
-
-        .top-hud-panel {
-            position: absolute;
-            top: 0px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            padding: 8px 24px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-            border-radius: 0 0 16px 16px;
-            border: 1px solid var(--border);
-            border-top: none;
-            background: var(--panel);
-            backdrop-filter: blur(24px);
-            white-space: nowrap;
-        }
-
-        .top-hud-panel select {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-            font-weight: bold;
-            background: rgba(0, 0, 0, 0.4);
-            color: var(--text);
-            border: 1px solid var(--accent);
-            padding: 4px 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            outline: none;
-            backdrop-filter: blur(8px);
-        }
-
-        .hud-text {
-            color: var(--hud-text);
-            text-shadow: 0 0 5px rgba(0, 255, 0, 0.1);
-            margin-left: 5px;
-            font-weight: bold;
-        }
-
-        details {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            margin-bottom: 12px;
-            overflow: hidden;
-            backdrop-filter: blur(8px);
-        }
-
-        summary {
-            font-size: 13px;
-            font-weight: 800;
-            cursor: pointer;
-            padding: 12px 14px;
-            text-transform: uppercase;
-            color: var(--accent);
-            letter-spacing: 1px;
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        .var-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-            margin: 4px 8px;
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 8px;
-            transition: 0.2s;
-            font-weight: 500;
-        }
-
-        .var-option:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .var-checkbox {
-            transform: scale(1.2);
-            accent-color: var(--accent);
-            cursor: pointer;
-            margin: 0;
-        }
-
-        .control-group {
-            margin-bottom: 20px;
-        }
-
-        .slider-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .slider-header label {
-            font-weight: 800;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text);
-            margin: 0;
-            opacity: 0.9;
-        }
-
-        .slider-value {
-            font-size: 12px;
-            font-weight: 900;
-            color: var(--accent);
-        }
-
-        .fxx-grid {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 4px;
-            margin-top: 10px;
-        }
-
-        .fxx-box {
-            height: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            font-size: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: transparent;
-        }
-
-        .fxx-box.loaded {
-            background: #2ecc71;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            border-color: transparent;
-        }
-
-        .fxx-box.active {
-            background: #f1c40f;
-            color: #000;
-            box-shadow: 0 0 10px #f1c40f;
-            font-weight: 900;
-            border-color: transparent;
-        }
-
-        .time-control {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1600;
-            padding: 12px 25px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            width: 90%;
-            max-width: 700px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-        }
-
         .radar-controls {
             position: fixed;
             bottom: 30px;
@@ -451,22 +266,13 @@
             border-radius: 20px;
         }
 
-        #fxxDisplay {
+        #radarTimeDisplay {
             font-family: 'JetBrains Mono', monospace;
             font-size: 18px;
             font-weight: 900;
             min-width: 40px;
             text-align: center;
             color: var(--accent);
-        }
-
-        #playProgress {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-            font-weight: bold;
-            color: #e74c3c;
-            min-width: 120px;
-            text-align: left;
         }
 
         .map-container {
@@ -681,39 +487,6 @@
             font-size: 18px;
         }
 
-        .lf-model-tabs {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 5px;
-        }
-
-        .lf-model-btn {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 800;
-            cursor: pointer;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(8px);
-            color: var(--text);
-            opacity: 0.7;
-            transition: 0.2s;
-        }
-
-        .lf-model-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            opacity: 1;
-        }
-
-        .lf-model-btn.active {
-            background: var(--accent);
-            color: #000;
-            border-color: var(--accent);
-            opacity: 1;
-        }
-
         .alert-badge {
             display: flex;
             align-items: flex-start;
@@ -902,19 +675,6 @@
                 overflow-x: hidden;
             }
 
-            .top-hud-panel {
-                position: relative;
-                top: 0;
-                transform: none;
-                left: 0;
-                border-radius: 0;
-                width: 100%;
-                padding: 10px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .time-control,
             .radar-controls {
                 width: 90% !important;
                 padding: 12px;
@@ -970,7 +730,6 @@
                 max-height: 300px;
             }
 
-            .settings-panel,
             #radarAlertsPanel {
                 position: fixed !important;
                 top: 0 !important;
@@ -993,19 +752,8 @@
                 border-right: 1px solid var(--border) !important;
             }
 
-            .settings-panel.open,
             #radarAlertsPanel.open {
                 transform: translateX(0) !important;
-            }
-
-            .sidebar-left,
-            .sidebar-right {
-                position: relative !important;
-                width: 100% !important;
-                left: 0 !important;
-                right: 0 !important;
-                top: 0 !important;
-                margin-bottom: 20px !important;
             }
         }
     </style>
@@ -1020,18 +768,17 @@
         <div class="nav-links" id="navLinks">
             <div class="nav-item active" onclick="showTab('home', this); toggleNavMenu(true);">HOME</div>
             <div class="nav-item" onclick="showTab('localforecast', this); toggleNavMenu(true);">LOCAL FORECAST</div>
-            <div class="nav-item" onclick="showTab('models', this); toggleNavMenu(true);">FORECAST MODELS</div>
             <div id="navRadarBtn" class="nav-item" onclick="showTab('radar', this); toggleNavMenu(true);">LIVE RADAR
             </div>
             <div class="nav-item" onclick="showTab('datasources', this); toggleNavMenu(true);">DATA SOURCES</div>
             <div class="nav-item" onclick="showTab('about', this); toggleNavMenu(true);">ABOUT</div>
             <div class="nav-item" onclick="showTab('feedback', this); toggleNavMenu(true);">FEEDBACK</div>
             <a href="https://www.buymeacoffee.com/tyreek" target="_blank" rel="noopener noreferrer"
-                class="nav-item donate-btn">DONATE ☕</a>
+                class="nav-item donate-btn">DONATE</a>
         </div>
     </nav>
 
-    <button id="mobileSettingsBtn" onclick="toggleMobileSettings()">☰ Settings</button>
+    <button id="mobileSettingsBtn" onclick="toggleMobileSettings()">☰ Alerts</button>
 
     <!-- HOME TAB -->
     <div id="home" class="tab-content active">
@@ -1041,7 +788,7 @@
 
                 <div class="glass home-alerts-panel" style="padding: 20px; display: flex; flex-direction: column;">
                     <h3 style="margin: 0 0 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
-                        &#9888; Active NWS Alerts</h3>
+                        Active NWS Alerts</h3>
                     <div id="homeAlertsList" style="flex:1;">
                         <div style="opacity:0.4; font-size:13px;">Loading alerts...</div>
                     </div>
@@ -1052,8 +799,7 @@
                         style="font-size: 12px; opacity: 0.5; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">
                         TJFWeather Alpha</div>
                     <h1 style="font-size: 30px; margin: 0 0 10px;">Dashboard</h1>
-                    <p style="font-size: 14px; line-height: 1.7; opacity: 0.75; margin: 0 0 18px;">Multi-model NWP
-                        viewer with live radar, local forecasts, and real-time NWS alerts.</p>
+                    <p style="font-size: 14px; line-height: 1.7; opacity: 0.75; margin: 0 0 18px;">Expert NWS forecasts, Statistical Uncertainty (MOS), and Real-Time ASOS Observations.</p>
 
                     <div id="homeLocalWeather" class="glass"
                         style="background: rgba(0,210,255,0.05); border: 1px solid var(--accent); padding: 16px; cursor:pointer; transition: transform 0.2s;"
@@ -1145,136 +891,6 @@
         </div>
     </div>
 
-    <!-- MODELS TAB -->
-    <div id="models" class="tab-content">
-        <div class="top-hud-panel glass">
-            <select id="modelSelect">
-                <optgroup label="Short Range (1-3 Days)">
-                    <option value="hrrr">HRRR</option>
-                    <option value="nam">NAM 3KM</option>
-                    <option value="rrfs">RRFS</option>
-                </optgroup>
-                <optgroup label="Medium Range (1-5 Days)">
-                    <option value="gfs">GFS</option>
-                </optgroup>
-            </select>
-            <select id="runSelect">
-                <option value="">LOADING...</option>
-            </select>
-            <span style="opacity: 0.5; margin: 0 10px;">|</span>
-            <span class="hud-text" id="hudDisplay">INIT: --Z | FXX: +00 | VALID: --Z</span>
-        </div>
-        <div id="settingsPanel" class="settings-panel">
-            <button class="close-btn"
-                style="display:none; position:sticky; top:0; float:right; background:none; border:none; color:#fff; font-size:24px; z-index:9000;"
-                onclick="toggleMobileSettings()">&times;</button>
-            <div class="sidebar-left glass">
-                <div class="control-group" style="margin-bottom: 15px;">
-                    <div
-                        style="background: rgba(243, 156, 18, 0.15); padding: 10px; border-radius: 12px; border-left: 3px solid #f39c12; cursor: pointer;">
-                        <label
-                            style="cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 0; color: var(--text); font-size: 13px; font-weight: 600;">
-                            <input type="checkbox" id="multiSelectToggle"
-                                style="transform:scale(1.2); accent-color:var(--accent);"> Enable Field Stacking
-                        </label>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <details open>
-                        <summary>Precipitation & Radar</summary>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="refc"> Simulated
-                            Reflectivity</label>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="qpf_6h"> 6-Hour
-                            QPF</label>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="qpf_12h"> 12-Hour
-                            QPF</label>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="qpf_24h"> 24-Hour
-                            QPF</label>
-                    </details>
-                    <details>
-                        <summary>Surface</summary>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="temp" checked>
-                            Temperature</label>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="dewpoint"> Dew
-                            Point</label>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="wind"> 10m
-                            Wind</label>
-                    </details>
-                    <details>
-                        <summary>Severe Weather</summary>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="sbcape">
-                            SBCAPE</label>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="sbcin">
-                            SBCIN</label>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="mlcape">
-                            MLCAPE</label>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="mlcin">
-                            MLCIN</label>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="srh1"> 0-1km
-                            SRH</label>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="srh3"> 0-3km
-                            SRH</label>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="shear"> 0-6km
-                            Shear</label>
-                    </details>
-                    <details>
-                        <summary>Upper Air</summary>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="upper_850">
-                            850mb</label>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="upper_500">
-                            500mb</label>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="upper_200">
-                            200mb</label>
-                    </details>
-                    <details>
-                        <summary>Winter Weather</summary>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="snow_depth"> Snow
-                            Depth</label>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="snow_accum"> Total
-                            Snowfall</label>
-                        <label class="var-option"><input type="checkbox" class="var-checkbox" value="visibility">
-                            Visibility</label>
-                    </details>
-                </div>
-                <div class="fxx-status-container">
-                    <div class="slider-header">
-                        <label>Cache State <span id="etaDisplay"
-                                style="color:#e74c3c; font-size:10px; margin-left: 8px; text-transform:none;"></span></label>
-                        <span class="slider-value" id="percentLoaded">0%</span>
-                    </div>
-                    <div class="fxx-grid" id="fxxGrid"></div>
-                </div>
-            </div>
-            <div class="sidebar-right glass">
-                <div class="control-group" style="margin-bottom: 25px;">
-                    <label>Domain</label>
-                    <select id="regionSelect"
-                        style="width: 100%; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid var(--border); font-weight: bold; outline: none; margin-top: 5px;">
-                        <option value="conus">CONUS</option>
-                        <option value="iowa">Iowa</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <div class="slider-header"><label>Opacity</label><span class="slider-value"><span
-                                id="opacityVal">100</span>%</span></div>
-                    <input type="range" id="opacitySlider" min="0" max="1" step="0.05" value="1.0" style="width: 100%;">
-                </div>
-                <div class="control-group">
-                    <div class="slider-header"><label>Speed</label><span class="slider-value"><span
-                                id="speedVal">100</span>ms</span></div>
-                    <input type="range" id="speedSlider" min="0" max="400" step="10" value="100" style="width: 100%;">
-                </div>
-            </div>
-        </div>
-        <div class="time-control glass">
-            <button id="playBtn" class="glass-btn" disabled>▶ PLAY</button>
-            <span id="playProgress"></span>
-            <input type="range" id="fxxSlider" min="0" max="48" step="1" value="0" style="flex-grow:1">
-            <span id="fxxDisplay">00</span>
-        </div>
-        <div id="map" class="map-container"></div>
-    </div>
-
     <!-- RADAR TAB -->
     <div id="radar" class="tab-content">
         <div id="fullRadarMap" class="map-container"></div>
@@ -1296,10 +912,10 @@
             <div style="text-align:right; margin-top:12px; border-top:1px solid var(--border); padding-top:8px;"><a
                     href="https://mobile.weather.gov" target="_blank" rel="noopener noreferrer"
                     style="color:var(--accent); text-decoration:none; font-size:10px; font-weight:bold;">Source:
-                    weather.gov ↗</a></div>
+                    weather.gov</a></div>
         </div>
         <div class="radar-controls glass">
-            <button id="radarPlayBtn" onclick="toggleRadarPlay()" class="glass-btn">⏸ PAUSE</button>
+            <button id="radarPlayBtn" onclick="toggleRadarPlay()" class="glass-btn">PAUSE</button>
             <label
                 style="cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 0; color: var(--text); font-size: 13px; font-weight: bold; border-left: 2px solid var(--border); padding-left: 15px;">
                 <input type="checkbox" id="nwsRadarToggle" checked onchange="toggleNWSLayer()"
@@ -1348,13 +964,6 @@
                         <li style="margin-bottom: 8px;"><strong>MOS (Model Output Statistics):</strong> Statistical
                             post-processing that corrects known numerical model biases for specific point locations
                             based on historical data.</li>
-                        <li style="margin-bottom: 8px;"><strong>HRRR (High-Resolution Rapid Refresh):</strong>
-                            Short-range (0-48h), high-detail model updated every hour. Excellent for imminent
-                            thunderstorms.</li>
-                        <li style="margin-bottom: 8px;"><strong>NAM 3KM (North American Mesoscale):</strong>
-                            High-resolution short-range model (0-60h) updated every 6 hours.</li>
-                        <li style="margin-bottom: 8px;"><strong>RRFS (Rapid Refresh Forecast System):</strong> The
-                            next-generation experimental short-range ensemble model.</li>
                         <li><strong>GFS (Global Forecast System):</strong> The flagship US medium-range model (0-384h+),
                             useful for forecasting broad weather patterns days in advance.</li>
                     </ul>
@@ -1465,14 +1074,10 @@
             'iowa': { lat: 42.03, lon: -93.62, z: 7.0 }
         };
 
-        const modelMaxFxx = { 'hrrr': 48, 'nam': 60, 'rrfs': 60, 'gfs': 120 };
-        let currentMaxFxx = 48;
         let countyLayers = [], stateLayers = [];
         let statusInterval, backgroundCheckInterval, radarInterval;
-        let activeFrame = 0, isPlaying = false, isFetching = false, isBackgroundFetching = false, playInterval;
         let mainRadarLayers = [], miniRadarLayers = [], rvFrames = [], rvIndex = 0, isRadarPlaying = true;
         let loadedLayers = {}, loadedData = {};
-        let requestedFrames = new Set();
         let nwsAlerts = [], alertPolygonLayer = null, alertPolygonLayerMini = null;
         let lfSelectedCity = null, lfActiveModel = 'all', lfTsCache = {};
 
@@ -1550,7 +1155,7 @@
                 }
             }
 
-            if (id === 'models' || id === 'radar') {
+            if (id === 'radar') {
                 document.getElementById('bgOverlay').style.display = 'none';
             } else {
                 document.getElementById('bgOverlay').style.display = 'block';
@@ -1560,7 +1165,6 @@
 
             // Refresh maps after visibility changes to prevent transparency
             setTimeout(() => {
-                if (id === 'models' && typeof map !== 'undefined') map.invalidateSize();
                 if (id === 'radar' && typeof fullRadarMap !== 'undefined') fullRadarMap.invalidateSize();
                 if (id === 'home' && typeof miniRadarMap !== 'undefined') miniRadarMap.invalidateSize();
             }, 150);
@@ -1572,24 +1176,20 @@
         });
 
         function updateMobileBtn() {
-            const isModels = document.getElementById('models').classList.contains('active');
             const isRadar = document.getElementById('radar').classList.contains('active');
             const btn = document.getElementById('mobileSettingsBtn');
-            if ((isModels || isRadar) && window.innerWidth <= 768) {
+            if (isRadar && window.innerWidth <= 768) {
                 btn.style.display = 'block';
-                btn.innerText = isModels ? '☰ Settings' : '☰ Alerts';
+                btn.innerText = '☰ Alerts';
             } else {
                 btn.style.display = 'none';
-                document.getElementById('settingsPanel').classList.remove('open');
                 document.getElementById('radarAlertsPanel').classList.remove('open');
             }
         }
         window.addEventListener('resize', updateMobileBtn);
 
         function toggleMobileSettings() {
-            const isModels = document.getElementById('models').classList.contains('active');
             const isRadar = document.getElementById('radar').classList.contains('active');
-            if (isModels) document.getElementById('settingsPanel').classList.toggle('open');
             if (isRadar) document.getElementById('radarAlertsPanel').classList.toggle('open');
         }
 
@@ -1604,13 +1204,6 @@
 
         const standardBasemap = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-        var map = L.map('map', { center: [38.5, -96.5], zoom: 4.5, zoomControl: false });
-        L.tileLayer(standardBasemap).addTo(map);
-
-        let isModelInteracting = false;
-        map.on('movestart zoomstart', () => isModelInteracting = true);
-        map.on('moveend zoomend', () => setTimeout(() => isModelInteracting = false, 300));
-
         var fullRadarMap = L.map('fullRadarMap', { center: [38.5, -96.5], zoom: 4.5, zoomControl: false });
         L.tileLayer(standardBasemap).addTo(fullRadarMap);
 
@@ -1621,7 +1214,7 @@
         var miniRadarMap = L.map('miniRadarMap', { center: [42.03, -93.62], zoom: 6, zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false });
         L.tileLayer(standardBasemap).addTo(miniRadarMap);
 
-        [map, fullRadarMap, miniRadarMap].forEach(m => {
+        [fullRadarMap, miniRadarMap].forEach(m => {
             m.createPane('alertsPane').style.zIndex = 350;
             m.createPane('radarPane').style.zIndex = 400;
             m.createPane('severeAlertsPane').style.zIndex = 450;
@@ -1643,14 +1236,13 @@
 
         fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json').then(res => res.json()).then(us => {
             window.usCounties = topojson.feature(us, us.objects.counties).features;
-            [map, fullRadarMap, miniRadarMap].forEach(m => {
+            [fullRadarMap, miniRadarMap].forEach(m => {
                 L.geoJSON(topojson.feature(us, us.objects.counties), { pane: 'bordersPane', interactive: false, style: getCountyStyle }).addTo(m);
                 L.geoJSON(topojson.feature(us, us.objects.states), { pane: 'bordersPane', interactive: false, style: getStateStyle }).addTo(m);
             });
             loadNWSAlerts();
         });
 
-        var cityLayer = L.layerGroup().addTo(map);
 
         async function fetchSPCDynamic(day, type) {
             try {
@@ -1847,7 +1439,7 @@
             if (spc.rawLvl === 0) {
                 return `
                 <div style="padding: 10px 14px; background: rgba(255,255,255,0.05); border-radius: 8px; font-size: 15px; opacity: 0.7; font-weight: 500; margin-bottom: 12px;">No Severe Weather Expected</div>
-                <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-block; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official SPC Outlook ↗</a></div>
+                <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-block; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official SPC Outlook</a></div>
                 `;
             }
             return `
@@ -1864,7 +1456,7 @@
                         <div>Hail: <span style="color:#2ecc71">${spc.hail}</span></div>
                     </div>
                 </div>
-                <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-block; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official SPC Outlook ↗</a></div>
+                <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-block; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official SPC Outlook</a></div>
             `;
         }
 
@@ -1969,7 +1561,7 @@
                 return sevB - sevA;
             });
 
-            const srcLink = `<div style="text-align:right;"><a href="https://mobile.weather.gov" target="_blank" rel="noopener noreferrer" class="source-link">View Weather.gov ↗</a></div>`;
+            const srcLink = `<div style="text-align:right;"><a href="https://mobile.weather.gov" target="_blank" rel="noopener noreferrer" class="source-link">View Weather.gov</a></div>`;
 
             const html = sortedAlerts.length
                 ? sortedAlerts.slice(0, 30).map(alertBadgeHTML).join('') + srcLink
@@ -2096,7 +1688,7 @@
 
         function toggleRadarPlay() {
             isRadarPlaying = !isRadarPlaying;
-            document.getElementById('radarPlayBtn').innerText = isRadarPlaying ? "⏸ PAUSE" : "▶ PLAY";
+            document.getElementById('radarPlayBtn').innerText = isRadarPlaying ? "PAUSE" : "PLAY";
         }
 
         async function robustNWSFetch(url) {
@@ -2122,7 +1714,7 @@
 
         function buildMeteorologistCreditHTML(wfo, lat, lon) {
             let afdLink = (wfo && wfo !== "NWS")
-                ? `<a href="https://mesonet.agron.iastate.edu/wx/afos/p.php?pil=AFD${wfo}" target="_blank" rel="noopener noreferrer" class="glass-btn" style="text-decoration: none; padding: 10px 16px; font-size: 14px; min-width: auto; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important;">Read Forecast Discussion ↗</a>`
+                ? `<a href="https://mesonet.agron.iastate.edu/wx/afos/p.php?pil=AFD${wfo}" target="_blank" rel="noopener noreferrer" class="glass-btn" style="text-decoration: none; padding: 10px 16px; font-size: 14px; min-width: auto; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important;">Read Forecast Discussion</a>`
                 : '';
 
             let wfoText = (wfo && wfo !== "NWS") ? `office in <strong>${wfo}</strong>` : `offices`;
@@ -2130,11 +1722,11 @@
 
             return `
             <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; line-height: 1.6;">
-                <div style="font-weight: bold; color: var(--accent); margin-bottom: 5px;">👨‍🔬 Expert Meteorologist Forecast</div>
+                <div style="font-weight: bold; color: var(--accent); margin-bottom: 5px;">Expert Meteorologist Forecast</div>
                 <div style="opacity: 0.85; margin-bottom: 10px;">These localized forecasts are actively monitored and adjusted by expert meteorologists at the National Weather Service (NWS) ${wfoText}.</div>
                 ${learnMoreText}
                 <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                    <a href="https://mobile.weather.gov/index.php?lat=${lat}&lon=${lon}" target="_blank" rel="noopener noreferrer" class="glass-btn" style="text-decoration: none; padding: 10px 16px; font-size: 14px; min-width: auto; background: rgba(0, 210, 255, 0.15)!important;">View Detailed NWS Data ↗</a>
+                    <a href="https://mobile.weather.gov/index.php?lat=${lat}&lon=${lon}" target="_blank" rel="noopener noreferrer" class="glass-btn" style="text-decoration: none; padding: 10px 16px; font-size: 14px; min-width: auto; background: rgba(0, 210, 255, 0.15)!important;">View Detailed NWS Data</a>
                     ${afdLink}
                 </div>
             </div>`;
@@ -2363,21 +1955,28 @@ async function triggerSearch(query) {
 }
 
 async function fetchMOSData() {
+    // Isolating try catches so one missing file doesn't break the rest
     try {
         let nbmRes = await fetch('static/nbm_timeseries_latest.json?t=' + Date.now());
         if(nbmRes.ok) mosDataCache.nbm = await nbmRes.json();
+    } catch(e) { console.log("NBM data not yet available"); }
+    
+    try {
         let gfsRes = await fetch('static/gfsmos_timeseries_latest.json?t=' + Date.now());
         if(gfsRes.ok) mosDataCache.gfsmos = await gfsRes.json();
+    } catch(e) { console.log("GFS MOS data not yet available"); }
+    
+    try {
         let namRes = await fetch('static/nammos_timeseries_latest.json?t=' + Date.now());
         if(namRes.ok) mosDataCache.nammos = await namRes.json();
-    } catch(e) {}
+    } catch(e) { console.log("NAM MOS data not yet available"); }
 }
 
 async function selectLFCity(cityId) {
     lfSelectedCity = cityId;
     buildLFCityList();
     const main = document.getElementById('lfMain');
-    main.innerHTML = '<div style="padding:40px; text-align:center; opacity:0.5;">Loading human & statistical forecasts...</div>';
+    main.innerHTML = '<div style="padding:40px; text-align:center; opacity:0.5;">Loading forecasts...</div>';
     
     let cityObj = LF_CITIES.find(c => c.id === cityId);
     if (!cityObj) return;
@@ -2427,7 +2026,7 @@ async function selectLFCity(cityId) {
             let period = nwsData.daily.properties.periods[0];
             nwsHtml = `
             <div class="glass" style="padding: 20px; margin-bottom: 20px; background: rgba(0, 210, 255, 0.05);">
-                <div style="font-size:10px; opacity:0.8; letter-spacing:1px; color: var(--accent);">👨‍🔬 EXPERT HUMAN FORECAST</div>
+                <div style="font-size:10px; opacity:0.8; letter-spacing:1px; color: var(--accent);">EXPERT HUMAN FORECAST</div>
                 <div style="font-size:20px; font-weight:900; margin-top: 5px;">${period.name}: ${period.temperature}°F</div>
                 <div style="font-size:15px; opacity:0.9; margin-top:10px; line-height: 1.5;">${period.detailedForecast}</div>
                 ${buildMeteorologistCreditHTML(gridId, cityObj.lat, cityObj.lon)}
@@ -2467,8 +2066,8 @@ async function selectLFCity(cityId) {
                 let tDate = new Date(baseDate.getTime() + (i * 3600000));
                 let timeStr = tDate.toLocaleTimeString([], {hour: 'numeric', weekday: 'short'});
                 
-                let gfsVal = gfs[i] != null ? gfs[i] + '°' : '-';
-                let namVal = nam[i] != null ? nam[i] + '°' : '-';
+                let gfsVal = (gfs && gfs[i] != null) ? gfs[i] + '°' : 'No Data';
+                let namVal = (nam && nam[i] != null) ? nam[i] + '°' : 'No Data';
                 let spread = "-";
                 
                 let vals = [nbm[i], gfs[i], nam[i]].filter(v => v != null);
@@ -2491,7 +2090,7 @@ async function selectLFCity(cityId) {
         if (tableRows) {
             mosHtml = `
             <div class="glass" style="padding: 20px;">
-                <div style="font-size:14px; font-weight:900; margin-bottom: 10px;">📊 STATISTICAL UNCERTAINTY (MOS)</div>
+                <div style="font-size:14px; font-weight:900; margin-bottom: 10px;">STATISTICAL UNCERTAINTY (MOS)</div>
                 <div style="font-size:12px; opacity:0.7; margin-bottom: 15px;">Comparing the official human consensus (NBM) against raw computer statistics algorithms. Higher spread = lower confidence.</div>
                 <div style="overflow-x:auto;">
                     <table class="mos-table" style="min-width: 500px;">
