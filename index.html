@@ -39,6 +39,10 @@
             z-index: 0; pointer-events: none;
         }
 
+        .leaflet-image-layer, .leaflet-tile-container img {
+            image-rendering: crisp-edges; image-rendering: pixelated;
+        }
+
         .glass {
             background: var(--panel); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
             border: 1px solid var(--border); border-radius: 20px;
@@ -136,11 +140,14 @@
         .lf-daily-row .day-hi { color: var(--danger); font-weight: 900; font-size: 18px; }
         .lf-daily-row .day-lo { color: var(--info); font-weight: 900; font-size: 18px; }
 
-        .mos-table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: center; }
-        .mos-table th { font-weight: 800; padding: 14px 10px; border-bottom: 2px solid var(--border); color: var(--text); opacity: 0.7; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
-        .mos-table td { padding: 14px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 600;}
-        .mos-table tr:hover { background: rgba(255,255,255,0.05); }
-        .highlight-col { background: rgba(0,210,255,0.08); color: var(--accent); }
+        /* Floating separated rows for MOS Table */
+        .mos-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; font-size: 14px; text-align: center; }
+        .mos-table th { font-weight: 800; padding: 10px 10px; color: var(--text); opacity: 0.7; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: none; }
+        .mos-table td { padding: 14px 10px; background: rgba(0,0,0,0.3); font-weight: 600; border: none; }
+        .mos-table tr td:first-child { border-radius: 12px 0 0 12px; }
+        .mos-table tr td:last-child { border-radius: 0 12px 12px 0; }
+        .mos-table tr:hover td { background: rgba(255,255,255,0.08); }
+        .highlight-col { background: rgba(0,210,255,0.08) !important; color: var(--accent); }
 
         .alert-badge { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.4; border-left: 4px solid currentColor; background: rgba(0, 0, 0, 0.5); }
         .alert-badge .ab-title { font-weight: 900; font-size: 14px; text-transform: uppercase; }
@@ -200,7 +207,7 @@
         <div style="padding: 30px; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; overflow-y: auto;">
             <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
 
-                <div class="glass home-alerts-panel" style="padding: 20px; display: flex; flex-direction: column; flex: 1; min-width: 300px; max-width: 400px;">
+                <div class="glass home-alerts-panel" style="padding: 20px; display: flex; flex-direction: column; flex: 1; min-width: 300px; max-width: 400px; max-height: 400px; overflow-y: auto;">
                     <h3 style="margin: 0 0 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--danger); font-weight: 900; display: flex; align-items: center; gap: 8px;">
                         <i class="ph-fill ph-warning-circle" style="font-size: 20px;"></i> ACTIVE WEATHER ALERTS
                     </h3>
@@ -1344,7 +1351,7 @@
             let alertsHtml = "";
             if (cityAlerts.length > 0) {
                 alertsHtml = `
-                <div class="glass home-alerts-panel" style="padding: 25px; margin-bottom: 20px; border-color: var(--danger); background: rgba(255, 71, 87, 0.1);">
+                <div class="glass" style="padding: 25px; margin-bottom: 20px; border: 2px solid var(--danger); background: rgba(255, 71, 87, 0.1); max-height: 250px; overflow-y: auto;">
                     <h3 style="margin: 0 0 16px; font-size: 14px; text-transform: uppercase; color: var(--danger); font-weight: 900; display: flex; align-items: center; gap: 8px;">
                         <i class="ph-fill ph-warning-circle" style="font-size: 20px;"></i> ACTIVE WEATHER ALERTS
                     </h3>
@@ -1490,7 +1497,7 @@
                         ${buildMeteorologistCreditHTML(gridId, cityObj.lat, cityObj.lon)}
                     </div>`;
                 }
-            } catch(e) { nwsHtml = "<div class='glass' style='padding:25px; color:var(--danger);'><i class="ph-fill ph-warning"></i> NWS Forecast temporarily unavailable.</div>" }
+            } catch(e) { nwsHtml = "<div class='glass' style='padding:25px; color:var(--danger);'><i class=\"ph-fill ph-warning\"></i> NWS Forecast temporarily unavailable.</div>" }
 
             let spcHtml = "";
             if (spcData.day1 && spcData.day1.cat) {
@@ -1525,7 +1532,7 @@
                 let currentHour = Math.floor(now.getTime() / 3600000) * 3600000; 
                 let baseDate = new Date(currentHour);
 
-                for(let i=6; i<=48; i+=3) {
+                for(let i=6; i<=48; i+=6) {
                     let nVal = nbm[i];
                     let gVal = gfs[i];
                     let mVal = nam[i];
@@ -1541,22 +1548,32 @@
                         let vals = [nVal, gVal, mVal].filter(v => v != null);
                         let spread = "-";
                         let spreadClass = "";
+                        let spreadIcon = "";
                         
                         if(vals.length > 1) {
                             let diff = Math.max(...vals) - Math.min(...vals);
                             spread = diff + '°';
-                            if (diff >= 5) spreadClass = "color: var(--danger);"; 
-                            else if (diff >= 3) spreadClass = "color: var(--warning);"; 
-                            else spreadClass = "color: var(--success);"; 
+                            if (diff >= 5) {
+                                spreadClass = "color: var(--danger);";
+                                spreadIcon = `<i class="ph-fill ph-warning-circle" style="font-size: 16px; vertical-align: middle;"></i>`;
+                            }
+                            else if (diff >= 3) {
+                                spreadClass = "color: var(--warning);";
+                                spreadIcon = `<i class="ph-fill ph-warning" style="font-size: 16px; vertical-align: middle;"></i>`;
+                            }
+                            else {
+                                spreadClass = "color: var(--success);";
+                                spreadIcon = `<i class="ph-fill ph-check-circle" style="font-size: 16px; vertical-align: middle;"></i>`;
+                            }
                         }
                         
                         tableRows += `
                             <tr>
-                                <td style="font-weight: 600; opacity: 0.9;">${timeStr}</td>
+                                <td style="font-weight: 600; opacity: 0.9; text-align: left;"><i class="ph ph-clock" style="vertical-align: middle; margin-right: 4px;"></i> ${timeStr}</td>
                                 <td class="highlight-col" style="font-weight: 900;">${nStr}</td>
                                 <td style="opacity: 0.8;">${gStr}</td>
                                 <td style="opacity: 0.8;">${mStr}</td>
-                                <td style="font-weight:900; ${spreadClass}">${spread}</td>
+                                <td style="font-weight:900; ${spreadClass}">${spreadIcon} ${spread}</td>
                             </tr>
                         `;
                     }
@@ -1572,14 +1589,14 @@
                             Comparing the official human consensus (NBM) against raw computer statistics algorithms (GFS & NAM). 
                             <span style="color:var(--danger); font-weight:bold;">Higher spread = lower confidence in the forecast.</span>
                         </div>
-                        <div style="overflow-x:auto; border-radius: 12px; border: 1px solid var(--border);">
+                        <div style="overflow-x:auto;">
                             <table class="mos-table" style="min-width: 500px; margin-top: 0;">
-                                <tr style="background: rgba(0,0,0,0.4);">
-                                    <th style="text-align: left; padding-left: 15px;">Valid Time</th>
-                                    <th class="highlight-col">NWS Consensus</th>
-                                    <th>GFS MOS</th>
-                                    <th>NAM MOS</th>
-                                    <th>Model Spread</th>
+                                <tr>
+                                    <th style="text-align: left; padding-left: 15px;"><i class="ph-fill ph-calendar"></i> Valid Time</th>
+                                    <th class="highlight-col"><i class="ph-fill ph-target"></i> NWS Consensus</th>
+                                    <th><i class="ph-fill ph-cpu"></i> GFS MOS</th>
+                                    <th><i class="ph-fill ph-cpu"></i> NAM MOS</th>
+                                    <th><i class="ph-fill ph-arrows-out-line-horizontal"></i> Model Spread</th>
                                 </tr>
                                 ${tableRows}
                             </table>
@@ -1600,10 +1617,10 @@
                 <h2 style="font-size: 36px; font-weight: 900; margin-top: 0; margin-bottom: 25px;">${cityObj.display}</h2>
                 ${alertsHtml}
                 ${asosHtml}
-                ${spcHtml}
+                ${nwsHtml}
                 ${hourlyHtml}
                 ${dailyHtml}
-                ${nwsHtml}
+                ${spcHtml}
                 ${mosHtml}
                 <div style="padding-bottom: 50px;"></div>
             `;
