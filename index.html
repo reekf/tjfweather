@@ -140,14 +140,16 @@
         .lf-daily-row .day-hi { color: var(--danger); font-weight: 900; font-size: 18px; }
         .lf-daily-row .day-lo { color: var(--info); font-weight: 900; font-size: 18px; }
 
-        /* Floating separated rows for MOS Table */
-        .mos-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; font-size: 14px; text-align: center; }
-        .mos-table th { font-weight: 800; padding: 10px 10px; color: var(--text); opacity: 0.7; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: none; }
-        .mos-table td { padding: 14px 10px; background: rgba(0,0,0,0.3); font-weight: 600; border: none; }
-        .mos-table tr td:first-child { border-radius: 12px 0 0 12px; }
-        .mos-table tr td:last-child { border-radius: 0 12px 12px 0; }
-        .mos-table tr:hover td { background: rgba(255,255,255,0.08); }
-        .highlight-col { background: rgba(0,210,255,0.08) !important; color: var(--accent); }
+        /* Premium MOS Grid Styles */
+        .mos-grid { display: flex; flex-direction: column; gap: 8px; }
+        .mos-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr 1.2fr; background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 12px; align-items: center; text-align: center; border: 1px solid transparent; transition: 0.2s; }
+        .mos-row:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+        .mos-header { background: transparent; padding: 0 16px 10px; border-bottom: 1px solid var(--border); border-radius: 0; font-weight: 800; font-size: 11px; text-transform: uppercase; opacity: 0.7; }
+        .mos-header:hover { background: transparent; border-color: var(--border); }
+        .mos-time { text-align: left; font-weight: 700; display: flex; align-items: center; gap: 8px; opacity: 0.9; }
+        .mos-nws { font-weight: 900; color: var(--accent); font-size: 16px; background: rgba(0,210,255,0.1); padding: 6px 0; border-radius: 8px; display: inline-block; width: 60px; margin: 0 auto; }
+        .mos-model { opacity: 0.8; font-weight: 600; font-size: 15px; }
+        .mos-spread { font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 15px; }
 
         .alert-badge { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.4; border-left: 4px solid currentColor; background: rgba(0, 0, 0, 0.5); }
         .alert-badge .ab-title { font-weight: 900; font-size: 14px; text-transform: uppercase; }
@@ -180,6 +182,7 @@
             #radarAlertsPanel { position: fixed !important; top: 0 !important; left: 0 !important; transform: translateX(-105%) !important; width: 85% !important; max-width: 320px !important; height: 100vh !important; max-height: 100vh !important; background: rgba(11, 14, 17, 0.95) !important; z-index: 8000 !important; transition: transform 0.3s !important; display: block !important; border-radius: 0 24px 24px 0 !important; padding: 60px 20px 20px 20px !important; border: none !important; border-right: 1px solid var(--border) !important; }
             #radarAlertsPanel.open { transform: translateX(0) !important; }
             #mobileSettingsBtn { display: block; position: fixed; top: 80px; right: 15px; z-index: 4000; background: rgba(0, 210, 255, 0.2) !important; border: 1px solid rgba(0, 210, 255, 0.5) !important; padding: 8px 16px; border-radius: 12px; font-weight: 900; font-size: 13px; text-transform: uppercase; color: #fff; display: flex; align-items: center; gap: 6px; }
+            .mos-grid { min-width: 500px; overflow-x: auto; padding-bottom: 10px;}
         }
     </style>
 </head>
@@ -672,6 +675,21 @@
             return null;
         }
 
+        function updateLocalSPC() {
+            if(!lfSelectedCity) return;
+            const cityObj = LF_CITIES.find(c => c.id === lfSelectedCity);
+            if (!cityObj) return;
+            
+            const todayEl = document.getElementById('lfSpcToday');
+            const tomEl = document.getElementById('lfSpcTom');
+            if (todayEl) {
+                todayEl.innerHTML = spcData.day1.cat ? renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 0)) : '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div>';
+            }
+            if (tomEl) {
+                tomEl.innerHTML = spcData.day2.cat ? renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 1)) : '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div>';
+            }
+        }
+
         async function loadSPCOutlooks() {
             const [d1c, d1t, d1w, d1h, d2c, d2t, d2w, d2h] = await Promise.all([
                 fetchSPCDynamic(1, 'cat'), fetchSPCDynamic(1, 'torn'), fetchSPCDynamic(1, 'wind'), fetchSPCDynamic(1, 'hail'),
@@ -682,16 +700,7 @@
             spcData.day2 = { cat: d2c, tor: d2t, wind: d2w, hail: d2h };
 
             updateHomeSPC();
-
-            if (lfSelectedCity && document.getElementById('localforecast').classList.contains('active')) {
-                const cityObj = LF_CITIES.find(c => c.id === lfSelectedCity);
-                if (cityObj) {
-                    const todayEl = document.getElementById('lfSpcToday');
-                    const tomEl = document.getElementById('lfSpcTom');
-                    if (todayEl) todayEl.innerHTML = spcData.day1.cat ? renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 0)) : '<div style="opacity:0.5; font-size:13px;">Loading SPC Data...</div>';
-                    if (tomEl) tomEl.innerHTML = spcData.day2.cat ? renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 1)) : '<div style="opacity:0.5; font-size:13px;">Loading SPC Data...</div>';
-                }
-            }
+            updateLocalSPC();
         }
 
         function isPointInNWSFeature(lon, lat, feature) {
@@ -1351,7 +1360,7 @@
             let alertsHtml = "";
             if (cityAlerts.length > 0) {
                 alertsHtml = `
-                <div class="glass" style="padding: 25px; margin-bottom: 20px; border: 2px solid var(--danger); background: rgba(255, 71, 87, 0.1); max-height: 250px; overflow-y: auto;">
+                <div class="glass" style="padding: 25px; margin-bottom: 20px; border: 2px solid var(--danger); background: rgba(255, 71, 87, 0.1);">
                     <h3 style="margin: 0 0 16px; font-size: 14px; text-transform: uppercase; color: var(--danger); font-weight: 900; display: flex; align-items: center; gap: 8px;">
                         <i class="ph-fill ph-warning-circle" style="font-size: 20px;"></i> ACTIVE WEATHER ALERTS
                     </h3>
@@ -1499,25 +1508,26 @@
                 }
             } catch(e) { nwsHtml = "<div class='glass' style='padding:25px; color:var(--danger);'><i class=\"ph-fill ph-warning\"></i> NWS Forecast temporarily unavailable.</div>" }
 
-            let spcHtml = "";
-            if (spcData.day1 && spcData.day1.cat) {
-                spcHtml = `
-                    <div style="display:flex; gap:20px; margin-bottom: 20px; flex-wrap:wrap;">
-                        <div class="glass" style="flex:1; min-width:280px; padding: 25px;">
-                            <div style="font-size:11px; opacity:0.8; font-weight: 800; letter-spacing:1px; margin-bottom:12px; display: flex; align-items: center; gap: 6px;">
-                                <i class="ph-fill ph-calendar-blank"></i> TODAY'S SPC OUTLOOK
-                            </div>
-                            ${renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 0))}
+            let spcHtml = `
+                <div style="display:flex; gap:20px; margin-bottom: 20px; flex-wrap:wrap;">
+                    <div class="glass" style="flex:1; min-width:280px; padding: 25px;">
+                        <div style="font-size:11px; opacity:0.8; font-weight: 800; letter-spacing:1px; margin-bottom:12px; display: flex; align-items: center; gap: 6px;">
+                            <i class="ph-fill ph-calendar-blank"></i> TODAY'S SPC OUTLOOK
                         </div>
-                        <div class="glass" style="flex:1; min-width:280px; padding: 25px;">
-                            <div style="font-size:11px; opacity:0.8; font-weight: 800; letter-spacing:1px; margin-bottom:12px; display: flex; align-items: center; gap: 6px;">
-                                <i class="ph-fill ph-calendar-plus"></i> TOMORROW'S SPC OUTLOOK
-                            </div>
-                            ${renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 1))}
+                        <div id="lfSpcToday">
+                            ${spcData.day1 && spcData.day1.cat ? renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 0)) : '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div>'}
                         </div>
                     </div>
-                `;
-            }
+                    <div class="glass" style="flex:1; min-width:280px; padding: 25px;">
+                        <div style="font-size:11px; opacity:0.8; font-weight: 800; letter-spacing:1px; margin-bottom:12px; display: flex; align-items: center; gap: 6px;">
+                            <i class="ph-fill ph-calendar-plus"></i> TOMORROW'S SPC OUTLOOK
+                        </div>
+                        <div id="lfSpcTom">
+                            ${spcData.day2 && spcData.day2.cat ? renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 1)) : '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div>'}
+                        </div>
+                    </div>
+                </div>
+            `;
 
             let mosHtml = "";
             let anyMos = mosDataCache.nbm || mosDataCache.gfsmos || mosDataCache.nammos;
@@ -1555,26 +1565,26 @@
                             spread = diff + '°';
                             if (diff >= 5) {
                                 spreadClass = "color: var(--danger);";
-                                spreadIcon = `<i class="ph-fill ph-warning-circle" style="font-size: 16px; vertical-align: middle;"></i>`;
+                                spreadIcon = `<i class="ph-fill ph-warning-circle" style="font-size: 18px; margin-right: 4px; vertical-align: middle;"></i>`;
                             }
                             else if (diff >= 3) {
                                 spreadClass = "color: var(--warning);";
-                                spreadIcon = `<i class="ph-fill ph-warning" style="font-size: 16px; vertical-align: middle;"></i>`;
+                                spreadIcon = `<i class="ph-fill ph-warning" style="font-size: 18px; margin-right: 4px; vertical-align: middle;"></i>`;
                             }
                             else {
                                 spreadClass = "color: var(--success);";
-                                spreadIcon = `<i class="ph-fill ph-check-circle" style="font-size: 16px; vertical-align: middle;"></i>`;
+                                spreadIcon = `<i class="ph-fill ph-check-circle" style="font-size: 18px; margin-right: 4px; vertical-align: middle;"></i>`;
                             }
                         }
                         
                         tableRows += `
-                            <tr>
-                                <td style="font-weight: 600; opacity: 0.9; text-align: left;"><i class="ph ph-clock" style="vertical-align: middle; margin-right: 4px;"></i> ${timeStr}</td>
-                                <td class="highlight-col" style="font-weight: 900;">${nStr}</td>
-                                <td style="opacity: 0.8;">${gStr}</td>
-                                <td style="opacity: 0.8;">${mStr}</td>
-                                <td style="font-weight:900; ${spreadClass}">${spreadIcon} ${spread}</td>
-                            </tr>
+                            <div class="mos-row">
+                                <div class="mos-time"><i class="ph ph-clock" style="font-size: 16px;"></i> ${timeStr}</div>
+                                <div><span class="mos-nws">${nStr}</span></div>
+                                <div class="mos-model">${gStr}</div>
+                                <div class="mos-model">${mStr}</div>
+                                <div class="mos-spread" style="${spreadClass}">${spreadIcon} ${spread}</div>
+                            </div>
                         `;
                     }
                 }
@@ -1589,17 +1599,15 @@
                             Comparing the official human consensus (NBM) against raw computer statistics algorithms (GFS & NAM). 
                             <span style="color:var(--danger); font-weight:bold;">Higher spread = lower confidence in the forecast.</span>
                         </div>
-                        <div style="overflow-x:auto;">
-                            <table class="mos-table" style="min-width: 500px; margin-top: 0;">
-                                <tr>
-                                    <th style="text-align: left; padding-left: 15px;"><i class="ph-fill ph-calendar"></i> Valid Time</th>
-                                    <th class="highlight-col"><i class="ph-fill ph-target"></i> NWS Consensus</th>
-                                    <th><i class="ph-fill ph-cpu"></i> GFS MOS</th>
-                                    <th><i class="ph-fill ph-cpu"></i> NAM MOS</th>
-                                    <th><i class="ph-fill ph-arrows-out-line-horizontal"></i> Model Spread</th>
-                                </tr>
-                                ${tableRows}
-                            </table>
+                        <div class="mos-grid">
+                            <div class="mos-row mos-header">
+                                <div class="mos-time" style="opacity:1;"><i class="ph-fill ph-calendar"></i> Valid Time</div>
+                                <div style="color:var(--accent);"><i class="ph-fill ph-target"></i> NWS Consensus</div>
+                                <div><i class="ph-fill ph-cpu"></i> GFS MOS</div>
+                                <div><i class="ph-fill ph-cpu"></i> NAM MOS</div>
+                                <div><i class="ph-fill ph-arrows-out-line-horizontal"></i> Model Spread</div>
+                            </div>
+                            ${tableRows}
                         </div>
                     </div>`;
                 } else {
