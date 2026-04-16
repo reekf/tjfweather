@@ -1359,6 +1359,7 @@
 
         async function triggerSearch(query) {
             if(!query) return;
+            clearTimeout(searchTimeout); // FIX: Stop pending search API calls
             const main = document.getElementById('lfMain');
             main.innerHTML = '<div style="padding:60px 20px; text-align:center; opacity:0.5;"><i class="ph ph-spinner ph-spin" style="font-size: 32px; margin-bottom: 15px;"></i><br>Searching for location...</div>';
             
@@ -1389,9 +1390,15 @@
         async function selectLFCity(cityId) {
             lfSelectedCity = cityId;
             
-            // FIX: Ensure the search input clears perfectly every time
+            // FIX: Stop pending search API calls so they don't overwrite the cleared list
+            clearTimeout(searchTimeout);
+
+            // FIX: Ensure the search input clears perfectly every time and dismisses keyboard
             const searchInput = document.getElementById('lfSearchInput');
-            if(searchInput) searchInput.value = '';
+            if(searchInput) {
+                searchInput.value = '';
+                searchInput.blur(); // Drops the mobile keyboard out of the way!
+            }
             buildLFCityList();
 
             // FIX: Smoothly auto-scroll down past the sidebar list on mobile devices
