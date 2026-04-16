@@ -182,7 +182,6 @@
             #radarAlertsPanel { position: fixed !important; top: 0 !important; left: 0 !important; transform: translateX(-105%) !important; width: 85% !important; max-width: 320px !important; height: 100vh !important; max-height: 100vh !important; background: rgba(11, 14, 17, 0.95) !important; z-index: 8000 !important; transition: transform 0.3s !important; display: block !important; border-radius: 0 24px 24px 0 !important; padding: 60px 20px 20px 20px !important; border: none !important; border-right: 1px solid var(--border) !important; }
             #radarAlertsPanel.open { transform: translateX(0) !important; }
             #mobileSettingsBtn { display: block; position: fixed; top: 80px; right: 15px; z-index: 4000; background: rgba(0, 210, 255, 0.2) !important; border: 1px solid rgba(0, 210, 255, 0.5) !important; padding: 8px 16px; border-radius: 12px; font-weight: 900; font-size: 13px; text-transform: uppercase; color: #fff; display: flex; align-items: center; gap: 6px; }
-            .mos-grid { min-width: 500px; overflow-x: auto; padding-bottom: 10px;}
         }
     </style>
 </head>
@@ -207,7 +206,8 @@
 
     <!-- HOME TAB -->
     <div id="home" class="tab-content active">
-        <div style="padding: 30px; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; overflow-y: auto;">
+        <!-- FIXED: Removed height:100% and double-overflow-y to fix bottom radar cutoff -->
+        <div style="padding: 30px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; padding-bottom: 80px;">
             <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
 
                 <div class="glass home-alerts-panel" style="padding: 20px; display: flex; flex-direction: column; flex: 1; min-width: 300px; max-width: 400px; max-height: 400px; overflow-y: auto;">
@@ -1388,7 +1388,20 @@
 
         async function selectLFCity(cityId) {
             lfSelectedCity = cityId;
+            
+            // FIX: Ensure the search input clears perfectly every time
+            const searchInput = document.getElementById('lfSearchInput');
+            if(searchInput) searchInput.value = '';
             buildLFCityList();
+
+            // FIX: Smoothly auto-scroll down past the sidebar list on mobile devices
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    const lfMain = document.getElementById('lfMain');
+                    if (lfMain) lfMain.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+
             const main = document.getElementById('lfMain');
             main.innerHTML = '<div style="padding:60px 20px; text-align:center; opacity:0.5;"><i class="ph ph-spinner ph-spin" style="font-size: 32px; margin-bottom: 15px;"></i><br>Compiling advanced forecasts...<br><span style="font-size: 13px; color: var(--accent); margin-top: 12px; display: inline-block; font-weight: bold;">Loading MOS Stats (< 3s)...</span></div>';
             
@@ -1640,15 +1653,18 @@
                             Comparing the official human consensus against raw computer statistics algorithms (GFS & NAM MOS). 
                             <span style="color:var(--danger); font-weight:bold;">Higher spread = lower confidence in the forecast.</span>
                         </div>
-                        <div class="mos-grid">
-                            <div class="mos-row mos-header">
-                                <div class="mos-time" style="opacity:1;"><i class="ph-fill ph-calendar"></i> Valid Date</div>
-                                <div style="color:var(--accent);"><i class="ph-fill ph-target"></i> NWS Consensus</div>
-                                <div><i class="ph-fill ph-cpu"></i> GFS MOS</div>
-                                <div><i class="ph-fill ph-cpu"></i> NAM MOS</div>
-                                <div><i class="ph-fill ph-arrows-out-line-horizontal"></i> Model Spread</div>
+                        <!-- FIX: Wrapped the grid in a secure horizontal scrollbox so it never bleeds off screen -->
+                        <div style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 10px;">
+                            <div class="mos-grid" style="min-width: 550px;">
+                                <div class="mos-row mos-header">
+                                    <div class="mos-time" style="opacity:1;"><i class="ph-fill ph-calendar"></i> Valid Date</div>
+                                    <div style="color:var(--accent);"><i class="ph-fill ph-target"></i> NWS Consensus</div>
+                                    <div><i class="ph-fill ph-cpu"></i> GFS MOS</div>
+                                    <div><i class="ph-fill ph-cpu"></i> NAM MOS</div>
+                                    <div><i class="ph-fill ph-arrows-out-line-horizontal"></i> Model Spread</div>
+                                </div>
+                                ${tableRows}
                             </div>
-                            ${tableRows}
                         </div>
                     </div>`;
                 } else {
