@@ -117,7 +117,7 @@ def update_nws_alerts():
         print(f"  [X] Error fetching alerts: {e}")
 
 def fetch_asos_current_conditions():
-    print("\n[2/4] Fetching live ASOS/METAR observations...")
+    print("\n[2/4] Fetching live ASOS/METAR observations (with Gusts)...")
     icaos = ",".join([c['icao'] for c in CITIES if 'icao' in c])
     awc_url = f"https://aviationweather.gov/api/data/metar?ids={icaos}&format=json"
     
@@ -130,14 +130,16 @@ def fetch_asos_current_conditions():
                 icao = obs.get('icaoId')
                 temp_c = obs.get('temp')
                 wind_spd = obs.get('wspd') 
+                wind_gust = obs.get('wgst') # Extracting Gusts
                 wx_string = obs.get('wxString', '')
                 
                 temp_f = round((temp_c * 9/5) + 32) if temp_c is not None else None
                 wind_mph = round(wind_spd * 1.15078) if wind_spd is not None else None
+                gust_mph = round(wind_gust * 1.15078) if wind_gust is not None else None
                 
                 city_name = next((c['name'] for c in CITIES if c.get('icao') == icao), None)
                 if city_name:
-                    conditions[city_name] = {"temp": temp_f, "wind": wind_mph, "wx": wx_string}
+                    conditions[city_name] = {"temp": temp_f, "wind": wind_mph, "gust": gust_mph, "wx": wx_string}
             
             os.makedirs('static', exist_ok=True)
             with open("static/asos_conditions.json", "w") as f:
