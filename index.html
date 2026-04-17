@@ -206,7 +206,6 @@
 
     <!-- HOME TAB -->
     <div id="home" class="tab-content active">
-        <!-- FIXED: Removed height:100% and double-overflow-y to fix bottom radar cutoff -->
         <div style="padding: 30px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; padding-bottom: 80px;">
             <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
 
@@ -238,7 +237,8 @@
                                     <i class="ph-fill ph-spinner ph-spin"></i> Loading...
                                 </div>
                                 <div id="homeWindVal" style="font-size:14px; opacity:0.8; font-weight:600; margin-top: 6px;">Wind: &mdash;</div>
-                                <div id="homeQpfVal" style="font-size:13px; opacity:0.6; margin-top:4px;">Forecast: &mdash;</div>
+                                <div id="homeFeelsLikeVal" style="font-size:13px; font-weight:bold; color:var(--info); margin-top: 4px;"></div>
+                                <div id="homeQpfVal" style="font-size:13px; opacity:0.6; margin-top:6px;">Forecast: &mdash;</div>
                             </div>
                         </div>
                         <div id="homeNextTemps"></div>
@@ -407,7 +407,7 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v11.0 | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v12.0 | AMES, IA</p>
             </div>
         </div>
     </div>
@@ -477,6 +477,7 @@
         };
 
         let searchTimeout = null;
+
         // --- Feels Like / Wind Chill Helpers ---
         function getFeelsLike(tempF, windMph) {
             // NWS Wind Chill Formula (Only applies if Temp <= 50F and Wind > 3mph)
@@ -496,8 +497,8 @@
             }
             return 0;
         }
+
         // --- Weather Icon Helper ---
-        
         function getWeatherIcon(wx, isDaytime = true) {
             const text = (wx || "").toLowerCase();
             if (text.includes("thunder") || text.includes("t-storm")) return "ph-cloud-lightning";
@@ -1168,6 +1169,7 @@
         async function loadHomeNWS(lat, lon, isGeo = false) {
             let tempStr = "—";
             let windStr = "Wind: —";
+            let flStr = "";
             let wxStr = "Observation Unavailable";
             let wxIcon = "ph-cloud-slash";
 
@@ -1179,7 +1181,20 @@
                         if (asosData['Ames']) {
                             let ad = asosData['Ames'];
                             if (ad.temp !== null) tempStr = `${ad.temp}°F`;
-                            if (ad.wind !== null) windStr = `Wind: ${ad.wind} mph`;
+                            if (ad.wind !== null) {
+                                windStr = `Wind: ${ad.wind} mph`;
+                                if(ad.gust) windStr += ` (Gusts: ${ad.gust} mph)`;
+                            }
+                            
+                            if (ad.temp !== null && ad.wind !== null) {
+                                let fl = getFeelsLike(ad.temp, ad.wind);
+                                flStr = `Feels Like: ${fl}°F`;
+                                if (ad.temp <= 50 && ad.gust && ad.gust > ad.wind) {
+                                    let mc = getFeelsLike(ad.temp, ad.gust);
+                                    if (mc < fl) flStr += ` | Min Chill (Gusts): ${mc}°F`;
+                                }
+                            }
+
                             if (ad.wx !== undefined) {
                                 let trans = translateWx(ad.wx);
                                 wxStr = trans || (ad.temp !== null ? "Clear / VFR" : wxStr);
@@ -1191,6 +1206,7 @@
 
                 document.getElementById('homeTempVal').innerText = tempStr;
                 document.getElementById('homeWindVal').innerText = windStr;
+                document.getElementById('homeFeelsLikeVal').innerText = flStr;
                 document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIcon}"></i> ${wxStr}`;
 
                 try {
@@ -1210,6 +1226,11 @@
                                     if (p) {
                                         let tDate = new Date(p.startTime);
                                         let pIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
+                                        
+                                        let hWind = parseMaxWind(p.windSpeed);
+                                        let hFl = getFeelsLike(p.temperature, hWind);
+                                        let flHtml = (hFl !== p.temperature) ? `<div style="font-size:12px; font-weight:bold; color:var(--info); margin-top:4px;">FL: ${hFl}&deg;</div>` : '';
+
                                         let qpfVal = p.quantitativePrecipitation?.value;
                                         let qpfStr = '';
                                         if (qpfVal > 0) {
@@ -1227,6 +1248,7 @@
                                             <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
                                             <i class="ph-fill ${pIcon}" style="font-size: 20px; margin: 4px 0;"></i>
                                             <div class="hr-temp" style="font-size:15px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
+                                            ${flHtml}
                                             ${qpfStr}
                                         </div>`;
                                     }
@@ -1258,9 +1280,35 @@
                         let props = obsRes?.properties;
                         if (props) {
                             let tempC = props.temperature?.value;
-                            if (tempC !== null && tempC !== undefined) tempStr = `${Math.round(tempC * 9 / 5 + 32)}°F`;
+                            let tempF = null;
+                            if (tempC !== null && tempC !== undefined) {
+                                tempF = Math.round(tempC * 9 / 5 + 32);
+                                tempStr = `${tempF}°F`;
+                            }
+                            
                             let windKmh = props.windSpeed?.value;
-                            if (windKmh !== null && windKmh !== undefined) windStr = `Wind: ${Math.round(windKmh / 1.60934)} mph`;
+                            let windMph = null;
+                            if (windKmh !== null && windKmh !== undefined) {
+                                windMph = Math.round(windKmh / 1.60934);
+                                windStr = `Wind: ${windMph} mph`;
+                            }
+
+                            let gustKmh = props.windGust?.value;
+                            let gustMph = null;
+                            if (gustKmh !== null && gustKmh !== undefined) {
+                                gustMph = Math.round(gustKmh / 1.60934);
+                                windStr += ` (Gusts: ${gustMph} mph)`;
+                            }
+                            
+                            if (tempF !== null && windMph !== null) {
+                                let fl = getFeelsLike(tempF, windMph);
+                                flStr = `Feels Like: ${fl}°F`;
+                                if (tempF <= 50 && gustMph && gustMph > windMph) {
+                                    let mc = getFeelsLike(tempF, gustMph);
+                                    if (mc < fl) flStr += ` | Min Chill (Gusts): ${mc}°F`;
+                                }
+                            }
+
                             let wx = props.textDescription || "";
                             let trans = translateWx(wx);
                             wxStr = trans || (tempC !== null ? "Clear / VFR" : wxStr);
@@ -1271,6 +1319,7 @@
 
                 document.getElementById('homeTempVal').innerText = tempStr;
                 document.getElementById('homeWindVal').innerText = windStr;
+                document.getElementById('homeFeelsLikeVal').innerText = flStr;
                 document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIcon}"></i> ${wxStr}`;
 
                 const fData = await robustNWSFetch(ptData.properties.forecast);
@@ -1288,6 +1337,11 @@
                             if (p) {
                                 let tDate = new Date(p.startTime);
                                 let pIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
+                                
+                                let hWind = parseMaxWind(p.windSpeed);
+                                let hFl = getFeelsLike(p.temperature, hWind);
+                                let flHtml = (hFl !== p.temperature) ? `<div style="font-size:12px; font-weight:bold; color:var(--info); margin-top:4px;">FL: ${hFl}&deg;</div>` : '';
+
                                 let qpfVal = p.quantitativePrecipitation?.value;
                                 let qpfStr = '';
                                 if (qpfVal > 0) {
@@ -1305,6 +1359,7 @@
                                     <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
                                     <i class="ph-fill ${pIcon}" style="font-size: 20px; margin: 4px 0;"></i>
                                     <div class="hr-temp" style="font-size:15px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
+                                    ${flHtml}
                                     ${qpfStr}
                                 </div>`;
                             }
@@ -1342,7 +1397,6 @@
 
             el.innerHTML = localHtml + `<div style="padding:10px; opacity:0.5; font-size:12px; text-align:center;"><i class="ph ph-spinner ph-spin"></i> Searching worldwide...</div>`;
 
-            // Debounce the API call for instant autocomplete
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(async () => {
                 try {
@@ -1354,7 +1408,6 @@
                             let stateOrCountry = loc.admin1 || loc.country;
                             let display = `${loc.name}, ${stateOrCountry}`;
                             let newCityId = `${loc.name}_${stateOrCountry}`;
-                            // Prevent duplicates if already in local list
                             if (LF_CITIES.find(c => c.id === newCityId || c.display === display)) return '';
                             return `<div class="lf-city-item" style="border-left: 2px solid var(--accent);" onclick="addAndSelectCity('${newCityId}', '${display}', ${loc.latitude}, ${loc.longitude})"><i class="ph ph-globe" style="margin-right:4px;"></i> ${display}</div>`;
                         }).join('');
@@ -1378,7 +1431,7 @@
 
         async function triggerSearch(query) {
             if(!query) return;
-            clearTimeout(searchTimeout); // FIX: Stop pending search API calls
+            clearTimeout(searchTimeout); 
             const main = document.getElementById('lfMain');
             main.innerHTML = '<div style="padding:60px 20px; text-align:center; opacity:0.5;"><i class="ph ph-spinner ph-spin" style="font-size: 32px; margin-bottom: 15px;"></i><br>Searching for location...</div>';
             
@@ -1409,18 +1462,15 @@
         async function selectLFCity(cityId) {
             lfSelectedCity = cityId;
             
-            // FIX: Stop pending search API calls so they don't overwrite the cleared list
             clearTimeout(searchTimeout);
 
-            // FIX: Ensure the search input clears perfectly every time and dismisses keyboard
             const searchInput = document.getElementById('lfSearchInput');
             if(searchInput) {
                 searchInput.value = '';
-                searchInput.blur(); // Drops the mobile keyboard out of the way!
+                searchInput.blur();
             }
             buildLFCityList();
 
-            // FIX: Smoothly auto-scroll down past the sidebar list on mobile devices
             if (window.innerWidth <= 768) {
                 setTimeout(() => {
                     const lfMain = document.getElementById('lfMain');
@@ -1456,12 +1506,11 @@
                     let displayWx = transWx || (ad.temp !== null ? "Clear" : "");
                     let wxIcon = getWeatherIcon(displayWx, true);
                     
-                    // NEW: Calculate Feels Like & Gust Windchill
                     let fl = getFeelsLike(ad.temp, ad.wind || 0);
                     let minChillHtml = "";
                     if (ad.temp <= 50 && ad.gust && ad.gust > ad.wind) {
                         let mc = getFeelsLike(ad.temp, ad.gust);
-                        minChillHtml = `<div style="color:var(--info); font-size:14px; margin-top:4px; font-weight:bold;"><i class="ph-fill ph-wind"></i> Min Chill (Gusts): ${mc}°F</div>`;
+                        if (mc < fl) minChillHtml = `<div style="color:var(--info); font-size:14px; margin-top:4px; font-weight:bold;"><i class="ph-fill ph-wind"></i> Min Chill (Gusts): ${mc}°F</div>`;
                     }
 
                     asosHtml = `
@@ -1515,7 +1564,6 @@
                             let tDate = new Date(p.startTime);
                             let hIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
                             
-                            // NEW: Calculate Hourly Feels Like
                             let windMph = parseMaxWind(p.windSpeed);
                             let fl = getFeelsLike(p.temperature, windMph);
                             let flHtml = (fl !== p.temperature) ? `<div style="font-size:12px; font-weight:bold; color:var(--info); margin-top:4px;">FL: ${fl}&deg;</div>` : '';
@@ -1557,12 +1605,17 @@
                         while(dayIdx < dailyPeriods.length) {
                             let p1 = dailyPeriods[dayIdx];
                             let p2 = (dayIdx + 1 < dailyPeriods.length) ? dailyPeriods[dayIdx+1] : null;
-                            let hi, lo, dIcon;
+                            let hi, lo, dIcon, dFl = '';
                             
                             if (p1.isDaytime) {
                                 hi = p1.temperature;
                                 lo = (p2 && !p2.isDaytime) ? p2.temperature : '--';
                                 dIcon = getWeatherIcon(p1.shortForecast, true);
+                                
+                                let windMph = parseMaxWind(p1.windSpeed);
+                                let fl = getFeelsLike(hi, windMph);
+                                if (fl !== hi) dFl = `<div style="font-size:11px; color:var(--info); margin-top:2px; text-align:right;">FL: ${fl}°</div>`;
+
                                 dayIdx += (p2 && !p2.isDaytime) ? 2 : 1;
                             } else {
                                 hi = '--';
@@ -1576,9 +1629,12 @@
                                 <div style="flex: 1; font-weight: 800; min-width: 90px;">${p1.name}</div>
                                 <div style="width: 40px; text-align: center;"><i class="ph-fill ${dIcon}" style="font-size: 22px;"></i></div>
                                 <div style="flex: 3; font-size: 13px; opacity: 0.85; padding: 0 15px; line-height: 1.4;">${p1.shortForecast}</div>
-                                <div style="text-align: right; width: 90px; display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
-                                    <span class="day-hi" style="width: 30px;">${hi !== '--' ? hi+'°' : '--'}</span>
-                                    <span class="day-lo" style="width: 30px; opacity: 0.8;">${lo !== '--' ? lo+'°' : '--'}</span>
+                                <div style="text-align: right; width: 90px; display: flex; flex-direction: column; justify-content: center; align-items: flex-end;">
+                                    <div style="display: flex; gap: 8px; align-items: center;">
+                                        <span class="day-hi" style="width: 30px;">${hi !== '--' ? hi+'°' : '--'}</span>
+                                        <span class="day-lo" style="width: 30px; opacity: 0.8;">${lo !== '--' ? lo+'°' : '--'}</span>
+                                    </div>
+                                    ${dFl}
                                 </div>
                             </div>`;
                         }
@@ -1638,9 +1694,7 @@
                 let currentHour = Math.floor(now.getTime() / 3600000) * 3600000; 
                 let baseDate = new Date(currentHour);
 
-                // Step by 24 hours to create a daily view
                 for(let i=24; i<=144; i+=24) {
-                    // Fallbacks for +/- 6 hours just in case exactly 24 isn't logged
                     let nVal = nbm[i] ?? nbm[i-6] ?? nbm[i+6];
                     let gVal = gfs[i] ?? gfs[i-6] ?? gfs[i+6];
                     let mVal = nam[i] ?? nam[i-6] ?? nam[i+6];
@@ -1697,7 +1751,6 @@
                             Comparing the official human consensus against raw computer statistics algorithms (GFS & NAM MOS). 
                             <span style="color:var(--danger); font-weight:bold;">Higher spread = lower confidence in the forecast.</span>
                         </div>
-                        <!-- FIX: Wrapped the grid in a secure horizontal scrollbox so it never bleeds off screen -->
                         <div style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 10px;">
                             <div class="mos-grid" style="min-width: 550px;">
                                 <div class="mos-row mos-header">
