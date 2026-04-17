@@ -477,8 +477,27 @@
         };
 
         let searchTimeout = null;
+        // --- Feels Like / Wind Chill Helpers ---
+        function getFeelsLike(tempF, windMph) {
+            // NWS Wind Chill Formula (Only applies if Temp <= 50F and Wind > 3mph)
+            if (tempF <= 50 && windMph > 3) {
+                let wc = 35.74 + (0.6215 * tempF) - (35.75 * Math.pow(windMph, 0.16)) + (0.4275 * tempF * Math.pow(windMph, 0.16));
+                return Math.round(wc);
+            }
+            return tempF; // Default to actual temp if wind chill doesn't apply
+        }
 
+        function parseMaxWind(windStr) {
+            // Extracts the highest wind speed if the NWS text says "10 to 15 mph"
+            if (!windStr) return 0;
+            let matches = windStr.match(/\d+/g);
+            if (matches) {
+                return Math.max(...matches.map(Number)); 
+            }
+            return 0;
+        }
         // --- Weather Icon Helper ---
+        
         function getWeatherIcon(wx, isDaytime = true) {
             const text = (wx || "").toLowerCase();
             if (text.includes("thunder") || text.includes("t-storm")) return "ph-cloud-lightning";
