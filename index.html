@@ -478,14 +478,48 @@
 
         let searchTimeout = null;
 
-        // --- Feels Like / Wind Chill Helpers ---
-        function getFeelsLike(tempF, windMph) {
-            // NWS Wind Chill Formula (Only applies if Temp <= 50F and Wind > 3mph)
+        // --- Feels Like / Wind Chill / Heat Index Helpers ---
+        function getFeelsLike(tempF, windMph, rh = null) {
+            // If RH is not provided, estimate a moderate 50% humidity to allow the continuous formula to work
+            let calcRh = rh !== null ? rh : 50; 
+            
+            // Steadman Apparent Temperature Formula (Continuous RealFeel)
+            let tempC = (tempF - 32) * 5 / 9;
+            let windMs = windMph * 0.44704;
+            
+            // Vapor pressure (e)
+            let e = (calcRh / 100) * 6.105 * Math.exp((17.27 * tempC) / (237.7 + tempC));
+            
+            // Steadman Apparent Temp in Celsius
+            let atC = tempC + 0.33 * e - 0.70 * windMs - 4.00;
+            
+            // Convert back to Fahrenheit
+            let apparentTempF = (atC * 9 / 5) + 32;
+
+            // NWS Wind Chill (Only applies if Temp <= 50F and Wind > 3mph)
             if (tempF <= 50 && windMph > 3) {
                 let wc = 35.74 + (0.6215 * tempF) - (35.75 * Math.pow(windMph, 0.16)) + (0.4275 * tempF * Math.pow(windMph, 0.16));
-                return Math.round(wc);
+                // Use whichever is colder between Apparent Temp and Wind Chill
+                return Math.round(Math.min(apparentTempF, wc));
             }
-            return tempF; // Default to actual temp if wind chill doesn't apply
+            
+            // NWS Heat Index Formula (Only applies if Temp >= 80F and RH >= 40%)
+            if (tempF >= 80 && calcRh >= 40) {
+                let hi = 0.5 * (tempF + 61.0 + ((tempF - 68.0) * 1.2) + (calcRh * 0.094));
+                if (hi >= 80) {
+                    hi = -42.379 + 2.04901523*tempF + 10.14333127*calcRh - 0.22475541*tempF*calcRh - 0.00683783*tempF*tempF - 0.05481717*calcRh*calcRh + 0.00122874*tempF*tempF*calcRh + 0.00085282*tempF*calcRh*calcRh - 0.00000199*tempF*tempF*calcRh*calcRh;
+                    if (calcRh < 13 && tempF >= 80 && tempF <= 112) {
+                        hi -= ((13 - calcRh) / 4) * Math.sqrt((17 - Math.abs(tempF - 95.)) / 17);
+                    } else if (calcRh > 85 && tempF >= 80 && tempF <= 87) {
+                        hi += ((calcRh - 85) / 10) * ((87 - tempF) / 5);
+                    }
+                }
+                // Use whichever is hotter between Apparent Temp and Heat Index
+                return Math.round(Math.max(apparentTempF, hi));
+            }
+            
+            // For the 50F - 80F range, return the Steadman continuous calculation
+            return Math.round(apparentTempF); 
         }
 
         function parseMaxWind(windStr) {
@@ -1228,7 +1262,8 @@
                                         let pIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
                                         
                                         let hWind = parseMaxWind(p.windSpeed);
-                                        let hFl = getFeelsLike(p.temperature, hWind);
+                                        let hRh = p.relativeHumidity?.value || null;
+                                        let hFl = getFeelsLike(p.temperature, hWind, hRh);
                                         let flHtml = (hFl !== p.temperature) ? `<div style="font-size:12px; font-weight:bold; color:var(--info); margin-top:4px;">FL: ${hFl}&deg;</div>` : '';
 
                                         let qpfVal = p.quantitativePrecipitation?.value;
@@ -1300,11 +1335,13 @@
                                 windStr += ` (Gusts: ${gustMph} mph)`;
                             }
                             
+                            let rhVal = props.relativeHumidity?.value || null;
+
                             if (tempF !== null && windMph !== null) {
-                                let fl = getFeelsLike(tempF, windMph);
+                                let fl = getFeelsLike(tempF, windMph, rhVal);
                                 flStr = `Feels Like: ${fl}°F`;
                                 if (tempF <= 50 && gustMph && gustMph > windMph) {
-                                    let mc = getFeelsLike(tempF, gustMph);
+                                    let mc = getFeelsLike(tempF, gustMph, rhVal);
                                     if (mc < fl) flStr += ` | Min Chill (Gusts): ${mc}°F`;
                                 }
                             }
@@ -1339,7 +1376,8 @@
                                 let pIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
                                 
                                 let hWind = parseMaxWind(p.windSpeed);
-                                let hFl = getFeelsLike(p.temperature, hWind);
+                                let hRh = p.relativeHumidity?.value || null;
+                                let hFl = getFeelsLike(p.temperature, hWind, hRh);
                                 let flHtml = (hFl !== p.temperature) ? `<div style="font-size:12px; font-weight:bold; color:var(--info); margin-top:4px;">FL: ${hFl}&deg;</div>` : '';
 
                                 let qpfVal = p.quantitativePrecipitation?.value;
@@ -1565,7 +1603,8 @@
                             let hIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
                             
                             let windMph = parseMaxWind(p.windSpeed);
-                            let fl = getFeelsLike(p.temperature, windMph);
+                            let hRh = p.relativeHumidity?.value || null;
+                            let fl = getFeelsLike(p.temperature, windMph, hRh);
                             let flHtml = (fl !== p.temperature) ? `<div style="font-size:12px; font-weight:bold; color:var(--info); margin-top:4px;">FL: ${fl}&deg;</div>` : '';
 
                             let qpfVal = p.quantitativePrecipitation?.value;
@@ -1613,7 +1652,8 @@
                                 dIcon = getWeatherIcon(p1.shortForecast, true);
                                 
                                 let windMph = parseMaxWind(p1.windSpeed);
-                                let fl = getFeelsLike(hi, windMph);
+                                let dRh = p1.relativeHumidity?.value || null;
+                                let fl = getFeelsLike(hi, windMph, dRh);
                                 if (fl !== hi) dFl = `<div style="font-size:11px; color:var(--info); margin-top:2px; text-align:right;">FL: ${fl}°</div>`;
 
                                 dayIdx += (p2 && !p2.isDaytime) ? 2 : 1;
