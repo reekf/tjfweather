@@ -1455,6 +1455,15 @@
                     let transWx = translateWx(ad.wx);
                     let displayWx = transWx || (ad.temp !== null ? "Clear" : "");
                     let wxIcon = getWeatherIcon(displayWx, true);
+                    
+                    // NEW: Calculate Feels Like & Gust Windchill
+                    let fl = getFeelsLike(ad.temp, ad.wind || 0);
+                    let minChillHtml = "";
+                    if (ad.temp <= 50 && ad.gust && ad.gust > ad.wind) {
+                        let mc = getFeelsLike(ad.temp, ad.gust);
+                        minChillHtml = `<div style="color:var(--info); font-size:14px; margin-top:4px; font-weight:bold;"><i class="ph-fill ph-wind"></i> Min Chill (Gusts): ${mc}°F</div>`;
+                    }
+
                     asosHtml = `
                     <div class="glass" style="padding: 25px; border-color: var(--accent); margin-bottom: 20px;">
                         <div style="font-size:11px; opacity:0.6; font-weight: 800; letter-spacing:1px; margin-bottom:12px; display: flex; align-items: center; gap: 6px;">
@@ -1466,7 +1475,9 @@
                                 <div style="font-weight:900; font-size:20px; display: flex; align-items: center; gap: 8px;">
                                     <i class="ph-fill ${wxIcon}"></i> ${displayWx}
                                 </div>
-                                <div style="opacity:0.8; margin-top:6px; font-weight: 600;">Wind: ${ad.wind} mph</div>
+                                <div style="opacity:0.8; margin-top:6px; font-weight: 600;">Wind: ${ad.wind !== null ? ad.wind + ' mph' : '--'}${ad.gust ? ` (Gusts: ${ad.gust} mph)` : ''}</div>
+                                <div style="opacity:0.9; margin-top:2px; font-weight: 600;">Feels Like: ${fl}°F</div>
+                                ${minChillHtml}
                             </div>
                         </div>
                     </div>`;
@@ -1503,6 +1514,12 @@
                         let hCols = hourlyPeriods.slice(0, 24).map(p => {
                             let tDate = new Date(p.startTime);
                             let hIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
+                            
+                            // NEW: Calculate Hourly Feels Like
+                            let windMph = parseMaxWind(p.windSpeed);
+                            let fl = getFeelsLike(p.temperature, windMph);
+                            let flHtml = (fl !== p.temperature) ? `<div style="font-size:12px; font-weight:bold; color:var(--info); margin-top:4px;">FL: ${fl}&deg;</div>` : '';
+
                             let qpfVal = p.quantitativePrecipitation?.value;
                             let qpfStr = '';
                             if (qpfVal > 0) {
@@ -1520,6 +1537,7 @@
                                 <div class="hr-label">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
                                 <i class="ph-fill ${hIcon}" style="font-size: 26px; margin: 4px 0; color: #fff;"></i>
                                 <div class="hr-temp">${p.temperature}&deg;</div>
+                                ${flHtml}
                                 ${qpfStr}
                             </div>`;
                         }).join('');
