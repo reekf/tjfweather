@@ -240,7 +240,7 @@
 
                     <div id="homeLocalWeather" class="glass"
                         style="background: rgba(0,210,255,0.05); border: 1px solid var(--accent); padding: 20px; cursor:pointer; transition: transform 0.2s;"
-                        onclick="showTab('localforecast', document.querySelector('.nav-item:nth-child(2)')); if(lfSelectedCity) selectLFCity(lfSelectedCity);"
+                        onclick="showTab('localforecast', document.querySelector('.nav-item:nth-child(2)')); if(lfSelectedCity) selectLFCity(lfSelectedCity, true);"
                         onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
                         <div id="homeLocationName" style="opacity:0.6; font-size:11px; font-weight: 800; letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; color: var(--accent); word-break: break-word; line-height: 1.4;">
                             Official NWS Forecast &mdash; Locating...
@@ -266,13 +266,13 @@
                         <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; opacity:0.5; margin-bottom:10px; display: flex; align-items: center; gap: 6px;">
                             <i class="ph-fill ph-calendar-blank"></i> Today's SPC Outlook
                         </div>
-                        <div id="spcTodayHome"><div style="opacity:0.5; font-size:13px;">Loading SPC Data...</div></div>
+                        <div id="spcTodayHome"><div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div></div>
                     </div>
                     <div style="border-top: 1px solid var(--border); padding-top: 15px;">
                         <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; opacity:0.5; margin-bottom:10px; display: flex; align-items: center; gap: 6px;">
                             <i class="ph-fill ph-calendar-plus"></i> Tomorrow's SPC Outlook
                         </div>
-                        <div id="spcTomHome"><div style="opacity:0.5; font-size:13px;">Loading SPC Data...</div></div>
+                        <div id="spcTomHome"><div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div></div>
                     </div>
                 </div>
 
@@ -434,14 +434,13 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v12.4 | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v12.8 | AMES, IA</p>
             </div>
         </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Safely register ChartDataLabels if the CDN loaded successfully
         if (typeof Chart !== 'undefined' && typeof ChartDataLabels !== 'undefined') {
             Chart.register(ChartDataLabels);
         }
@@ -503,6 +502,8 @@
         let lfSelectedCity = null, lfActiveModel = 'all', lfTsCache = {};
         let mosDataCache = { gfsmos: null, nammos: null, nbm: null };
         let mosChartInstance = null; 
+        
+        let spcRiskCache = {};
 
         let spcData = {
             day1: { cat: null, tor: null, wind: null, hail: null },
@@ -511,10 +512,18 @@
 
         let searchTimeout = null;
 
+        async function fetchWithTimeout(resource, options = {}) {
+            const { timeout = 6000 } = options;
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeout);
+            const response = await fetch(resource, { ...options, signal: controller.signal });
+            clearTimeout(id);
+            return response;
+        }
+
         // --- Feels Like / Wind Chill / Heat Index Helpers ---
         function getFeelsLike(tempF, windMph, rh = null) {
             let calcRh = rh !== null ? rh : 50; 
-            
             let tempC = (tempF - 32) * 5 / 9;
             let windMs = windMph * 0.44704;
             
@@ -559,16 +568,10 @@
                     gust = Math.max(gust, ...gMatches.map(Number));
                 }
             }
-            
-            // Artificial gust injection for missing NWS API data on breezy days
-            if (gust <= sustained && sustained >= 10) {
-                gust = Math.round(sustained * 1.3);
-            }
-            
+            if (gust <= sustained && sustained >= 10) gust = Math.round(sustained * 1.3);
             return { sustained, gust };
         }
 
-        // --- Weather Icon Helper ---
         function getWeatherIcon(wx, isDaytime = true) {
             const text = (wx || "").toLowerCase();
             if (text.includes("thunder") || text.includes("t-storm")) return "ph-cloud-lightning";
@@ -584,51 +587,29 @@
         function translateWx(wx) {
             if (!wx) return "";
             let trans = wx.toUpperCase();
-            trans = trans.replace(/-/g, "Light ");
-            trans = trans.replace(/\+/g, "Heavy ");
-            trans = trans.replace(/BR/g, "Mist ");
-            trans = trans.replace(/FG/g, "Fog ");
-            trans = trans.replace(/HZ/g, "Haze ");
-            trans = trans.replace(/FU/g, "Smoke ");
-            trans = trans.replace(/VA/g, "Volcanic Ash ");
-            trans = trans.replace(/DU/g, "Dust ");
-            trans = trans.replace(/SA/g, "Sand ");
-            trans = trans.replace(/DZ/g, "Drizzle ");
-            trans = trans.replace(/RA/g, "Rain ");
-            trans = trans.replace(/SN/g, "Snow ");
-            trans = trans.replace(/SG/g, "Snow Grains ");
-            trans = trans.replace(/IC/g, "Ice Crystals ");
-            trans = trans.replace(/PL/g, "Ice Pellets ");
-            trans = trans.replace(/GR/g, "Hail ");
-            trans = trans.replace(/GS/g, "Small Hail ");
-            trans = trans.replace(/UP/g, "Unknown Precip ");
-            trans = trans.replace(/MI/g, "Shallow ");
-            trans = trans.replace(/PR/g, "Partial ");
-            trans = trans.replace(/BC/g, "Patches ");
-            trans = trans.replace(/DR/g, "Low Drifting ");
-            trans = trans.replace(/BL/g, "Blowing ");
-            trans = trans.replace(/SH/g, "Showers ");
-            trans = trans.replace(/TS/g, "Thunderstorm ");
-            trans = trans.replace(/FZ/g, "Freezing ");
+            trans = trans.replace(/-/g, "Light "); trans = trans.replace(/\+/g, "Heavy ");
+            trans = trans.replace(/BR/g, "Mist "); trans = trans.replace(/FG/g, "Fog ");
+            trans = trans.replace(/HZ/g, "Haze "); trans = trans.replace(/FU/g, "Smoke ");
+            trans = trans.replace(/VA/g, "Volcanic Ash "); trans = trans.replace(/DU/g, "Dust ");
+            trans = trans.replace(/SA/g, "Sand "); trans = trans.replace(/DZ/g, "Drizzle ");
+            trans = trans.replace(/RA/g, "Rain "); trans = trans.replace(/SN/g, "Snow ");
+            trans = trans.replace(/SG/g, "Snow Grains "); trans = trans.replace(/IC/g, "Ice Crystals ");
+            trans = trans.replace(/PL/g, "Ice Pellets "); trans = trans.replace(/GR/g, "Hail ");
+            trans = trans.replace(/GS/g, "Small Hail "); trans = trans.replace(/UP/g, "Unknown Precip ");
+            trans = trans.replace(/MI/g, "Shallow "); trans = trans.replace(/PR/g, "Partial ");
+            trans = trans.replace(/BC/g, "Patches "); trans = trans.replace(/DR/g, "Low Drifting ");
+            trans = trans.replace(/BL/g, "Blowing "); trans = trans.replace(/SH/g, "Showers ");
+            trans = trans.replace(/TS/g, "Thunderstorm "); trans = trans.replace(/FZ/g, "Freezing ");
             trans = trans.replace(/\s+/g, ' ').trim();
             return trans || "Clear";
         }
 
-        // =========================================================
-        // TAB SWITCHER
-        // =========================================================
         function showTab(id, element, noPush = false) {
-            document.querySelectorAll('.tab-content').forEach(t => {
-                t.classList.remove('active');
-                t.style.display = 'none';
-                t.style.pointerEvents = 'none';
-            });
+            document.querySelectorAll('.tab-content').forEach(t => { t.classList.remove('active'); t.style.display = 'none'; t.style.pointerEvents = 'none'; });
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
 
             const targetTab = document.getElementById(id) || document.getElementById('home');
-            targetTab.classList.add('active');
-            targetTab.style.display = 'block';
-            targetTab.style.pointerEvents = 'auto';
+            targetTab.classList.add('active'); targetTab.style.display = 'block'; targetTab.style.pointerEvents = 'auto';
 
             if (element) {
                 element.classList.add('active');
@@ -636,18 +617,13 @@
                 try {
                     const navItem = document.querySelector(`.nav-item[onclick*="showTab('${id}')"]`);
                     if (navItem) navItem.classList.add('active');
-                } catch(e) { console.error("Navigation button lookup failed", e); }
+                } catch(e) {}
             }
 
-            if (!noPush) {
-                try { window.history.pushState(null, '', '#' + id); } catch (e) {}
-            }
+            if (!noPush) { try { window.history.pushState(null, '', '#' + id); } catch (e) {} }
 
-            if (id === 'radar') {
-                document.getElementById('bgOverlay').style.display = 'none';
-            } else {
-                document.getElementById('bgOverlay').style.display = 'block';
-            }
+            if (id === 'radar') document.getElementById('bgOverlay').style.display = 'none';
+            else document.getElementById('bgOverlay').style.display = 'block';
 
             if (typeof updateMobileBtn === 'function') updateMobileBtn();
 
@@ -658,34 +634,43 @@
         }
 
         window.addEventListener('popstate', () => {
-            const hash = window.location.hash.replace('#', '') || 'home';
-            showTab(hash, null, true);
+            const hashStr = window.location.hash.replace('#', '');
+            const hashParts = hashStr.split('?');
+            const tab = hashParts[0] || 'home';
+            
+            let cityParam = null;
+            if (hashParts.length > 1) {
+                const urlParams = new URLSearchParams('?' + hashParts[1]);
+                cityParam = urlParams.get('city');
+            }
+
+            showTab(tab, null, true);
+            
+            if (tab === 'localforecast' && cityParam) {
+                if (lfSelectedCity !== cityParam) {
+                    let existingCity = LF_CITIES.find(c => c.id === cityParam);
+                    if (existingCity) selectLFCity(cityParam, true);
+                    else triggerSearch(cityParam.replace(/_/g, ' '), true);
+                }
+            }
         });
 
         function updateMobileBtn() {
             const isRadar = document.getElementById('radar').classList.contains('active');
             const btn = document.getElementById('mobileSettingsBtn');
-            if (isRadar && window.innerWidth <= 768) {
-                btn.style.display = 'flex';
-            } else {
-                btn.style.display = 'none';
-                document.getElementById('radarAlertsPanel').classList.remove('open');
-            }
+            if (isRadar && window.innerWidth <= 768) btn.style.display = 'flex';
+            else { btn.style.display = 'none'; document.getElementById('radarAlertsPanel').classList.remove('open'); }
         }
         window.addEventListener('resize', updateMobileBtn);
 
         function toggleMobileSettings() {
-            const isRadar = document.getElementById('radar').classList.contains('active');
-            if (isRadar) document.getElementById('radarAlertsPanel').classList.toggle('open');
+            if (document.getElementById('radar').classList.contains('active')) document.getElementById('radarAlertsPanel').classList.toggle('open');
         }
 
         function toggleNavMenu(forceClose = false) {
             const nav = document.getElementById('navLinks');
-            if (forceClose) {
-                nav.classList.remove('show-menu');
-            } else {
-                nav.classList.toggle('show-menu');
-            }
+            if (forceClose) nav.classList.remove('show-menu');
+            else nav.classList.toggle('show-menu');
         }
 
         const standardBasemap = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -733,11 +718,8 @@
             try {
                 let cbust = Date.now();
                 let url = encodeURIComponent(`https://www.spc.noaa.gov/products/outlook/day${day}otlk_${type}.lyr.geojson?t=${cbust}`);
-                let res = await fetch(`https://api.allorigins.win/raw?url=${url}`, { cache: 'no-cache' });
-                if (res.ok) {
-                    let data = await res.json();
-                    if (data && data.features) return data;
-                }
+                let res = await fetchWithTimeout(`https://api.allorigins.win/raw?url=${url}`, { cache: 'no-cache', timeout: 5000 });
+                if (res.ok) { let data = await res.json(); if (data && data.features) return data; }
             } catch (e) { }
 
             const now = new Date();
@@ -756,11 +738,8 @@
                     const url = `https://www.spc.noaa.gov/products/outlook/archive/${year}/day${day}otlk_${dateStr}_${t}_${type}.lyr.geojson`;
                     try {
                         const proxiedUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-                        const res = await fetch(proxiedUrl, { cache: 'no-cache' });
-                        if (res.ok) {
-                            const data = await res.json();
-                            if (data && data.features) return data;
-                        }
+                        const res = await fetchWithTimeout(proxiedUrl, { cache: 'no-cache', timeout: 4000 });
+                        if (res.ok) { const data = await res.json(); if (data && data.features) return data; }
                     } catch (e) { }
                 }
             }
@@ -772,13 +751,25 @@
             const cityObj = LF_CITIES.find(c => c.id === lfSelectedCity);
             if (!cityObj) return;
             
+            let cacheKey = `${cityObj.lat},${cityObj.lon}`;
             const todayEl = document.getElementById('lfSpcToday');
             const tomEl = document.getElementById('lfSpcTom');
-            if (todayEl) {
-                todayEl.innerHTML = spcData.day1.cat ? renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 0)) : '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div>';
+            
+            if (spcRiskCache[cacheKey]) {
+                if (todayEl) todayEl.innerHTML = spcRiskCache[cacheKey].day1;
+                if (tomEl) tomEl.innerHTML = spcRiskCache[cacheKey].day2;
+                return;
             }
-            if (tomEl) {
-                tomEl.innerHTML = spcData.day2.cat ? renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 1)) : '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div>';
+
+            if (spcData.day1.cat) {
+                let d1 = renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 0));
+                let d2 = renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 1));
+                spcRiskCache[cacheKey] = { day1: d1, day2: d2 };
+                if (todayEl) todayEl.innerHTML = d1;
+                if (tomEl) tomEl.innerHTML = d2;
+            } else {
+                if (todayEl) todayEl.innerHTML = '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div>';
+                if (tomEl) tomEl.innerHTML = '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div>';
             }
         }
 
@@ -787,12 +778,9 @@
                 fetchSPCDynamic(1, 'cat'), fetchSPCDynamic(1, 'torn'), fetchSPCDynamic(1, 'wind'), fetchSPCDynamic(1, 'hail'),
                 fetchSPCDynamic(2, 'cat'), fetchSPCDynamic(2, 'torn'), fetchSPCDynamic(2, 'wind'), fetchSPCDynamic(2, 'hail')
             ]);
-
             spcData.day1 = { cat: d1c, tor: d1t, wind: d1w, hail: d1h };
             spcData.day2 = { cat: d2c, tor: d2t, wind: d2w, hail: d2h };
-
-            updateHomeSPC();
-            updateLocalSPC();
+            updateHomeSPC(); updateLocalSPC();
         }
 
         function isPointInNWSFeature(lon, lat, feature) {
@@ -813,38 +801,27 @@
             }
 
             let polys = [];
-            if (type === 'Polygon') {
-                polys.push(coords[0]);
-            } else if (type === 'MultiPolygon') {
-                coords.forEach(c => {
-                    if (c && c[0]) polys.push(c[0]);
-                });
-            }
+            if (type === 'Polygon') polys.push(coords[0]);
+            else if (type === 'MultiPolygon') coords.forEach(c => { if (c && c[0]) polys.push(c[0]); });
 
-            for (let poly of polys) {
-                if (poly && pointInPolygon([lon, lat], poly)) return true;
-            }
+            for (let poly of polys) if (poly && pointInPolygon([lon, lat], poly)) return true;
             return false;
         }
 
         function extractHighestProb(geojsonData, lat, lon) {
-            let maxProb = 0;
-            let sig = false;
+            let maxProb = 0; let sig = false;
             if (geojsonData && geojsonData.features) {
                 geojsonData.features.forEach(f => {
                     if (isPointInNWSFeature(lon, lat, f)) {
                         let props = f.properties || {};
                         let labelStr = (props.LABEL || props.label || props.LABEL2 || props.DN || props.dn || props.qualifier || "").toString().toUpperCase().trim();
-
-                        if (labelStr.includes("SIG")) sig = true;
-                        if (props.sig === 1 || props.SIG === 1) sig = true;
-
+                        if (labelStr.includes("SIG") || props.sig === 1 || props.SIG === 1) sig = true;
                         let match = labelStr.match(/(?:0\.\d+|\d+)/);
                         if (match) {
                             let probNum = parseFloat(match[0]);
-                            if (probNum > 0 && probNum <= 1) { probNum = Math.round(probNum * 100); }
+                            if (probNum > 0 && probNum <= 1) probNum = Math.round(probNum * 100);
                             const validProbs = [2, 5, 10, 15, 30, 45, 60];
-                            if (validProbs.includes(probNum) && probNum > maxProb) { maxProb = probNum; }
+                            if (validProbs.includes(probNum) && probNum > maxProb) maxProb = probNum;
                         }
                     }
                 });
@@ -863,7 +840,6 @@
                     if (isPointInNWSFeature(lon, lat, f)) {
                         let props = f.properties || {};
                         let labelStr = (props.LABEL || props.label || props.LABEL2 || props.qualifier || "").toString().toUpperCase().trim();
-
                         let lvl = 0;
                         if (labelStr.includes('HIGH')) lvl = 6;
                         else if (labelStr.includes('MDT') || labelStr.includes('MODERATE')) lvl = 5;
@@ -876,85 +852,63 @@
                             let dn = props.DN !== undefined ? props.DN : (props.dn !== undefined ? props.dn : null);
                             if (dn !== null) {
                                 dn = parseInt(dn);
-                                if (dn === 2) lvl = 1;
-                                else if (dn === 3) lvl = 2;
-                                else if (dn === 4) lvl = 3;
-                                else if (dn === 5) lvl = 4;
-                                else if (dn === 6) lvl = 5;
-                                else if (dn === 8) lvl = 6;
+                                if (dn === 2) lvl = 1; else if (dn === 3) lvl = 2; else if (dn === 4) lvl = 3;
+                                else if (dn === 5) lvl = 4; else if (dn === 6) lvl = 5; else if (dn === 8) lvl = 6;
                             }
                         }
-
                         if (lvl > riskLvl) riskLvl = lvl;
                     }
                 });
             }
 
             const riskNames = ["No Severe Expected", "General Thunderstorms", "Marginal Risk", "Slight Risk", "Enhanced Risk", "Moderate Risk", "High Risk"];
-            const riskExp = {
-                "No Severe Expected": "No Severe Expected",
-                "General Thunderstorms": "General Thunderstorms",
-                "Marginal Risk": "Marginal Risk of Severe Weather",
-                "Slight Risk": "Slight Risk of Severe Weather",
-                "Enhanced Risk": "Enhanced Risk of Severe Weather",
-                "Moderate Risk": "Moderate Risk of Severe Weather",
-                "High Risk": "High Risk of Severe Weather"
-            };
-
+            const riskExp = { "No Severe Expected": "No Severe Expected", "General Thunderstorms": "General Thunderstorms", "Marginal Risk": "Marginal Risk of Severe Weather", "Slight Risk": "Slight Risk of Severe Weather", "Enhanced Risk": "Enhanced Risk of Severe Weather", "Moderate Risk": "Moderate Risk of Severe Weather", "High Risk": "High Risk of Severe Weather" };
             const riskColors = ["#444", "#8bc34a", "#00a152", "#f1c40f", "#e67e22", "#e74c3c", "#ff00ff"];
             const textColors = ["#fff", "#000", "#fff", "#000", "#000", "#fff", "#fff"];
 
-            let torProb = extractHighestProb(data.tor, lat, lon);
-            let windProb = extractHighestProb(data.wind, lat, lon);
-            let hailProb = extractHighestProb(data.hail, lat, lon);
-
             return {
                 level: riskLvl === 0 ? "0" : (riskLvl === 1 ? "TSTM" : riskLvl - 1),
-                name: riskExp[riskNames[riskLvl]],
-                bgColor: riskColors[riskLvl],
-                textColor: textColors[riskLvl],
-                tor: torProb,
-                wind: windProb,
-                hail: hailProb,
-                rawLvl: riskLvl
+                name: riskExp[riskNames[riskLvl]], bgColor: riskColors[riskLvl], textColor: textColors[riskLvl],
+                tor: extractHighestProb(data.tor, lat, lon), wind: extractHighestProb(data.wind, lat, lon), hail: extractHighestProb(data.hail, lat, lon), rawLvl: riskLvl
             };
         }
 
         function renderSPCHTML(spc) {
-            if (spc.rawLvl === 0) {
-                return `
+            if (spc.rawLvl === 0) return `
                 <div style="padding: 10px 14px; background: rgba(255,255,255,0.05); border-radius: 8px; font-size: 15px; opacity: 0.7; font-weight: 500; margin-bottom: 12px;">No Severe Weather Expected</div>
-                <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official SPC Outlook <i class="ph ph-arrow-up-right"></i></a></div>
-                `;
-            }
+                <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official SPC Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
             return `
                 <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="background: ${spc.bgColor}; color: ${spc.textColor}; padding: 6px 12px; border-radius: 6px; font-weight: 900; font-size: 15px;">
-                            ${spc.rawLvl === 1 ? "TSTM" : spc.level + "/5"}
-                        </div>
+                        <div style="background: ${spc.bgColor}; color: ${spc.textColor}; padding: 6px 12px; border-radius: 6px; font-weight: 900; font-size: 15px;">${spc.rawLvl === 1 ? "TSTM" : spc.level + "/5"}</div>
                         <div style="font-weight: 900; font-size: 16px; color: ${spc.bgColor};">${spc.name}</div>
                     </div>
                     <div style="display: flex; gap: 18px; font-size: 14px; font-weight: 800; opacity: 0.85; margin-top: 4px;">
-                        <div>Tornado: <span style="color:#ff4757">${spc.tor}</span></div>
-                        <div>Wind: <span style="color:#00d2ff">${spc.wind}</span></div>
-                        <div>Hail: <span style="color:#2ecc71">${spc.hail}</span></div>
+                        <div>Tornado: <span style="color:#ff4757">${spc.tor}</span></div><div>Wind: <span style="color:#00d2ff">${spc.wind}</span></div><div>Hail: <span style="color:#2ecc71">${spc.hail}</span></div>
                     </div>
                 </div>
-                <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official SPC Outlook <i class="ph ph-arrow-up-right"></i></a></div>
-            `;
+                <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official SPC Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
         }
 
         function updateHomeSPC() {
             const lat = window.currentHomeLat || 42.03;
             const lon = window.currentHomeLon || -93.62;
+            let cacheKey = `home_${lat},${lon}`;
+
             if (spcData.day1.cat === null) {
                 document.getElementById('spcTodayHome').innerHTML = '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div>';
                 document.getElementById('spcTomHome').innerHTML = '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div>';
                 return;
             }
-            document.getElementById('spcTodayHome').innerHTML = renderSPCHTML(getRealSPCOutlook(lat, lon, 0));
-            document.getElementById('spcTomHome').innerHTML = renderSPCHTML(getRealSPCOutlook(lat, lon, 1));
+            
+            if (!spcRiskCache[cacheKey]) {
+                spcRiskCache[cacheKey] = {
+                    day1: renderSPCHTML(getRealSPCOutlook(lat, lon, 0)),
+                    day2: renderSPCHTML(getRealSPCOutlook(lat, lon, 1))
+                };
+            }
+            document.getElementById('spcTodayHome').innerHTML = spcRiskCache[cacheKey].day1;
+            document.getElementById('spcTomHome').innerHTML = spcRiskCache[cacheKey].day2;
         }
 
         function alertClass(event) {
@@ -976,32 +930,17 @@
                 let expDate = new Date(f.properties.expires);
                 expText = `<div style="font-size:10px; margin-top:6px; opacity:0.8; font-weight:800; text-transform:uppercase;">Expires: ${expDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })}</div>`;
             }
-            
             let icon = "ph-warning";
-            if(cls === 'alert-tornado') icon = "ph-wind";
-            else if(cls === 'alert-thunderstorm') icon = "ph-cloud-lightning";
-            else if(cls === 'alert-winter') icon = "ph-snowflake";
-
-            return `
-            <div class="alert-badge ${cls}">
-                <i class="ph-fill ${icon}" style="font-size: 20px; margin-top: 2px;"></i>
-                <div>
-                    <div class="ab-title">${f.properties.event}</div>
-                    <div class="ab-area">${area}</div>
-                    ${expText}
-                </div>
-            </div>`;
+            if(cls === 'alert-tornado') icon = "ph-wind"; else if(cls === 'alert-thunderstorm') icon = "ph-cloud-lightning"; else if(cls === 'alert-winter') icon = "ph-snowflake";
+            return `<div class="alert-badge ${cls}"><i class="ph-fill ${icon}" style="font-size: 20px; margin-top: 2px;"></i><div><div class="ab-title">${f.properties.event}</div><div class="ab-area">${area}</div>${expText}</div></div>`;
         }
 
         async function loadNWSAlerts() {
             try {
-                const res = await fetch('static/nws_alerts.json?t=' + Date.now(), { cache: 'no-cache' });
+                const res = await fetchWithTimeout('static/nws_alerts.json?t=' + Date.now(), { cache: 'no-cache', timeout: 5000 });
                 const data = await res.json();
                 const now = new Date();
-                nwsAlerts = (data.features || []).filter(f => {
-                    if (f.properties && f.properties.expires) return new Date(f.properties.expires) > now;
-                    return true;
-                });
+                nwsAlerts = (data.features || []).filter(f => { if (f.properties && f.properties.expires) return new Date(f.properties.expires) > now; return true; });
             } catch (e) { nwsAlerts = []; }
 
             if (window.usCounties) {
@@ -1009,7 +948,6 @@
                     if (!f.geometry && f.properties.geocode && f.properties.geocode.SAME) {
                         let fipsCodes = f.properties.geocode.SAME.map(code => code.length === 6 ? code.substring(1) : code);
                         let matchingCounties = window.usCounties.filter(c => fipsCodes.includes(c.id));
-
                         if (matchingCounties.length > 0) {
                             let multiCoords = [];
                             matchingCounties.forEach(c => {
@@ -1021,59 +959,36 @@
                     }
                 });
             }
-
-            renderAlertPanels();
-            renderAlertPolygons();
-            if (window.currentHomeLat && window.currentHomeLon) {
-                updateHomeAlerts(window.currentHomeLat, window.currentHomeLon);
-            }
+            renderAlertPanels(); renderAlertPolygons();
+            if (window.currentHomeLat && window.currentHomeLon) updateHomeAlerts(window.currentHomeLat, window.currentHomeLon);
         }
 
         function updateHomeAlerts(cityLat, cityLon) {
-            const relevant = nwsAlerts.filter(f => {
-                if (f.geometry) return isPointInNWSFeature(cityLon, cityLat, f);
-                return false;
-            }).slice(0, 4);
-
+            const relevant = nwsAlerts.filter(f => { if (f.geometry) return isPointInNWSFeature(cityLon, cityLat, f); return false; }).slice(0, 4);
             const box = document.getElementById('homeAlertsList');
-            if (relevant.length > 0) {
-                box.innerHTML = relevant.map(alertBadgeHTML).join('');
-            } else {
-                box.innerHTML = '<div style="opacity:0.4; font-size:13px; font-style: italic;">No active alerts for this location.</div>';
-            }
+            if (relevant.length > 0) box.innerHTML = relevant.map(alertBadgeHTML).join('');
+            else box.innerHTML = '<div style="opacity:0.4; font-size:13px; font-style: italic;">No active alerts for this location.</div>';
         }
 
         function renderAlertPanels() {
             const sortedAlerts = [...nwsAlerts].sort((a, b) => {
                 const mapSev = { 'Extreme': 4, 'Severe': 3, 'Moderate': 2, 'Minor': 1 };
-                const sevA = mapSev[a.properties.severity] || 0;
-                const sevB = mapSev[b.properties.severity] || 0;
-                return sevB - sevA;
+                return (mapSev[b.properties.severity] || 0) - (mapSev[a.properties.severity] || 0);
             });
-
             const srcLink = `<div style="text-align:right;"><a href="https://mobile.weather.gov" target="_blank" rel="noopener noreferrer" class="source-link">View Weather.gov <i class="ph ph-arrow-up-right"></i></a></div>`;
-
-            const html = sortedAlerts.length
-                ? sortedAlerts.slice(0, 30).map(alertBadgeHTML).join('') + srcLink
-                : '<div style="opacity:0.4; font-size:13px; font-style: italic;">No active alerts nationwide.</div>';
-
+            const html = sortedAlerts.length ? sortedAlerts.slice(0, 30).map(alertBadgeHTML).join('') + srcLink : '<div style="opacity:0.4; font-size:13px; font-style: italic;">No active alerts nationwide.</div>';
             const radEl = document.getElementById('radarAlertsList');
             if (radEl) radEl.innerHTML = html;
         }
 
         function renderAlertPolygons() {
-            if (alertPolygonLayer) { fullRadarMap.removeLayer(alertPolygonLayer); }
-            if (alertPolygonLayerMini) { miniRadarMap.removeLayer(alertPolygonLayerMini); }
+            if (alertPolygonLayer) fullRadarMap.removeLayer(alertPolygonLayer);
+            if (alertPolygonLayerMini) miniRadarMap.removeLayer(alertPolygonLayerMini);
 
-            const colorMap = {
-                'alert-tornado': '#ff4444', 'alert-thunderstorm': '#ff9800',
-                'alert-flash-flood': '#00c853', 'alert-flood': '#00bcd4',
-                'alert-winter': '#9b9bff', 'alert-wind': '#f4e03b', 'alert-other': '#aaaaaa'
-            };
-
+            const colorMap = { 'alert-tornado': '#ff4444', 'alert-thunderstorm': '#ff9800', 'alert-flash-flood': '#00c853', 'alert-flood': '#00bcd4', 'alert-winter': '#9b9bff', 'alert-wind': '#f4e03b', 'alert-other': '#aaaaaa' };
             let geojsonFeatures = nwsAlerts.filter(f => f.geometry);
-
             const urgentOnly = document.getElementById('urgentRadarToggle') && document.getElementById('urgentRadarToggle').checked;
+            
             if (urgentOnly) {
                 geojsonFeatures = geojsonFeatures.filter(f => {
                     const e = (f.properties.event || '').toLowerCase();
@@ -1082,41 +997,33 @@
             }
 
             if (!geojsonFeatures.length) return;
-
-            const severeFeatures = [];
-            const otherFeatures = [];
+            const severeFeatures = []; const otherFeatures = [];
 
             geojsonFeatures.forEach(f => {
                 const e = (f.properties.event || '').toLowerCase();
                 const isTopTier = e.includes('tornado warning') || e.includes('severe thunderstorm warning') || e.includes('special weather statement');
-                if (isTopTier) { severeFeatures.push(f); } else { otherFeatures.push(f); }
+                if (isTopTier) severeFeatures.push(f); else otherFeatures.push(f);
             });
 
             const styleFn = (feature) => {
                 const cls = alertClass(feature.properties.event);
-                const color = colorMap[cls] || '#aaa';
                 const isWarning = (feature.properties.event || '').toLowerCase().includes('warning');
-                return { color: color, weight: isWarning ? 3 : 2, fillOpacity: 0, opacity: 0.95 };
+                return { color: colorMap[cls] || '#aaa', weight: isWarning ? 3 : 2, fillOpacity: 0, opacity: 0.95 };
             };
 
-            const onEachFn = (feature, layer) => {
-                layer.bindTooltip(`<b>${feature.properties.event}</b><br/><small>${(feature.properties.areaDesc || '').split(';')[0]}</small>`, { sticky: true });
-            };
-
-            const severeLayer = L.geoJSON({ type: 'FeatureCollection', features: severeFeatures }, { pane: 'severeAlertsPane', style: styleFn, onEachFeature: onEachFn });
-            const otherLayer = L.geoJSON({ type: 'FeatureCollection', features: otherFeatures }, { pane: 'alertsPane', style: styleFn, onEachFeature: onEachFn });
-
-            const severeLayerMini = L.geoJSON({ type: 'FeatureCollection', features: severeFeatures }, { pane: 'severeAlertsPane', style: styleFn, onEachFeature: onEachFn });
-            const otherLayerMini = L.geoJSON({ type: 'FeatureCollection', features: otherFeatures }, { pane: 'alertsPane', style: styleFn, onEachFeature: onEachFn });
-
-            alertPolygonLayer = L.layerGroup([severeLayer, otherLayer]);
-            alertPolygonLayerMini = L.layerGroup([severeLayerMini, otherLayerMini]);
+            const onEachFn = (feature, layer) => { layer.bindTooltip(`<b>${feature.properties.event}</b><br/><small>${(feature.properties.areaDesc || '').split(';')[0]}</small>`, { sticky: true }); };
+            
+            alertPolygonLayer = L.layerGroup([
+                L.geoJSON({ type: 'FeatureCollection', features: severeFeatures }, { pane: 'severeAlertsPane', style: styleFn, onEachFeature: onEachFn }),
+                L.geoJSON({ type: 'FeatureCollection', features: otherFeatures }, { pane: 'alertsPane', style: styleFn, onEachFeature: onEachFn })
+            ]);
+            alertPolygonLayerMini = L.layerGroup([
+                L.geoJSON({ type: 'FeatureCollection', features: severeFeatures }, { pane: 'severeAlertsPane', style: styleFn, onEachFeature: onEachFn }),
+                L.geoJSON({ type: 'FeatureCollection', features: otherFeatures }, { pane: 'alertsPane', style: styleFn, onEachFeature: onEachFn })
+            ]);
 
             alertPolygonLayerMini.addTo(miniRadarMap);
-
-            if (document.getElementById('nwsRadarToggle').checked) {
-                alertPolygonLayer.addTo(fullRadarMap);
-            }
+            if (document.getElementById('nwsRadarToggle').checked) alertPolygonLayer.addTo(fullRadarMap);
         }
 
         function toggleNWSLayer() {
@@ -1127,16 +1034,13 @@
 
         async function initLiveRadar() {
             try {
-                mainRadarLayers.forEach(l => fullRadarMap.removeLayer(l));
-                miniRadarLayers.forEach(l => miniRadarMap.removeLayer(l));
+                mainRadarLayers.forEach(l => fullRadarMap.removeLayer(l)); miniRadarLayers.forEach(l => miniRadarMap.removeLayer(l));
                 mainRadarLayers = []; miniRadarLayers = [];
                 if (radarInterval) clearInterval(radarInterval);
 
-                const cbust = new Date().getTime();
-                const res = await fetch(`https://api.rainviewer.com/public/weather-maps.json?t=${cbust}`);
+                const res = await fetchWithTimeout(`https://api.rainviewer.com/public/weather-maps.json?t=${Date.now()}`, { timeout: 5000 });
                 const data = await res.json();
-                rvFrames = data.radar.past.slice(-6);
-                rvIndex = 0;
+                rvFrames = data.radar.past.slice(-6); rvIndex = 0;
 
                 rvFrames.forEach((frame) => {
                     let url = `${data.host}${frame.path}/256/{z}/{x}/{y}/6/1_1.png`;
@@ -1155,13 +1059,11 @@
                     mainRadarLayers[rvIndex].setOpacity(0); miniRadarLayers[rvIndex].setOpacity(0);
                     rvIndex = (rvIndex + 1) % rvFrames.length;
                     mainRadarLayers[rvIndex].setOpacity(0.85); miniRadarLayers[rvIndex].setOpacity(0.85);
-
                     let t = new Date(rvFrames[rvIndex].time * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
                     document.getElementById('radarTimeDisplay').innerText = t;
-                    let mrt = document.getElementById('miniRadarTime');
-                    if (mrt) mrt.innerText = t;
+                    let mrt = document.getElementById('miniRadarTime'); if (mrt) mrt.innerText = t;
                 }, 800);
-            } catch (e) { console.log("Radar sync failed", e); }
+            } catch (e) { console.log("Radar sync failed"); }
         }
 
         function toggleRadarPlay() {
@@ -1171,106 +1073,97 @@
 
         async function robustNWSFetch(url) {
             try {
-                let res = await fetch(url, { cache: 'no-cache' });
-                if (res.ok) {
-                    let data = await res.json();
-                    if (!data.status || data.status === 200) return data;
-                }
+                let res = await fetchWithTimeout(url, { headers: { 'Cache-Control': 'no-cache' }, timeout: 6000 });
+                if (res.ok) { let data = await res.json(); if (!data.status || data.status === 200) return data; }
             } catch (e) { }
-
             try {
                 let proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-                let pRes = await fetch(proxied, { cache: 'no-cache' });
-                if (pRes.ok) {
-                    let data = await pRes.json();
-                    if (!data.status || data.status === 200) return data;
-                }
+                let pRes = await fetchWithTimeout(proxied, { timeout: 6000 });
+                if (pRes.ok) { let data = await pRes.json(); if (!data.status || data.status === 200) return data; }
             } catch (e) { }
-
             throw new Error("NWS Fetch Failed");
         }
 
         function buildMeteorologistCreditHTML(wfo, lat, lon) {
-            let afdLink = (wfo && wfo !== "NWS")
-                ? `<a href="https://mesonet.agron.iastate.edu/wx/afos/p.php?pil=AFD${wfo}" target="_blank" rel="noopener noreferrer" class="glass-btn" style="text-decoration: none; padding: 10px 16px; font-size: 14px; min-width: auto; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important;">Read Forecast Discussion <i class="ph ph-arrow-up-right"></i></a>`
-                : '';
-
-            let wfoText = (wfo && wfo !== "NWS") ? `office in <strong>${wfo}</strong>` : `offices`;
-            let learnMoreText = (wfo && wfo !== "NWS") ? `<div style="font-weight: bold; color: #f1c40f; margin-bottom: 10px;">Want to learn how these forecasts were made? Read the expert forecast discussion here:</div>` : ``;
-
+            let afdLink = (wfo && wfo !== "NWS") ? `<a href="https://mesonet.agron.iastate.edu/wx/afos/p.php?pil=AFD${wfo}" target="_blank" rel="noopener noreferrer" class="glass-btn" style="text-decoration: none; padding: 10px 16px; font-size: 14px; min-width: auto; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important;">Read Forecast Discussion <i class="ph ph-arrow-up-right"></i></a>` : '';
             return `
             <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; line-height: 1.6;">
-                <div style="font-weight: bold; color: var(--accent); margin-bottom: 5px; display: flex; align-items: center; gap: 6px;">
-                    <i class="ph-fill ph-user-focus" style="font-size: 18px;"></i> EXPERT METEOROLOGIST FORECAST
-                </div>
-                <div style="opacity: 0.85; margin-bottom: 15px;">These localized forecasts are actively monitored and adjusted by expert meteorologists at the National Weather Service (NWS) ${wfoText}.</div>
-                ${learnMoreText}
+                <div style="font-weight: bold; color: var(--accent); margin-bottom: 5px; display: flex; align-items: center; gap: 6px;"><i class="ph-fill ph-user-focus" style="font-size: 18px;"></i> EXPERT METEOROLOGIST FORECAST</div>
+                <div style="opacity: 0.85; margin-bottom: 15px;">These localized forecasts are actively monitored and adjusted by expert meteorologists at the National Weather Service (NWS) ${(wfo && wfo !== "NWS") ? `office in <strong>${wfo}</strong>` : `offices`}.</div>
+                ${(wfo && wfo !== "NWS") ? `<div style="font-weight: bold; color: #f1c40f; margin-bottom: 10px;">Want to learn how these forecasts were made? Read the expert forecast discussion here:</div>` : ``}
                 <div style="display: flex; gap: 15px; flex-wrap: wrap;">
                     <a href="https://mobile.weather.gov/index.php?lat=${lat}&lon=${lon}" target="_blank" rel="noopener noreferrer" class="glass-btn" style="text-decoration: none; padding: 10px 16px; font-size: 14px; min-width: auto; background: rgba(0, 210, 255, 0.15)!important;">View Detailed NWS Data <i class="ph ph-arrow-up-right"></i></a>
                     ${afdLink}
                 </div>
             </div>`;
         }
-        
+
         async function fetchLiveASOS(lat, lon, fallbackData) {
-            let result = { temp: '--', wind: null, gust: null, wx: 'Loading...', icon: 'ph-cloud-slash', rh: 50, interpolated: false };
-            
+            let result = { temp: '--', wind: null, gust: null, wx: 'Loading...', icon: 'ph-cloud', rh: 50, interpolated: false };
             try {
                 let ptData = await robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
                 let stationsRes = await robustNWSFetch(ptData.properties.observationStations);
                 let stationId = stationsRes.features[0].properties.stationIdentifier;
                 
-                let awcRes = await fetch(`https://aviationweather.gov/api/data/metar?ids=${stationId}&format=json&hours=3`);
+                let awcRes = await fetchWithTimeout(`https://aviationweather.gov/api/data/metar?ids=${stationId}&format=json&hours=3&t=${Date.now()}`, { timeout: 6000 });
                 let awcData = await awcRes.json();
                 
                 if (awcData && awcData.length > 0) {
                     awcData.sort((a, b) => new Date(b.obsTime) - new Date(a.obsTime));
                     let latest = awcData[0];
-                    
                     let tempC = latest.temp;
                     let isInterpolated = false;
                     let latestTime = new Date(latest.obsTime).getTime();
                     let hoursSinceLast = (Date.now() - latestTime) / 3600000;
                     
-                    if (hoursSinceLast > 0.15 && awcData.length > 1) { // If older than 9 minutes, try to interpolate
+                    if (hoursSinceLast > 0.1 && awcData.length > 1) { 
                         let older = awcData.find(m => {
                             let diff = (latestTime - new Date(m.obsTime).getTime()) / 3600000;
-                            return diff >= 0.8 && m.temp !== null; // Find reading roughly an hour older
+                            return diff >= 0.8 && m.temp !== null; 
                         });
                         
                         if (older) {
                             let timeDiff = (latestTime - new Date(older.obsTime).getTime()) / 3600000;
                             let tempRate = (latest.temp - older.temp) / timeDiff;
-                            tempRate = Math.max(-3, Math.min(3, tempRate)); // Cap rate at 3C/hr
+                            tempRate = Math.max(-2.5, Math.min(2.5, tempRate));
                             tempC = latest.temp + (tempRate * hoursSinceLast);
                             isInterpolated = true;
                         }
                     }
 
-                    result.temp = Math.round((tempC * 9/5) + 32);
-                    result.interpolated = isInterpolated;
-                    
+                    if (tempC !== null && tempC !== undefined) {
+                        result.temp = Math.round((tempC * 9/5) + 32);
+                        result.interpolated = isInterpolated;
+                    }
                     if (latest.wspd !== null) result.wind = Math.round(latest.wspd * 1.15078);
                     if (latest.wgst !== null) result.gust = Math.round(latest.wgst * 1.15078);
-                    
-                    if (latest.dewp !== null && latest.temp !== null) {
-                        result.rh = 100 * Math.exp((17.625 * latest.dewp)/(243.04 + latest.dewp)) / Math.exp((17.625 * latest.temp)/(243.04 + latest.temp));
-                    }
+                    if (latest.dewp !== null && latest.temp !== null) result.rh = 100 * Math.exp((17.625 * latest.dewp)/(243.04 + latest.dewp)) / Math.exp((17.625 * latest.temp)/(243.04 + latest.temp));
                     
                     let transWx = translateWx(latest.wxString || "");
-                    result.wx = transWx || "Clear";
-                    result.icon = getWeatherIcon(result.wx, true);
+                    result.wx = transWx || "Clear"; result.icon = getWeatherIcon(result.wx, true);
                     return result;
                 }
             } catch(e) {}
 
-            if (fallbackData) {
-                if (fallbackData.temp !== null) result.temp = fallbackData.temp;
-                if (fallbackData.wind !== null) result.wind = fallbackData.wind;
-                if (fallbackData.gust !== null) result.gust = fallbackData.gust;
+            // Enhanced Fallback Logic (Prevents the "Cross" Cloud icon error on failed NWS fetches)
+            if (fallbackData && fallbackData.temp !== null && fallbackData.temp !== undefined) {
+                result.temp = fallbackData.temp;
+                result.wind = fallbackData.wind !== null ? fallbackData.wind : null;
+                result.gust = fallbackData.gust !== null ? fallbackData.gust : null;
                 let transWx = translateWx(fallbackData.wx || "");
-                result.wx = transWx || "Clear";
-                result.icon = getWeatherIcon(result.wx, true);
+                result.wx = transWx || "Clear"; result.icon = getWeatherIcon(result.wx, true);
+            } else if (result.temp === '--') {
+                try {
+                    let omRes = await fetchWithTimeout(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`, { timeout: 4000 });
+                    let omData = await omRes.json();
+                    if(omData && omData.current_weather) {
+                        result.temp = Math.round((omData.current_weather.temperature * 9/5) + 32);
+                        result.wind = Math.round(omData.current_weather.windspeed * 0.621371);
+                        result.wx = "Fair"; result.icon = getWeatherIcon(result.wx, true);
+                        return result;
+                    }
+                } catch(e) {}
+                result.wx = "Observation Unavailable"; result.icon = "ph-cloud-slash";
             }
             return result;
         }
@@ -1278,50 +1171,37 @@
         async function setupHomeLocation() {
             window.currentHomeLat = 42.03; window.currentHomeLon = -93.62;
             document.getElementById('homeLocationName').innerText = `Official NWS Forecast — Ames, IA`;
-            loadHomeNWS(42.03, -93.62, false);
-            updateHomeAlerts(42.03, -93.62);
-            updateHomeSPC();
+            loadHomeNWS(42.03, -93.62, false); updateHomeAlerts(42.03, -93.62); updateHomeSPC();
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     pos => {
-                        window.currentHomeLat = pos.coords.latitude;
-                        window.currentHomeLon = pos.coords.longitude;
+                        window.currentHomeLat = pos.coords.latitude; window.currentHomeLon = pos.coords.longitude;
                         document.getElementById('homeLocationName').innerText = `Official NWS Forecast — Locating...`;
                         loadHomeNWS(pos.coords.latitude, pos.coords.longitude, true);
                         miniRadarMap.setView([pos.coords.latitude, pos.coords.longitude], 6);
-                        updateHomeAlerts(pos.coords.latitude, pos.coords.longitude);
-                        updateHomeSPC();
+                        updateHomeAlerts(pos.coords.latitude, pos.coords.longitude); updateHomeSPC();
                     },
-                    err => { console.warn("Geolocation denied/ignored. Keeping Ames."); },
-                    { timeout: 5000, maximumAge: 60000 }
+                    err => {}, { timeout: 5000, maximumAge: 60000 }
                 );
             }
         }
 
         async function loadHomeNWS(lat, lon, isGeo = false) {
-            let tempStr = "—";
-            let windStr = "Wind: —";
-            let flStr = "";
-            let wxStr = "Observation Unavailable";
-            let wxIcon = "ph-cloud-slash";
+            let tempStr = "—"; let windStr = "Wind: —"; let flStr = ""; let wxStr = "Observation Unavailable"; let wxIcon = "ph-cloud-slash";
             let fallbackAd = null;
+            let staticFile = (!isGeo && lat === 42.03 && lon === -93.62) ? 'Ames' : null;
 
-            if (!isGeo && lat === 42.03 && lon === -93.62) {
+            if (staticFile) {
                 try {
-                    const asosRes = await fetch('static/asos_conditions.json?t=' + Date.now());
-                    if (asosRes.ok) {
-                        const asosData = await asosRes.json();
-                        if (asosData['Ames']) fallbackAd = asosData['Ames'];
-                    }
+                    const asosRes = await fetchWithTimeout(`static/asos_conditions.json?t=${Date.now()}`, { timeout: 3000 });
+                    if (asosRes.ok) { const asosData = await asosRes.json(); if (asosData['Ames']) fallbackAd = asosData['Ames']; }
                 } catch (e) { }
             }
 
-            // Real-Time ASOS Fetch & Interpolation Engine
             let liveASOS = await fetchLiveASOS(lat, lon, fallbackAd);
             tempStr = liveASOS.temp !== '--' ? `${liveASOS.temp}°F` : '--';
-            wxIcon = liveASOS.icon;
-            wxStr = liveASOS.wx;
+            wxIcon = liveASOS.icon; wxStr = liveASOS.wx;
             
             if (liveASOS.wind !== null) {
                 windStr = `Wind: ${liveASOS.wind} mph`;
@@ -1333,42 +1213,30 @@
                 flStr = `Feels Like: ${fl}°F`;
                 if (liveASOS.gust && liveASOS.gust > liveASOS.wind) {
                     let mc = getFeelsLike(liveASOS.temp, liveASOS.gust, liveASOS.rh);
-                    if (mc < fl) {
-                        flStr += ` | <span style="color:#a29bfe;">Min Chill (Gusts): ${mc}°F</span> <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a>`;
-                    } else {
-                        flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">Gusts don't lower temp</span>`;
-                    }
-                } else {
-                    flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">No gusts past hour</span>`;
-                }
+                    if (mc < fl) flStr += ` | <span style="color:#a29bfe;">Min Chill (Gusts): ${mc}°F</span> <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a>`;
+                    else flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">Gusts don't lower temp</span>`;
+                } else flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">No gusts past hour</span>`;
             }
 
             document.getElementById('homeTempVal').innerText = tempStr;
             document.getElementById('homeWindVal').innerText = windStr;
             document.getElementById('homeFeelsLikeVal').innerHTML = flStr;
             
-            let interpTag = liveASOS.interpolated ? `<span style="font-size:10px; color:var(--warning); vertical-align:super;" title="Interpolated from recent trend">*</span>` : '';
+            let interpTag = liveASOS.interpolated && tempStr !== '--' ? `<span style="font-size:10px; color:var(--warning); vertical-align:super;" title="Interpolated from recent trend">*</span>` : '';
             document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIcon}" style="font-size: 36px; color: #fff;"></i> ${interpTag}`;
 
             try {
-                let ptData = null;
-                let gridId = "NWS";
-                let nwsData = null;
-                let cacheValid = false;
+                let ptData = null; let gridId = "NWS"; let nwsData = null; let cacheValid = false;
                 
-                let staticFile = (!isGeo && lat === 42.03 && lon === -93.62) ? 'Ames' : null;
-
                 if (staticFile) {
                     try {
-                        let cacheRes = await fetch(`static/nws/${staticName}.json?t=${Date.now()}`);
+                        let cacheRes = await fetchWithTimeout(`static/nws/${staticFile}.json?t=${Date.now()}`, { timeout: 3000 });
                         if(cacheRes.ok) {
                             let cData = await cacheRes.json();
                             if (cData && cData.hourly && cData.hourly.properties) {
-                                let validPeriods = cData.hourly.properties.periods.filter(p => new Date(p.endTime) > new Date());
-                                if (validPeriods.length >= 4) {
-                                    nwsData = cData;
-                                    cacheValid = true;
-                                }
+                                // Strictly check startTime to prevent holding onto cached past hours
+                                let validPeriods = cData.hourly.properties.periods.filter(p => new Date(p.startTime).getTime() > Date.now() - 3600000);
+                                if (validPeriods.length >= 4) { nwsData = cData; cacheValid = true; }
                             }
                         }
                     } catch(e){}
@@ -1377,17 +1245,17 @@
                 if (!cacheValid) {
                     ptData = await robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
                     if (!ptData || !ptData.properties) throw new Error("Invalid NWS Point Data");
-                    
                     if(isGeo) {
                         const city = ptData.properties.relativeLocation?.properties?.city || "Unknown";
                         const state = ptData.properties.relativeLocation?.properties?.state || "";
                         document.getElementById('homeLocationName').innerText = `Official NWS Forecast — ${city}, ${state}`;
                     }
-
                     gridId = ptData.properties.gridId;
                     let fData = await robustNWSFetch(ptData.properties.forecast);
                     let hData = await robustNWSFetch(ptData.properties.forecastHourly);
                     nwsData = { daily: fData, hourly: hData };
+                } else if(nwsData && nwsData.daily && nwsData.daily.properties) {
+                    gridId = nwsData.daily.properties.gridId || "NWS";
                 }
 
                 if (nwsData && nwsData.daily && nwsData.daily.properties) {
@@ -1396,15 +1264,14 @@
                 }
 
                 if (nwsData && nwsData.hourly && nwsData.hourly.properties) {
-                    let validHourly = nwsData.hourly.properties.periods.filter(p => new Date(p.endTime) > new Date());
-                    
+                    // Strictly check startTime to prevent holding onto cached past hours
+                    let validHourly = nwsData.hourly.properties.periods.filter(p => new Date(p.startTime).getTime() > Date.now() - 3600000);
                     let tempsHtml = `<div style="display:flex; gap:10px; margin-top:20px; overflow-x: auto; padding-bottom: 5px;">`;
                     for (let i = 0; i < Math.min(4, validHourly.length); i++) {
                         let p = validHourly[i];
                         if (p) {
                             let tDate = new Date(p.startTime);
                             let pIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
-                            
                             let hWinds = parseWinds(p.windSpeed, p.windGust);
                             let hRh = p.relativeHumidity?.value || null;
                             let hFl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
@@ -1412,14 +1279,9 @@
 
                             if (hWinds.gust > hWinds.sustained) {
                                 let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
-                                if (mc < hFl) {
-                                    flHtml += `<div style="font-size:12px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
-                                } else {
-                                    flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
-                                }
-                            } else {
-                                flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">No gusts<br>expected</div>`;
-                            }
+                                if (mc < hFl) flHtml += `<div style="font-size:12px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
+                                else flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
+                            } else flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">No gusts<br>expected</div>`;
 
                             let qpfVal = p.quantitativePrecipitation?.value;
                             let qpfStr = '';
@@ -1428,30 +1290,22 @@
                                 qpfStr = `<div style="color:var(--success); font-size:11px; font-weight:900; margin-top:8px;">${inches}"</div>`;
                             } else {
                                 let pop = p.probabilityOfPrecipitation?.value || 0;
-                                if (pop > 0) {
-                                    qpfStr = `<div style="color:var(--info); font-size:11px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
-                                } else {
-                                    qpfStr = `<div style="color:transparent; font-size:11px; margin-top:8px;">0%</div>`;
-                                }
+                                if (pop > 0) qpfStr = `<div style="color:var(--info); font-size:11px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
+                                else qpfStr = `<div style="color:transparent; font-size:11px; margin-top:8px;">0%</div>`;
                             }
                             tempsHtml += `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
                                 <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
                                 <i class="ph-fill ${pIcon}" style="font-size: 26px; margin: 4px 0;"></i>
                                 <div class="hr-temp" style="font-size:15px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
-                                ${flHtml}
-                                ${qpfStr}
+                                ${flHtml} ${qpfStr}
                             </div>`;
                         }
                     }
                     tempsHtml += `</div>`;
                     document.getElementById('homeNextTemps').innerHTML = tempsHtml;
                 }
-                
                 document.getElementById('homeForecastFootnote').innerHTML = buildMeteorologistCreditHTML(gridId, lat, lon);
-
-            } catch (err) {
-                console.error("Home NWS load failed", err);
-            }
+            } catch (err) {}
         }
 
         // ==========================================
@@ -1461,24 +1315,17 @@
             const el = document.getElementById('lfCityList');
             if (!val || val.length < 2) {
                 const filtered = LF_CITIES.filter(c => c.display.toLowerCase().includes(val?.toLowerCase() || ''));
-                el.innerHTML = filtered.map(c => 
-                    `<div class="lf-city-item${c.id === lfSelectedCity ? ' selected' : ''}" onclick="selectLFCity('${c.id}')">${c.display}</div>`
-                ).join('');
+                el.innerHTML = filtered.map(c => `<div class="lf-city-item${c.id === lfSelectedCity ? ' selected' : ''}" onclick="selectLFCity('${c.id}')">${c.display}</div>`).join('');
                 return;
             }
-
-            // Show local saved matches first
             let filtered = LF_CITIES.filter(c => c.display.toLowerCase().includes(val.toLowerCase()));
-            let localHtml = filtered.map(c => 
-                `<div class="lf-city-item${c.id === lfSelectedCity ? ' selected' : ''}" onclick="selectLFCity('${c.id}')">${c.display}</div>`
-            ).join('');
-
+            let localHtml = filtered.map(c => `<div class="lf-city-item${c.id === lfSelectedCity ? ' selected' : ''}" onclick="selectLFCity('${c.id}')">${c.display}</div>`).join('');
             el.innerHTML = localHtml + `<div style="padding:10px; opacity:0.5; font-size:12px; text-align:center;"><i class="ph ph-spinner ph-spin"></i> Searching worldwide...</div>`;
 
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(async () => {
                 try {
-                    let res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(val)}&count=5&language=en&format=json`);
+                    let res = await fetchWithTimeout(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(val)}&count=5&language=en&format=json`, { timeout: 4000 });
                     let data = await res.json();
                     let remoteHtml = "";
                     if (data && data.results) {
@@ -1491,62 +1338,48 @@
                         }).join('');
                     }
                     el.innerHTML = remoteHtml || localHtml ? localHtml + remoteHtml : `<div style="padding:10px; opacity:0.5; font-size:12px; text-align:center;">No results found.</div>`;
-                } catch (e) {
-                    el.innerHTML = localHtml;
-                }
+                } catch (e) { el.innerHTML = localHtml; }
             }, 300);
         }
 
         function buildLFCityList() { filterLFCities(''); }
 
-        function addAndSelectCity(id, display, lat, lon) {
-            if(!LF_CITIES.find(c => c.id === id)) {
-                LF_CITIES.unshift({ id, display, lat: parseFloat(lat), lon: parseFloat(lon) });
-            }
-            document.getElementById('lfSearchInput').value = '';
-            selectLFCity(id);
+        function addAndSelectCity(id, display, lat, lon, preventPush = false) {
+            if(!LF_CITIES.find(c => c.id === id)) LF_CITIES.unshift({ id, display, lat: parseFloat(lat), lon: parseFloat(lon) });
+            const searchInput = document.getElementById('lfSearchInput');
+            if(searchInput) searchInput.value = '';
+            selectLFCity(id, preventPush);
         }
 
-        async function triggerSearch(query) {
+        async function triggerSearch(query, preventPush = false) {
             if(!query) return;
             clearTimeout(searchTimeout); 
             const main = document.getElementById('lfMain');
             main.innerHTML = '<div style="padding:60px 20px; text-align:center; opacity:0.5;"><i class="ph ph-spinner ph-spin" style="font-size: 32px; margin-bottom: 15px;"></i><br>Searching for location...</div>';
-            
             try {
-                let res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`);
+                let res = await fetchWithTimeout(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`, { timeout: 5000 });
                 let data = await res.json();
                 if(data && data.results && data.results.length > 0) {
-                    let loc = data.results[0];
-                    let stateOrCountry = loc.admin1 || loc.country;
-                    let display = `${loc.name}, ${stateOrCountry}`;
-                    let newCityId = `${loc.name}_${stateOrCountry}`;
-                    
-                    addAndSelectCity(newCityId, display, loc.latitude, loc.longitude);
-                } else {
-                    main.innerHTML = '<div style="padding:60px 20px; text-align:center; color:var(--danger);"><i class="ph-fill ph-warning" style="font-size: 32px; margin-bottom: 15px;"></i><br>Location not found. Try a City or Zip Code.</div>';
-                }
-            } catch(e) {
-                main.innerHTML = '<div style="padding:60px 20px; text-align:center; color:var(--danger);"><i class="ph-fill ph-warning" style="font-size: 32px; margin-bottom: 15px;"></i><br>Search failed. Please try again.</div>';
-            }
+                    let loc = data.results[0]; let stateOrCountry = loc.admin1 || loc.country;
+                    let display = `${loc.name}, ${stateOrCountry}`; let newCityId = `${loc.name}_${stateOrCountry}`;
+                    addAndSelectCity(newCityId, display, loc.latitude, loc.longitude, preventPush);
+                } else main.innerHTML = '<div style="padding:60px 20px; text-align:center; color:var(--danger);"><i class="ph-fill ph-warning" style="font-size: 32px; margin-bottom: 15px;"></i><br>Location not found. Try a City or Zip Code.</div>';
+            } catch(e) { main.innerHTML = '<div style="padding:60px 20px; text-align:center; color:var(--danger);"><i class="ph-fill ph-warning" style="font-size: 32px; margin-bottom: 15px;"></i><br>Search failed. Please try again.</div>'; }
         }
 
         async function fetchMOSData() {
-            try { let nbmRes = await fetch('static/nbm_timeseries_latest.json?t=' + Date.now()); if(nbmRes.ok) mosDataCache.nbm = await nbmRes.json(); } catch(e) { console.log("NBM fetch failed"); }
-            try { let gfsRes = await fetch('static/gfsmos_timeseries_latest.json?t=' + Date.now()); if(gfsRes.ok) mosDataCache.gfsmos = await gfsRes.json(); } catch(e) { console.log("GFS MOS fetch failed"); }
-            try { let namRes = await fetch('static/nammos_timeseries_latest.json?t=' + Date.now()); if(namRes.ok) mosDataCache.nammos = await namRes.json(); } catch(e) { console.log("NAM MOS fetch failed"); }
+            try { let nbmRes = await fetchWithTimeout('static/nbm_timeseries_latest.json?t=' + Date.now(), { timeout: 5000 }); if(nbmRes.ok) mosDataCache.nbm = await nbmRes.json(); } catch(e) {}
+            try { let gfsRes = await fetchWithTimeout('static/gfsmos_timeseries_latest.json?t=' + Date.now(), { timeout: 5000 }); if(gfsRes.ok) mosDataCache.gfsmos = await gfsRes.json(); } catch(e) {}
+            try { let namRes = await fetchWithTimeout('static/nammos_timeseries_latest.json?t=' + Date.now(), { timeout: 5000 }); if(namRes.ok) mosDataCache.nammos = await namRes.json(); } catch(e) {}
         }
 
-        async function selectLFCity(cityId) {
+        async function selectLFCity(cityId, noPush = false) {
             lfSelectedCity = cityId;
+            if (!noPush) window.history.pushState(null, '', '#localforecast?city=' + encodeURIComponent(cityId));
             
             clearTimeout(searchTimeout);
-
             const searchInput = document.getElementById('lfSearchInput');
-            if(searchInput) {
-                searchInput.value = '';
-                searchInput.blur();
-            }
+            if(searchInput) { searchInput.value = ''; searchInput.blur(); }
             buildLFCityList();
 
             if (window.innerWidth <= 768) {
@@ -1576,11 +1409,8 @@
 
             let fallbackAd = null;
             try {
-                let asosRes = await fetch('static/asos_conditions.json?t=' + Date.now());
-                if(asosRes.ok) {
-                    let asosData = await asosRes.json();
-                    if(asosData[cityId]) fallbackAd = asosData[cityId];
-                }
+                let asosRes = await fetchWithTimeout(`static/asos_conditions.json?t=${Date.now()}`, { timeout: 3000 });
+                if(asosRes.ok) { let asosData = await asosRes.json(); if(asosData[cityId]) fallbackAd = asosData[cityId]; }
             } catch(e) {}
 
             let liveASOS = await fetchLiveASOS(cityObj.lat, cityObj.lon, fallbackAd);
@@ -1620,10 +1450,7 @@
                 </div>`;
             }
 
-            let nwsHtml = "";
-            let hourlyHtml = "";
-            let dailyHtml = "";
-            let gridId = "NWS";
+            let nwsHtml = ""; let hourlyHtml = ""; let dailyHtml = ""; let gridId = "NWS";
             
             try {
                 let safeName = cityId.replace(/ /g, "_");
@@ -1631,15 +1458,13 @@
                 let cacheValid = false;
                 
                 try {
-                    let nwsRes = await fetch(`static/nws/${safeName}.json?t=${Date.now()}`);
+                    let nwsRes = await fetchWithTimeout(`static/nws/${safeName}.json?t=${Date.now()}`, { timeout: 3000 });
                     if(nwsRes.ok) {
                         let cData = await nwsRes.json();
                         if (cData && cData.hourly && cData.hourly.properties) {
-                            let validPeriods = cData.hourly.properties.periods.filter(p => new Date(p.endTime) > new Date());
-                            if (validPeriods.length >= 4) {
-                                nwsData = cData;
-                                cacheValid = true;
-                            }
+                            // Strictly check startTime to prevent holding onto cached past hours
+                            let validPeriods = cData.hourly.properties.periods.filter(p => new Date(p.startTime).getTime() > Date.now() - 3600000);
+                            if (validPeriods.length >= 4) { nwsData = cData; cacheValid = true; }
                         }
                     }
                 } catch(e) {}
@@ -1658,9 +1483,10 @@
                 
                 if (nwsData && nwsData.daily && nwsData.daily.properties) {
                     let dailyPeriods = nwsData.daily.properties.periods;
-                    
                     let hourlyPeriods = (nwsData.hourly && nwsData.hourly.properties) ? nwsData.hourly.properties.periods : [];
-                    let validHourly = hourlyPeriods.filter(p => new Date(p.endTime) > new Date());
+                    
+                    // Strictly check startTime to prevent holding onto cached past hours
+                    let validHourly = hourlyPeriods.filter(p => new Date(p.startTime).getTime() > Date.now() - 3600000);
                     
                     if (validHourly.length > 0) {
                         let hCols = validHourly.slice(0, 24).map(p => {
@@ -1848,9 +1674,7 @@
                 let baseDate = new Date();
                 
                 for(let d=0; d<7; d++) {
-                    let startIdx = d * 24;
-                    let endIdx = startIdx + 24;
-                    
+                    let startIdx = d * 24; let endIdx = startIdx + 24;
                     let dDate = new Date(baseDate.getTime() + (d * 86400000));
                     let dayName = d === 0 ? "Today" : dDate.toLocaleDateString([], {weekday: 'short'});
                     
@@ -1858,13 +1682,11 @@
                     let gfsSlice = gfs.slice(startIdx, endIdx).filter(v => v != null);
                     let namSlice = nam.slice(startIdx, endIdx).filter(v => v != null);
                     
-                    // Chronological Highs (Daytime)
                     labels.push(dayName + ' High');
                     nbmLine.push(nbmSlice.length ? Math.max(...nbmSlice) : null);
                     gfsLine.push(gfsSlice.length ? Math.max(...gfsSlice) : null);
                     namLine.push(namSlice.length ? Math.max(...namSlice) : null);
                     
-                    // Chronological Lows (Nighttime)
                     labels.push(dayName + ' Low');
                     nbmLine.push(nbmSlice.length ? Math.min(...nbmSlice) : null);
                     gfsLine.push(gfsSlice.length ? Math.min(...gfsSlice) : null);
@@ -1887,7 +1709,6 @@
                     </div>
                 </div>`;
 
-                // Render the Chart.js graphic safely
                 setTimeout(() => {
                     const ctx = document.getElementById('mosChart');
                     if (ctx) {
@@ -1903,8 +1724,7 @@
                                 ]
                             },
                             options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
+                                responsive: true, maintainAspectRatio: false,
                                 plugins: {
                                     legend: { labels: { color: '#fff', font: { family: 'Inter', size: 11 } } },
                                     tooltip: { mode: 'index', intersect: false },
@@ -1954,7 +1774,17 @@
         }
 
         window.onload = () => {
-            showTab('home');
+            const hashStr = window.location.hash.replace('#', '');
+            const hashParts = hashStr.split('?');
+            const tab = hashParts[0] || 'home';
+            
+            let cityParam = null;
+            if (hashParts.length > 1) {
+                const urlParams = new URLSearchParams('?' + hashParts[1]);
+                cityParam = urlParams.get('city');
+            }
+
+            showTab(tab, null, true);
             
             buildLFCityList();
             initLiveRadar();
@@ -1963,7 +1793,16 @@
             setupHomeLocation();
             
             fetchMOSData().then(() => {
-                if(lfSelectedCity) selectLFCity(lfSelectedCity);
+                if (tab === 'localforecast' && cityParam) {
+                    let existingCity = LF_CITIES.find(c => c.id === cityParam);
+                    if (existingCity) {
+                        selectLFCity(cityParam, true);
+                    } else {
+                        triggerSearch(cityParam.replace(/_/g, ' '), true);
+                    }
+                } else if (lfSelectedCity) {
+                    selectLFCity(lfSelectedCity, true);
+                }
             });
         };
     </script>
