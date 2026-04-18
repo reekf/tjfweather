@@ -134,11 +134,10 @@
         .lf-hour-col .hr-label { opacity: 0.7; margin-bottom: 8px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
         .lf-hour-col .hr-temp { font-size: 20px; font-weight: 900; color: var(--accent); margin-top: 8px; }
 
-        .lf-daily-row { display: flex; align-items: center; padding: 16px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); transition: background 0.2s; border-radius: 12px; }
-        .lf-daily-row:hover { background: rgba(255, 255, 255, 0.05); }
-        .lf-daily-row:last-child { border-bottom: none; }
-        .lf-daily-row .day-hi { color: var(--danger); font-weight: 900; font-size: 18px; }
-        .lf-daily-row .day-lo { color: var(--info); font-weight: 900; font-size: 18px; }
+        .lf-daily-col { min-width: 140px; text-align: center; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 10px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; transition: background 0.2s; }
+        .lf-daily-col:hover { background: rgba(255, 255, 255, 0.05); }
+        .lf-daily-col .day-hi { color: var(--danger); font-weight: 900; font-size: 18px; }
+        .lf-daily-col .day-lo { color: var(--info); font-weight: 900; font-size: 18px; }
 
         /* Premium MOS Grid Styles */
         .mos-grid { display: flex; flex-direction: column; gap: 8px; }
@@ -1688,12 +1687,13 @@
                     }
                     
                     if (dailyPeriods.length > 0) {
-                        let dRows = "";
+                        let dCols = "";
                         let dayIdx = 0;
                         while(dayIdx < dailyPeriods.length) {
                             let p1 = dailyPeriods[dayIdx];
                             let p2 = (dayIdx + 1 < dailyPeriods.length) ? dailyPeriods[dayIdx+1] : null;
-                            let hi, lo, dIcon, dFl = '';
+                            let hi, lo, dIcon, dayFlHtml = '', eveFlHtml = '', nightMcHtml = '';
+                            let dayName = p1.name;
                             
                             if (p1.isDaytime) {
                                 hi = p1.temperature;
@@ -1702,12 +1702,19 @@
                                 
                                 let dWinds = parseWinds(p1.windSpeed, p1.windGust);
                                 let dRh = p1.relativeHumidity?.value || null;
-                                let fl = getFeelsLike(hi, dWinds.sustained, dRh);
-                                if (fl !== hi) dFl = `<div style="font-size:11px; color:var(--info); margin-top:2px; text-align:right;">Feels Like: ${fl}°</div>`;
+                                let dFl = getFeelsLike(hi, dWinds.sustained, dRh);
+                                if (dFl !== hi) dayFlHtml = `<div style="font-size:11px; color:var(--warning); margin-top:6px; font-weight:bold;">Day FL: ${dFl}°</div>`;
 
-                                if (hi !== '--' && dWinds.gust > dWinds.sustained) {
-                                    let mc = getFeelsLike(hi, dWinds.gust, dRh);
-                                    if (mc < fl) dFl += `<div style="font-size:11px; color:#a29bfe; margin-top:2px; text-align:right;">Min Chill: ${mc}°</div>`;
+                                if (p2 && !p2.isDaytime) {
+                                    let nWinds = parseWinds(p2.windSpeed, p2.windGust);
+                                    let nRh = p2.relativeHumidity?.value || null;
+                                    let nFl = getFeelsLike(lo, nWinds.sustained, nRh);
+                                    if (nFl !== lo) eveFlHtml = `<div style="font-size:11px; color:var(--info); margin-top:2px; font-weight:bold;">Eve FL: ${nFl}°</div>`;
+
+                                    if (lo !== '--' && nWinds.gust > nWinds.sustained) {
+                                        let nMc = getFeelsLike(lo, nWinds.gust, nRh);
+                                        if (nMc < nFl) nightMcHtml = `<div style="font-size:11px; color:#a29bfe; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
+                                    }
                                 }
 
                                 dayIdx += (p2 && !p2.isDaytime) ? 2 : 1;
@@ -1715,21 +1722,30 @@
                                 hi = '--';
                                 lo = p1.temperature;
                                 dIcon = getWeatherIcon(p1.shortForecast, false);
+                                
+                                let nWinds = parseWinds(p1.windSpeed, p1.windGust);
+                                let nRh = p1.relativeHumidity?.value || null;
+                                let nFl = getFeelsLike(lo, nWinds.sustained, nRh);
+                                if (nFl !== lo) eveFlHtml = `<div style="font-size:11px; color:var(--info); margin-top:6px; font-weight:bold;">Eve FL: ${nFl}°</div>`;
+                                
+                                if (lo !== '--' && nWinds.gust > nWinds.sustained) {
+                                    let nMc = getFeelsLike(lo, nWinds.gust, nRh);
+                                    if (nMc < nFl) nightMcHtml = `<div style="font-size:11px; color:#a29bfe; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
+                                }
                                 dayIdx++;
                             }
                             
-                            dRows += `
-                            <div class="lf-daily-row">
-                                <div style="flex: 1; font-weight: 800; min-width: 90px;">${p1.name}</div>
-                                <div style="width: 40px; text-align: center;"><i class="ph-fill ${dIcon}" style="font-size: 22px;"></i></div>
-                                <div style="flex: 3; font-size: 13px; opacity: 0.85; padding: 0 15px; line-height: 1.4;">${p1.shortForecast}</div>
-                                <div style="text-align: right; width: 90px; display: flex; flex-direction: column; justify-content: center; align-items: flex-end;">
-                                    <div style="display: flex; gap: 8px; align-items: center;">
-                                        <span class="day-hi" style="width: 30px;">${hi !== '--' ? hi+'°' : '--'}</span>
-                                        <span class="day-lo" style="width: 30px; opacity: 0.8;">${lo !== '--' ? lo+'°' : '--'}</span>
-                                    </div>
-                                    ${dFl}
+                            dCols += `
+                            <div class="lf-daily-col">
+                                <div style="font-weight: 800; font-size: 13px; margin-bottom: 8px;">${dayName}</div>
+                                <i class="ph-fill ${dIcon}" style="font-size: 28px; margin-bottom: 8px; color: #fff;"></i>
+                                <div style="display: flex; gap: 8px; align-items: center; justify-content: center; margin-bottom: 2px;">
+                                    <span class="day-hi">${hi !== '--' ? hi+'°' : '--'}</span>
+                                    <span class="day-lo" style="opacity: 0.85;">${lo !== '--' ? lo+'°' : '--'}</span>
                                 </div>
+                                ${dayFlHtml}
+                                ${eveFlHtml}
+                                ${nightMcHtml}
                             </div>`;
                         }
                         
@@ -1738,8 +1754,8 @@
                             <div style="font-size:12px; font-weight:900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px;">
                                 <i class="ph-fill ph-calendar-blank"></i> 7-DAY FORECAST
                             </div>
-                            <div style="display: flex; flex-direction: column; gap: 4px;">
-                                ${dRows}
+                            <div class="lf-hourly-scroll">
+                                ${dCols}
                             </div>
                         </div>`;
                     }
