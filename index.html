@@ -9,6 +9,7 @@
     <script src="https://d3js.org/topojson.v3.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <style>
         /* Universal Box-Sizing */
         *, *::before, *::after { box-sizing: border-box; }
@@ -135,7 +136,7 @@
         .lf-hour-col .hr-label { opacity: 0.7; margin-bottom: 8px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
         .lf-hour-col .hr-temp { font-size: 20px; font-weight: 900; color: var(--accent); margin-top: 8px; }
 
-        .lf-daily-col { min-width: 160px; text-align: center; background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(20, 30, 40, 0.6) 100%); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.2s; }
+        .lf-daily-col { min-width: 190px; text-align: center; background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(20, 30, 40, 0.6) 100%); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.2s; }
         .lf-daily-col:hover { background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(30, 45, 60, 0.8) 100%); border-color: var(--accent); transform: translateY(-2px); }
 
         .alert-badge { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.4; border-left: 4px solid currentColor; background: rgba(0, 0, 0, 0.5); word-wrap: break-word; white-space: normal; height: auto; min-height: min-content; }
@@ -413,6 +414,11 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        // Safely register ChartDataLabels if the CDN loaded successfully
+        if (typeof Chart !== 'undefined' && typeof ChartDataLabels !== 'undefined') {
+            Chart.register(ChartDataLabels);
+        }
+
         const LF_CITIES = [
             { id: 'New York', display: 'New York, NY', lat: 40.71, lon: -74.00 }, { id: 'Los Angeles', display: 'Los Angeles, CA', lat: 34.05, lon: -118.24 },
             { id: 'Chicago', display: 'Chicago, IL', lat: 41.87, lon: -87.62 }, { id: 'Houston', display: 'Houston, TX', lat: 29.76, lon: -95.36 },
@@ -527,7 +533,7 @@
                 }
             }
             
-            // If the NWS API fails to return a gust string for the hourly array, but it's a breezy day, mathematically inject the standard mechanical gust factor so the UI calculation succeeds.
+            // Artificial gust injection for missing NWS API data on breezy days
             if (gust <= sustained && sustained >= 10) {
                 gust = Math.round(sustained * 1.3);
             }
@@ -1277,7 +1283,13 @@
 
                                         if (hWinds.gust > hWinds.sustained) {
                                             let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
-                                            if (mc < hFl) flHtml += `<div style="font-size:12px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
+                                            if (mc < hFl) {
+                                                flHtml += `<div style="font-size:12px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
+                                            } else {
+                                                flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
+                                            }
+                                        } else {
+                                            flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">No gusts<br>expected</div>`;
                                         }
 
                                         let qpfVal = p.quantitativePrecipitation?.value;
@@ -1402,7 +1414,13 @@
 
                                 if (hWinds.gust > hWinds.sustained) {
                                     let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
-                                    if (mc < hFl) flHtml += `<div style="font-size:12px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
+                                    if (mc < hFl) {
+                                        flHtml += `<div style="font-size:12px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
+                                    } else {
+                                        flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
+                                    }
+                                } else {
+                                    flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">No gusts<br>expected</div>`;
                                 }
 
                                 let qpfVal = p.quantitativePrecipitation?.value;
@@ -1640,7 +1658,13 @@
 
                             if (hWinds.gust > hWinds.sustained) {
                                 let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
-                                if (mc < fl) flHtml += `<div style="font-size:12px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
+                                if (mc < fl) {
+                                    flHtml += `<div style="font-size:12px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
+                                } else {
+                                    flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
+                                }
+                            } else {
+                                flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">No gusts<br>expected</div>`;
                             }
 
                             let qpfVal = p.quantitativePrecipitation?.value;
@@ -1691,17 +1715,23 @@
                                 let dWinds = parseWinds(p1.windSpeed, p1.windGust);
                                 let dRh = p1.relativeHumidity?.value || null;
                                 let dFl = getFeelsLike(hi, dWinds.sustained, dRh);
-                                if (dFl !== hi && !isNaN(dFl)) dayFlHtml = `<div style="font-size:12px; color:var(--warning); margin-top:6px; font-weight:bold;">Day FL: ${dFl}°</div>`;
+                                if (hi !== '--' && dFl !== hi && !isNaN(dFl)) dayFlHtml = `<div style="font-size:12px; color:var(--warning); margin-top:6px; font-weight:bold;">Day Feels Like: ${dFl}°</div>`;
 
                                 if (p2 && !p2.isDaytime && lo !== '--') {
                                     let nWinds = parseWinds(p2.windSpeed, p2.windGust);
                                     let nRh = p2.relativeHumidity?.value || null;
                                     let nFl = getFeelsLike(lo, nWinds.sustained, nRh);
-                                    if (nFl !== lo && !isNaN(nFl)) eveFlHtml = `<div style="font-size:12px; color:var(--info); margin-top:6px; font-weight:bold;">Eve FL: ${nFl}°</div>`;
+                                    if (nFl !== lo && !isNaN(nFl)) eveFlHtml = `<div style="font-size:12px; color:var(--info); margin-top:6px; font-weight:bold;">Eve Feels Like: ${nFl}°</div>`;
 
                                     if (nWinds.gust > nWinds.sustained) {
                                         let nMc = getFeelsLike(lo, nWinds.gust, nRh);
-                                        if (nMc < nFl && !isNaN(nMc)) nightMcHtml = `<div style="font-size:12px; color:#a29bfe; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
+                                        if (nMc < nFl && !isNaN(nMc)) {
+                                            nightMcHtml = `<div style="font-size:12px; color:#a29bfe; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
+                                        } else {
+                                            nightMcHtml = `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px;">Gusts don't lower temp</div>`;
+                                        }
+                                    } else {
+                                        nightMcHtml = `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px;">No gusts expected</div>`;
                                     }
                                 }
 
@@ -1714,11 +1744,17 @@
                                 let nWinds = parseWinds(p1.windSpeed, p1.windGust);
                                 let nRh = p1.relativeHumidity?.value || null;
                                 let nFl = getFeelsLike(lo, nWinds.sustained, nRh);
-                                if (nFl !== lo && !isNaN(nFl)) eveFlHtml = `<div style="font-size:12px; color:var(--info); margin-top:6px; font-weight:bold;">Eve FL: ${nFl}°</div>`;
+                                if (lo !== '--' && nFl !== lo && !isNaN(nFl)) eveFlHtml = `<div style="font-size:12px; color:var(--info); margin-top:6px; font-weight:bold;">Eve Feels Like: ${nFl}°</div>`;
                                 
-                                if (nWinds.gust > nWinds.sustained) {
+                                if (lo !== '--' && nWinds.gust > nWinds.sustained) {
                                     let nMc = getFeelsLike(lo, nWinds.gust, nRh);
-                                    if (nMc < nFl && !isNaN(nMc)) nightMcHtml = `<div style="font-size:12px; color:#a29bfe; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
+                                    if (nMc < nFl && !isNaN(nMc)) {
+                                        nightMcHtml = `<div style="font-size:12px; color:#a29bfe; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
+                                    } else {
+                                        nightMcHtml = `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px;">Gusts don't lower temp</div>`;
+                                    }
+                                } else {
+                                    nightMcHtml = `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px;">No gusts expected</div>`;
                                 }
                                 dayIdx++;
                             }
@@ -1792,7 +1828,7 @@
                 let nam = (mosDataCache.nammos && mosDataCache.nammos[cityId]) ? mosDataCache.nammos[cityId].temp : [];
                 
                 let labels = [];
-                let nbmH = [], nbmL = [], gfsH = [], gfsL = [], namH = [], namL = [];
+                let nbmLine = [], gfsLine = [], namLine = [];
                 let baseDate = new Date();
                 
                 for(let d=0; d<7; d++) {
@@ -1801,18 +1837,22 @@
                     
                     let dDate = new Date(baseDate.getTime() + (d * 86400000));
                     let dayName = d === 0 ? "Today" : dDate.toLocaleDateString([], {weekday: 'short'});
-                    labels.push(dayName);
                     
                     let nbmSlice = nbm.slice(startIdx, endIdx).filter(v => v != null);
                     let gfsSlice = gfs.slice(startIdx, endIdx).filter(v => v != null);
                     let namSlice = nam.slice(startIdx, endIdx).filter(v => v != null);
                     
-                    nbmH.push(nbmSlice.length ? Math.max(...nbmSlice) : null);
-                    nbmL.push(nbmSlice.length ? Math.min(...nbmSlice) : null);
-                    gfsH.push(gfsSlice.length ? Math.max(...gfsSlice) : null);
-                    gfsL.push(gfsSlice.length ? Math.min(...gfsSlice) : null);
-                    namH.push(namSlice.length ? Math.max(...namSlice) : null);
-                    namL.push(namSlice.length ? Math.min(...namSlice) : null);
+                    // Chronological Highs (Daytime)
+                    labels.push(dayName + ' High');
+                    nbmLine.push(nbmSlice.length ? Math.max(...nbmSlice) : null);
+                    gfsLine.push(gfsSlice.length ? Math.max(...gfsSlice) : null);
+                    namLine.push(namSlice.length ? Math.max(...namSlice) : null);
+                    
+                    // Chronological Lows (Nighttime)
+                    labels.push(dayName + ' Low');
+                    nbmLine.push(nbmSlice.length ? Math.min(...nbmSlice) : null);
+                    gfsLine.push(gfsSlice.length ? Math.min(...gfsSlice) : null);
+                    namLine.push(namSlice.length ? Math.min(...namSlice) : null);
                 }
 
                 mosHtml = `
@@ -1824,8 +1864,10 @@
                         Plotting the daily High and Low temperature spread between the official NBM consensus, GFS MOS, and NAM MOS models.
                         <span style="color:var(--danger); font-weight:bold;">Wider gaps = lower confidence in the forecast.</span>
                     </div>
-                    <div style="width: 100%; height: 350px; position: relative;">
-                        <canvas id="mosChart"></canvas>
+                    <div style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 10px;">
+                        <div style="min-width: 900px; height: 350px; position: relative;">
+                            <canvas id="mosChart"></canvas>
+                        </div>
                     </div>
                 </div>`;
 
@@ -1839,12 +1881,9 @@
                             data: {
                                 labels: labels,
                                 datasets: [
-                                    { label: 'NBM High', data: nbmH, borderColor: '#00d2ff', backgroundColor: '#00d2ff', borderWidth: 3, pointRadius: 4, fill: false, tension: 0.3 },
-                                    { label: 'NBM Low', data: nbmL, borderColor: '#00d2ff', backgroundColor: '#00d2ff', borderWidth: 3, pointRadius: 4, fill: false, borderDash: [5, 5], tension: 0.3 },
-                                    { label: 'GFS High', data: gfsH, borderColor: '#ff4757', backgroundColor: '#ff4757', borderWidth: 2, pointRadius: 3, fill: false, tension: 0.3 },
-                                    { label: 'GFS Low', data: gfsL, borderColor: '#ff4757', backgroundColor: '#ff4757', borderWidth: 2, pointRadius: 3, fill: false, borderDash: [5, 5], tension: 0.3 },
-                                    { label: 'NAM High', data: namH, borderColor: '#2ecc71', backgroundColor: '#2ecc71', borderWidth: 2, pointRadius: 3, fill: false, tension: 0.3 },
-                                    { label: 'NAM Low', data: namL, borderColor: '#2ecc71', backgroundColor: '#2ecc71', borderWidth: 2, pointRadius: 3, fill: false, borderDash: [5, 5], tension: 0.3 }
+                                    { label: 'NBM', data: nbmLine, borderColor: '#00d2ff', backgroundColor: '#00d2ff', borderWidth: 3, pointRadius: 4, fill: false, tension: 0.2 },
+                                    { label: 'GFS MOS', data: gfsLine, borderColor: '#ff4757', backgroundColor: '#ff4757', borderWidth: 2, pointRadius: 3, fill: false, tension: 0.2 },
+                                    { label: 'NAM MOS', data: namLine, borderColor: '#2ecc71', backgroundColor: '#2ecc71', borderWidth: 2, pointRadius: 3, fill: false, tension: 0.2 }
                                 ]
                             },
                             options: {
@@ -1852,10 +1891,17 @@
                                 maintainAspectRatio: false,
                                 plugins: {
                                     legend: { labels: { color: '#fff', font: { family: 'Inter', size: 11 } } },
-                                    tooltip: { mode: 'index', intersect: false }
+                                    tooltip: { mode: 'index', intersect: false },
+                                    datalabels: {
+                                        color: function(context) { return context.dataset.borderColor; },
+                                        font: { weight: 'bold', size: 11 },
+                                        align: function(context) { return context.dataIndex % 2 === 0 ? 'top' : 'bottom'; },
+                                        offset: 4,
+                                        formatter: function(value) { return value !== null ? value + '°' : ''; }
+                                    }
                                 },
                                 scales: {
-                                    x: { ticks: { color: '#aaa' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                                    x: { ticks: { color: '#aaa', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
                                     y: { ticks: { color: '#aaa', callback: function(value){ return value + '°'; } }, grid: { color: 'rgba(255,255,255,0.05)' } }
                                 },
                                 interaction: { mode: 'nearest', axis: 'x', intersect: false }
