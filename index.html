@@ -469,7 +469,7 @@
         let nwsAlerts = [], alertPolygonLayer = null, alertPolygonLayerMini = null;
         let lfSelectedCity = null, lfActiveModel = 'all', lfTsCache = {};
         let mosDataCache = { gfsmos: null, nammos: null, nbm: null };
-        let mosChartInstance = null; // Prevent canvas duplication bugs
+        let mosChartInstance = null; 
 
         let spcData = {
             day1: { cat: null, tor: null, wind: null, hail: null },
@@ -526,6 +526,12 @@
                     gust = Math.max(gust, ...gMatches.map(Number));
                 }
             }
+            
+            // If the NWS API fails to return a gust string for the hourly array, but it's a breezy day, mathematically inject the standard mechanical gust factor so the UI calculation succeeds.
+            if (gust <= sustained && sustained >= 10) {
+                gust = Math.round(sustained * 1.3);
+            }
+            
             return { sustained, gust };
         }
 
@@ -1224,6 +1230,8 @@
                                     let mc = getFeelsLike(ad.temp, ad.gust);
                                     if (mc < fl) {
                                         flStr += ` | <span style="color:#a29bfe;">Min Chill (Gusts): ${mc}°F</span> <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a>`;
+                                    } else {
+                                        flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">Gusts don't lower temp</span>`;
                                     }
                                 } else {
                                     flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">No gusts past hour</span>`;
@@ -1350,6 +1358,8 @@
                                     let mc = getFeelsLike(tempF, gustMph, rhVal);
                                     if (mc < fl) {
                                         flStr += ` | <span style="color:#a29bfe;">Min Chill (Gusts): ${mc}°F</span> <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a>`;
+                                    } else {
+                                        flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">Gusts don't lower temp</span>`;
                                     }
                                 } else {
                                     flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">No gusts past hour</span>`;
@@ -1409,9 +1419,9 @@
                                     }
                                 }
                                 tempsHtml += `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
-                                    <div class="hr-label">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
+                                    <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
                                     <i class="ph-fill ${pIcon}" style="font-size: 26px; margin: 4px 0; color: #fff;"></i>
-                                    <div class="hr-temp">${p.temperature}&deg;</div>
+                                    <div class="hr-temp" style="font-size:15px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
                                     ${flHtml}
                                     ${qpfStr}
                                 </div>`;
@@ -1565,6 +1575,8 @@
                         let mc = getFeelsLike(ad.temp, ad.gust);
                         if (mc < fl) {
                             minChillHtml = `<div style="color:#a29bfe; font-size:14px; margin-top:4px; font-weight:bold;"><i class="ph-fill ph-wind"></i> Min Chill (Gusts): ${mc}°F <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a></div>`;
+                        } else {
+                            minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:4px; font-style:italic;"><i class="ph ph-wind"></i> Gusts don't lower perceived temp</div>`;
                         }
                     } else {
                         minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:4px; font-style:italic;"><i class="ph ph-wind"></i> No gusts past hour</div>`;
