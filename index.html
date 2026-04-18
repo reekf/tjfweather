@@ -137,7 +137,7 @@
         .lf-search-wrap button { background: var(--accent); border: none; color: #000; font-weight: 900; padding: 10px 16px; border-radius: 12px; cursor: pointer; }
         
         .lf-city-list { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
-        .lf-city-item { padding: 10px 14px; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 600; border: 1px solid transparent; }
+        .lf-city-item { padding: 10px 14px; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 600; border: 1px solid transparent; display: flex; align-items: center; }
         .lf-city-item:hover, .lf-city-item.selected { background: rgba(0, 210, 255, 0.15); border-color: var(--accent); color: var(--accent); }
 
         .lf-hourly-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: thin; }
@@ -453,7 +453,7 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v13.2 (Firebase Enabled) | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v13.4 (Firebase Enabled) | AMES, IA</p>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <h3 style="font-size: 16px; color: var(--info); margin-top: 0;">App Features</h3>
@@ -470,15 +470,24 @@
     <div id="authModal" class="bg-overlay" style="display:none; z-index: 9999; justify-content:center; align-items:center; pointer-events: auto;">
         <div class="glass" style="padding: 30px; width: 90%; max-width: 350px; display:flex; flex-direction:column; gap: 15px; background: rgba(11, 14, 17, 0.95); border: 1px solid var(--accent);">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2 style="margin:0; font-size: 20px; font-weight:900;">Account Access</h2>
+                <h2 id="authModalTitle" style="margin:0; font-size: 20px; font-weight:900;">Login</h2>
                 <button style="background:none; border:none; color:#fff; font-size:28px; cursor:pointer; padding:0; line-height:1;" onclick="window.closeAuthModal()">&times;</button>
             </div>
             <div id="authError" style="color: var(--danger); font-size:13px; display:none; background:rgba(255,71,87,0.1); padding:10px; border-radius:8px; border:1px solid rgba(255,71,87,0.3);"></div>
-            <input type="email" id="authEmail" placeholder="Email Address" style="background: rgba(0,0,0,0.5); border:1px solid var(--border); color:#fff; padding:14px; border-radius:12px; outline:none; font-family:inherit;" />
-            <input type="password" id="authPass" placeholder="Password" style="background: rgba(0,0,0,0.5); border:1px solid var(--border); color:#fff; padding:14px; border-radius:12px; outline:none; font-family:inherit;" />
-            <div id="authActionBtns" style="display:flex; gap:10px; margin-top:10px;">
-                <button class="glass-btn" style="flex:1;" onclick="window.handleAuthAction('login')">Login</button>
-                <button class="glass-btn" style="flex:1; background:rgba(255,255,255,0.1)!important; border-color:var(--border)!important;" onclick="window.handleAuthAction('register')">Register</button>
+            
+            <div id="authFormFields" style="display:flex; flex-direction:column; gap:15px;">
+                <input type="email" id="authEmail" placeholder="Email Address" style="background: rgba(0,0,0,0.5); border:1px solid var(--border); color:#fff; padding:14px; border-radius:12px; outline:none; font-family:inherit;" />
+                <input type="password" id="authPass" placeholder="Password" style="background: rgba(0,0,0,0.5); border:1px solid var(--border); color:#fff; padding:14px; border-radius:12px; outline:none; font-family:inherit;" />
+            </div>
+
+            <div id="authActionBtns" style="display:flex; flex-direction: column; gap:10px; margin-top:5px;">
+                <button id="mainAuthBtn" class="glass-btn" style="width: 100%;" onclick="window.handleAuthAction()">Login</button>
+                <button class="glass-btn" style="width: 100%; background:rgba(255,255,255,0.1)!important; border-color:var(--border)!important; color: #fff!important;" onclick="window.doGoogleLogin()">
+                    <i class="ph-fill ph-google-logo"></i> Sign in with Google
+                </button>
+                <div style="text-align:center; margin-top:10px; font-size: 13px;">
+                    <a href="#" id="authToggleLink" style="color: var(--accent); text-decoration: none;" onclick="window.toggleAuthMode(event)">Don't have an account? Register here</a>
+                </div>
             </div>
         </div>
     </div>
@@ -489,12 +498,26 @@
         window.pinnedCities = [];
         window.currentHomeCityId = null;
         window.renderPinnedCities = function(){};
+        window.authMode = 'login';
         
         // Modal Handlers
+        window.toggleAuthMode = function(e) {
+            if(e) e.preventDefault();
+            window.authMode = window.authMode === 'login' ? 'register' : 'login';
+            document.getElementById('authModalTitle').innerText = window.authMode === 'login' ? 'Login' : 'Create Account';
+            document.getElementById('mainAuthBtn').innerText = window.authMode === 'login' ? 'Login' : 'Register';
+            document.getElementById('authToggleLink').innerText = window.authMode === 'login' ? "Don't have an account? Register here" : "Already have an account? Login here";
+            document.getElementById('authError').style.display = 'none';
+        };
+
         window.openAuthModal = function(msg = "") {
-            document.getElementById('authEmail').style.display = 'block';
-            document.getElementById('authPass').style.display = 'block';
+            document.getElementById('authFormFields').style.display = 'flex';
             document.getElementById('authActionBtns').style.display = 'flex';
+            
+            window.authMode = 'login';
+            document.getElementById('authModalTitle').innerText = 'Login';
+            document.getElementById('mainAuthBtn').innerText = 'Login';
+            document.getElementById('authToggleLink').innerText = "Don't have an account? Register here";
             
             const errDiv = document.getElementById('authError');
             if (msg) { errDiv.innerText = msg; errDiv.style.display = 'block'; }
@@ -514,11 +537,10 @@
         window.showModalMessage = function(msg) {
             document.getElementById('authError').innerText = msg;
             document.getElementById('authError').style.display = 'block';
-            // Keep inputs visible to allow the user to easily retry typing the password!
             document.getElementById('authModal').style.display = 'flex';
         };
 
-        window.handleAuthAction = async function(action) {
+        window.handleAuthAction = async function() {
             const email = document.getElementById('authEmail').value;
             const pass = document.getElementById('authPass').value;
             const errDiv = document.getElementById('authError');
@@ -527,9 +549,9 @@
             errDiv.style.display = 'none';
             
             let success = false;
-            if (action === 'login' && window.doLogin) {
+            if (window.authMode === 'login' && window.doLogin) {
                 success = await window.doLogin(email, pass);
-            } else if (action === 'register' && window.doRegister) {
+            } else if (window.authMode === 'register' && window.doRegister) {
                 success = await window.doRegister(email, pass);
             }
             
@@ -972,6 +994,11 @@
             return false;
         }
 
+        window.getCityAlerts = function(lat, lon) {
+            if (!window.nwsAlerts || window.nwsAlerts.length === 0) return [];
+            return window.nwsAlerts.filter(f => { if (f.geometry) return isPointInNWSFeature(lon, lat, f); return false; });
+        };
+
         function extractHighestProb(geojsonData, lat, lon) {
             let maxProb = 0; let sig = false;
             if (geojsonData && geojsonData.features) {
@@ -1104,11 +1131,11 @@
                 const res = await fetchWithTimeout('static/nws_alerts.json?t=' + Date.now(), { cache: 'no-cache', timeout: 5000 });
                 const data = await res.json();
                 const now = new Date();
-                nwsAlerts = (data.features || []).filter(f => { if (f.properties && f.properties.expires) return new Date(f.properties.expires) > now; return true; });
-            } catch (e) { nwsAlerts = []; }
+                window.nwsAlerts = (data.features || []).filter(f => { if (f.properties && f.properties.expires) return new Date(f.properties.expires) > now; return true; });
+            } catch (e) { window.nwsAlerts = []; }
 
             if (window.usCounties) {
-                nwsAlerts.forEach(f => {
+                window.nwsAlerts.forEach(f => {
                     if (!f.geometry && f.properties.geocode && f.properties.geocode.SAME) {
                         let fipsCodes = f.properties.geocode.SAME.map(code => code.length === 6 ? code.substring(1) : code);
                         let matchingCounties = window.usCounties.filter(c => fipsCodes.includes(c.id));
@@ -1125,17 +1152,19 @@
             }
             window.renderAlertPanels(); window.renderAlertPolygons();
             if (window.currentHomeLat && window.currentHomeLon) window.updateHomeAlerts(window.currentHomeLat, window.currentHomeLon);
+            if (window.renderPinnedCities) window.renderPinnedCities();
+            if (window.buildLFCityList) window.buildLFCityList();
         }
 
         window.updateHomeAlerts = function(cityLat, cityLon) {
-            const relevant = nwsAlerts.filter(f => { if (f.geometry) return isPointInNWSFeature(cityLon, cityLat, f); return false; }).slice(0, 4);
+            const relevant = window.getCityAlerts(cityLat, cityLon).slice(0, 4);
             const box = document.getElementById('homeAlertsList');
             if (relevant.length > 0) box.innerHTML = relevant.map(alertBadgeHTML).join('');
             else box.innerHTML = '<div style="opacity:0.4; font-size:13px; font-style: italic;">No active alerts for this location.</div>';
         }
 
         window.renderAlertPanels = function() {
-            const sortedAlerts = [...nwsAlerts].sort((a, b) => {
+            const sortedAlerts = [...(window.nwsAlerts || [])].sort((a, b) => {
                 const mapSev = { 'Extreme': 4, 'Severe': 3, 'Moderate': 2, 'Minor': 1 };
                 return (mapSev[b.properties.severity] || 0) - (mapSev[a.properties.severity] || 0);
             });
@@ -1150,7 +1179,7 @@
             if (alertPolygonLayerMini) miniRadarMap.removeLayer(alertPolygonLayerMini);
 
             const colorMap = { 'alert-tornado': '#ff4444', 'alert-thunderstorm': '#ff9800', 'alert-flash-flood': '#00c853', 'alert-flood': '#00bcd4', 'alert-winter': '#9b9bff', 'alert-wind': '#f4e03b', 'alert-other': '#aaaaaa' };
-            let geojsonFeatures = nwsAlerts.filter(f => f.geometry);
+            let geojsonFeatures = (window.nwsAlerts || []).filter(f => f.geometry);
             const urgentOnly = document.getElementById('urgentRadarToggle') && document.getElementById('urgentRadarToggle').checked;
             
             if (urgentOnly) {
@@ -1345,8 +1374,14 @@
                 if (pc.id === window.currentHomeCityId) continue; 
                 validCards++;
                 
+                let cAlerts = window.getCityAlerts(pc.lat, pc.lon);
+                let alertIconHtml = cAlerts.length > 0 ? `<i class="ph-fill ph-warning" style="color:var(--danger); font-size:16px;" title="${cAlerts.length} Active Alert(s)"></i>` : '';
+
                 html += `<div id="pinned-card-${pc.id}" class="glass" style="min-width: 240px; padding: 20px; cursor: pointer; display: flex; flex-direction: column; gap: 10px; transition:0.2s;" onclick="window.showTab('localforecast'); window.selectLFCity('${pc.id}', false);" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-                    <div style="font-size:13px; font-weight:800; color:var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform:uppercase;">${pc.display}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="font-size:13px; font-weight:800; color:var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform:uppercase;">${pc.display}</div>
+                        ${alertIconHtml}
+                    </div>
                     <div style="display:flex; align-items:center; gap:12px; margin-top:5px;">
                         <i class="ph ph-spinner ph-spin" style="font-size:32px; opacity:0.5;"></i>
                         <span style="font-size:14px; opacity:0.6; font-weight:600;">Loading...</span>
@@ -1369,8 +1404,14 @@
                 let liveASOS = await fetchLiveASOS(pc.lat, pc.lon, null);
                 const card = document.getElementById(`pinned-card-${pc.id}`);
                 if(card) {
+                    let cAlerts = window.getCityAlerts(pc.lat, pc.lon);
+                    let alertIconHtml = cAlerts.length > 0 ? `<i class="ph-fill ph-warning" style="color:var(--danger); font-size:16px;" title="${cAlerts.length} Active Alert(s)"></i>` : '';
+                    
                     card.innerHTML = `
-                        <div style="font-size:13px; font-weight:800; color:var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform:uppercase;">${pc.display}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div style="font-size:13px; font-weight:800; color:var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform:uppercase;">${pc.display}</div>
+                            ${alertIconHtml}
+                        </div>
                         <div style="display:flex; align-items:center; gap:15px; margin-top:5px;">
                             <i class="ph-fill ${liveASOS.icon}" style="font-size:36px; color:#fff;"></i>
                             <div>
@@ -1549,7 +1590,11 @@
                     let pCities = LF_CITIES.filter(c => pIds.includes(c.id));
                     if(pCities.length > 0) {
                         pinnedHtml = `<div style="font-size:10px; opacity:0.5; margin: 10px 0 4px 10px; text-transform:uppercase; font-weight:800; letter-spacing:1px;">Pinned Cities</div>` + 
-                                     pCities.map(c => `<div class="lf-city-item${c.id === lfSelectedCity ? ' selected' : ''}" onclick="window.selectLFCity('${c.id}', false)"><i class="ph-fill ph-push-pin" style="color:var(--accent); margin-right:6px;"></i> ${c.display}</div>`).join('');
+                                     pCities.map(c => {
+                                         let cAlerts = window.getCityAlerts(c.lat, c.lon);
+                                         let alertHtml = cAlerts.length > 0 ? `<i class="ph-fill ph-warning" style="color:var(--danger); margin-left:auto;" title="Active Alerts"></i>` : '';
+                                         return `<div class="lf-city-item${c.id === lfSelectedCity ? ' selected' : ''}" style="display:flex; align-items:center;" onclick="window.selectLFCity('${c.id}', false)"><i class="ph-fill ph-push-pin" style="color:var(--accent); margin-right:6px;"></i> <span>${c.display}</span> ${alertHtml}</div>`;
+                                     }).join('');
                         remainingCities = LF_CITIES.filter(c => !pIds.includes(c.id));
                     }
                 }
@@ -1663,7 +1708,7 @@
             let cityObj = LF_CITIES.find(c => c.id === cityId);
             if (!cityObj) return;
 
-            let cityAlerts = nwsAlerts.filter(f => isPointInNWSFeature(cityObj.lon, cityObj.lat, f));
+            let cityAlerts = window.nwsAlerts ? window.nwsAlerts.filter(f => isPointInNWSFeature(cityObj.lon, cityObj.lat, f)) : [];
             let alertsHtml = "";
             if (cityAlerts.length > 0) {
                 alertsHtml = `
@@ -2081,7 +2126,7 @@
     <!-- FIREBASE MODULE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==============================================================================
@@ -2122,14 +2167,17 @@
             
             const initAuth = async () => {
                 try {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    const isUsingCustomConfig = Object.keys(myFirebaseConfig).length > 0;
+                    if (!isUsingCustomConfig && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                         await signInWithCustomToken(auth, __initial_auth_token);
                     } else {
                         await signInAnonymously(auth);
                     }
                 } catch (error) {
                     console.error("Firebase Auth Error:", error);
-                    if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
+                    if (error.code === 'auth/custom-token-mismatch') {
+                        try { await signInAnonymously(auth); } catch(e) { console.error(e); }
+                    } else if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
                         window.showModalMessage("Firebase Setup Required: Please go to your Firebase Console -> Authentication -> Sign-in method, and enable BOTH 'Email/Password' and 'Anonymous' sign-in.");
                     }
                 }
@@ -2166,21 +2214,33 @@
                 }
             });
         }
+
+        window.doGoogleLogin = async function() {
+            if (!auth) { window.showModalMessage("Database connection not established."); return false; }
+            try {
+                const provider = new GoogleAuthProvider();
+                await signInWithPopup(auth, provider);
+                return true;
+            } catch(e) { window.showModalMessage(e.message.replace('Firebase: ', '')); return false; }
+        }
         
         window.doRegister = async function(email, pass) {
             if (!auth) { window.showModalMessage("Database connection not established."); return false; }
             try { await createUserWithEmailAndPassword(auth, email, pass); return true; } 
             catch(e) { window.showModalMessage(e.message.replace('Firebase: ', '')); return false; }
         }
+
         window.doLogin = async function(email, pass) {
             if (!auth) { window.showModalMessage("Database connection not established."); return false; }
             try { await signInWithEmailAndPassword(auth, email, pass); return true; } 
             catch(e) { window.showModalMessage(e.message.replace('Firebase: ', '')); return false; }
         }
+
         window.doLogout = async function() {
             await signOut(auth);
             await signInAnonymously(auth);
         }
+
         window.toggleFirestorePin = async function(cityObj) {
             if (!auth || !auth.currentUser || auth.currentUser.isAnonymous) return;
             const uid = auth.currentUser.uid;
