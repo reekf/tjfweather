@@ -151,6 +151,9 @@
         .alert-wind { color: #f4e03b; border: 1px solid rgba(255, 235, 59, 0.4); }
         .alert-other { color: #aaaaaa; border: 1px solid rgba(180, 180, 180, 0.4); }
 
+        .home-weather-content { display: flex; gap: 20px; align-items: center; }
+        .home-temp-val { font-size: 54px; font-weight: 900; color: var(--text); line-height: 1; }
+
         @media (max-width: 1000px) {
             .mobile-menu-btn { display: block; margin-right: auto; }
             .logo { position: absolute; left: 50%; transform: translateX(-50%); }
@@ -170,6 +173,9 @@
             #radarAlertsPanel { position: fixed !important; top: 0 !important; left: 0 !important; transform: translateX(-105%) !important; width: 85% !important; max-width: 320px !important; height: 100vh !important; max-height: 100vh !important; background: rgba(11, 14, 17, 0.95) !important; z-index: 8000 !important; transition: transform 0.3s !important; display: block !important; border-radius: 0 24px 24px 0 !important; padding: 60px 20px 20px 20px !important; border: none !important; border-right: 1px solid var(--border) !important; }
             #radarAlertsPanel.open { transform: translateX(0) !important; }
             #mobileSettingsBtn { display: block; position: fixed; top: 80px; right: 15px; z-index: 4000; background: rgba(0, 210, 255, 0.2) !important; border: 1px solid rgba(0, 210, 255, 0.5) !important; padding: 8px 16px; border-radius: 12px; font-weight: 900; font-size: 13px; text-transform: uppercase; color: #fff; display: flex; align-items: center; gap: 6px; }
+            
+            .home-weather-content { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .home-temp-val { font-size: 48px; }
         }
     </style>
 </head>
@@ -218,8 +224,8 @@
                         <div id="homeLocationName" style="opacity:0.6; font-size:11px; font-weight: 800; letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; color: var(--accent);">
                             Official NWS Forecast &mdash; Locating...
                         </div>
-                        <div id="homeWeatherContent" style="display:flex; gap:20px; align-items:center;">
-                            <div style="font-size:54px; font-weight:900; color:var(--text); line-height: 1;" id="homeTempVal">&mdash;</div>
+                        <div id="homeWeatherContent" class="home-weather-content">
+                            <div class="home-temp-val" id="homeTempVal">&mdash;</div>
                             <div style="display:flex; flex-direction:column; justify-content:center;">
                                 <div id="homeWxVal" style="font-size:18px; font-weight:800; color:var(--accent); display:flex; align-items:center; gap: 8px;">
                                     <i class="ph-fill ph-spinner ph-spin"></i> Loading...
@@ -1269,9 +1275,12 @@
 
                         try {
                             if (nwsData.hourly && nwsData.hourly.properties) {
+                                let now = new Date();
+                                let validHourly = nwsData.hourly.properties.periods.filter(p => new Date(p.endTime) > now);
+                                
                                 let tempsHtml = `<div style="display:flex; gap:10px; margin-top:20px; overflow-x: auto; padding-bottom: 5px;">`;
-                                for (let i = 1; i <= 4; i++) {
-                                    let p = nwsData.hourly.properties.periods[i];
+                                for (let i = 0; i < Math.min(4, validHourly.length); i++) {
+                                    let p = validHourly[i];
                                     if (p) {
                                         let tDate = new Date(p.startTime);
                                         let pIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
@@ -1296,13 +1305,13 @@
                                         let qpfStr = '';
                                         if (qpfVal > 0) {
                                             let inches = (qpfVal / 25.4).toFixed(2);
-                                            qpfStr = `<div style="color:var(--success); font-size:11px; font-weight:900; margin-top:6px;">${inches}"</div>`;
+                                            qpfStr = `<div style="color:var(--success); font-size:11px; font-weight:900; margin-top:8px;">${inches}"</div>`;
                                         } else {
                                             let pop = p.probabilityOfPrecipitation?.value || 0;
                                             if (pop > 0) {
-                                                qpfStr = `<div style="color:var(--info); font-size:11px; font-weight:bold; margin-top:6px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
+                                                qpfStr = `<div style="color:var(--info); font-size:11px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
                                             } else {
-                                                qpfStr = `<div style="color:transparent; font-size:11px; margin-top:6px;">0%</div>`;
+                                                qpfStr = `<div style="color:transparent; font-size:11px; margin-top:8px;">0%</div>`;
                                             }
                                         }
                                         tempsHtml += `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
@@ -1400,9 +1409,12 @@
                 try {
                     const hData = await robustNWSFetch(ptData.properties.forecastHourly);
                     if (hData && hData.properties) {
+                        let now = new Date();
+                        let validHourly = hData.properties.periods.filter(p => new Date(p.endTime) > now);
+                        
                         let tempsHtml = `<div style="display:flex; gap:10px; margin-top:20px; overflow-x: auto; padding-bottom: 5px;">`;
-                        for (let i = 1; i <= 4; i++) {
-                            let p = hData.properties.periods[i];
+                        for (let i = 0; i < Math.min(4, validHourly.length); i++) {
+                            let p = validHourly[i];
                             if (p) {
                                 let tDate = new Date(p.startTime);
                                 let pIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
@@ -1438,7 +1450,7 @@
                                 }
                                 tempsHtml += `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
                                     <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
-                                    <i class="ph-fill ${pIcon}" style="font-size: 26px; margin: 4px 0; color: #fff;"></i>
+                                    <i class="ph-fill ${pIcon}" style="font-size: 26px; margin: 4px 0;"></i>
                                     <div class="hr-temp" style="font-size:15px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
                                     ${flHtml}
                                     ${qpfStr}
@@ -1592,29 +1604,26 @@
                     if (ad.gust && ad.gust > ad.wind) {
                         let mc = getFeelsLike(ad.temp, ad.gust);
                         if (mc < fl) {
-                            minChillHtml = `<div style="color:#a29bfe; font-size:14px; margin-top:4px; font-weight:bold;"><i class="ph-fill ph-wind"></i> Min Chill (Gusts): ${mc}°F <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a></div>`;
+                            minChillHtml = `<div style="color:#a29bfe; font-size:14px; margin-top:2px; font-weight:bold;"><i class="ph-fill ph-wind"></i> Min Chill (Gusts): ${mc}°F <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a></div>`;
                         } else {
-                            minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:4px; font-style:italic;"><i class="ph ph-wind"></i> Gusts don't lower perceived temp</div>`;
+                            minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:2px; font-style:italic;"><i class="ph ph-wind"></i> Gusts don't lower perceived temp</div>`;
                         }
                     } else {
-                        minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:4px; font-style:italic;"><i class="ph ph-wind"></i> No gusts past hour</div>`;
+                        minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:2px; font-style:italic;"><i class="ph ph-wind"></i> No gusts past hour</div>`;
                     }
 
                     asosHtml = `
-                    <div class="glass" style="padding: 25px; border-color: var(--accent); margin-bottom: 20px;">
-                        <div style="font-size:11px; opacity:0.6; font-weight: 800; letter-spacing:1px; margin-bottom:12px; display: flex; align-items: center; gap: 6px;">
-                            <i class="ph-fill ph-thermometer"></i> LIVE ASOS OBSERVATION
+                    <div class="glass" style="margin-bottom: 20px; background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(20, 30, 40, 0.6) 100%); border-color: var(--accent); padding: 25px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                        <div style="font-size:12px; font-weight: 900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase;">
+                            <i class="ph-fill ph-thermometer"></i> LIVE ASOS OBSERVATIONS
                         </div>
-                        <div style="display:flex; gap: 20px; align-items:center;">
-                            <div style="font-size:54px; font-weight:900; color:var(--accent); line-height:1;">${ad.temp}°F</div>
-                            <div>
-                                <div style="font-weight:900; font-size:20px; display: flex; align-items: center; gap: 8px;">
-                                    <i class="ph-fill ${wxIcon}"></i> ${displayWx}
-                                </div>
-                                <div style="opacity:0.8; margin-top:6px; font-weight: 600;">Wind: ${ad.wind !== null ? ad.wind + ' mph' : '--'}${ad.gust ? ` (Gusts: ${ad.gust} mph)` : ''}</div>
-                                <div style="opacity:0.9; margin-top:2px; font-weight: 600;">Feels Like: ${fl}°F</div>
-                                ${minChillHtml}
-                            </div>
+                        <i class="ph-fill ${wxIcon}" style="font-size: 48px; margin-bottom: 12px; color: #fff;"></i>
+                        <div style="font-size:36px; font-weight:900; color:var(--danger); line-height:1; margin-bottom:15px;">${ad.temp}°F</div>
+                        
+                        <div style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 300px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+                            <div style="font-size: 14px; font-weight: 600; opacity: 0.85;">Wind: ${ad.wind !== null ? ad.wind + ' mph' : '--'}${ad.gust ? ` (Gusts: ${ad.gust} mph)` : ''}</div>
+                            <div style="font-size: 14px; font-weight: bold; color: var(--info);">Feels Like: ${fl}°F</div>
+                            ${minChillHtml}
                         </div>
                     </div>`;
                 }
@@ -1644,10 +1653,13 @@
                 
                 if (nwsData && nwsData.daily && nwsData.daily.properties) {
                     let dailyPeriods = nwsData.daily.properties.periods;
-                    let hourlyPeriods = (nwsData.hourly && nwsData.hourly.properties) ? nwsData.hourly.properties.periods : [];
                     
-                    if (hourlyPeriods.length > 0) {
-                        let hCols = hourlyPeriods.slice(0, 24).map(p => {
+                    let hourlyPeriods = (nwsData.hourly && nwsData.hourly.properties) ? nwsData.hourly.properties.periods : [];
+                    let now = new Date();
+                    let validHourly = hourlyPeriods.filter(p => new Date(p.endTime) > now);
+                    
+                    if (validHourly.length > 0) {
+                        let hCols = validHourly.slice(0, 24).map(p => {
                             let tDate = new Date(p.startTime);
                             let hIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
                             
@@ -1680,7 +1692,7 @@
                                     qpfStr = `<div style="color:transparent; font-size:12px; margin-top:8px;">0%</div>`;
                                 }
                             }
-                            return `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
+                            return `<div class="lf-hour-col">
                                 <div class="hr-label">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
                                 <i class="ph-fill ${hIcon}" style="font-size: 26px; margin: 4px 0; color: #fff;"></i>
                                 <div class="hr-temp">${p.temperature}&deg;</div>
@@ -1746,7 +1758,7 @@
                                 let nFl = getFeelsLike(lo, nWinds.sustained, nRh);
                                 if (lo !== '--' && nFl !== lo && !isNaN(nFl)) eveFlHtml = `<div style="font-size:12px; color:var(--info); margin-top:6px; font-weight:bold;">Eve Feels Like: ${nFl}°</div>`;
                                 
-                                if (lo !== '--' && nWinds.gust > nWinds.sustained) {
+                                if (nWinds.gust > nWinds.sustained) {
                                     let nMc = getFeelsLike(lo, nWinds.gust, nRh);
                                     if (nMc < nFl && !isNaN(nMc)) {
                                         nightMcHtml = `<div style="font-size:12px; color:#a29bfe; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
