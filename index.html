@@ -2084,10 +2084,33 @@
         import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // ==============================================================================
+        // 1. PASTE YOUR FIREBASE CONFIG HERE
+        // Go to Firebase Console -> Project Settings -> General -> Your Apps (Web)
+        // ==============================================================================
+        let myFirebaseConfig = {
+            apiKey: "AIzaSyDGujuIMmbcaxTVf2NOHBoR7Swzg2D2VUA",
+
+            authDomain: "tjfwx-2b9b7.firebaseapp.com",
+
+            projectId: "tjfwx-2b9b7",
+
+            storageBucket: "tjfwx-2b9b7.firebasestorage.app",
+
+            messagingSenderId: "665398157561",
+
+            appId: "1:665398157561:web:a019e1b0e17ac4e74b4228",
+
+            measurementId: "G-MLFVBH7KDH"
+
+        };
+
         let app, auth, db;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'tjf-weather-app';
-        let firebaseConfig = null;
-        try { firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null; } catch(e) {}
+        let firebaseConfig = Object.keys(myFirebaseConfig).length > 0 ? myFirebaseConfig : null;
+        
+        // Fallback to internal environment config if yours isn't filled out yet
+        try { if (!firebaseConfig && typeof __firebase_config !== 'undefined') firebaseConfig = JSON.parse(__firebase_config); } catch(e) {}
 
         if (firebaseConfig) {
             app = initializeApp(firebaseConfig);
