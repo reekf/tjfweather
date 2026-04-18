@@ -5,6 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TJFWeather | Dashboard</title>
+    
+    <!-- PWA Meta Tags for iOS & Android -->
+    <meta name="theme-color" content="#0b0e11">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TJFWeather">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=">
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://d3js.org/topojson.v3.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -434,10 +442,80 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v12.8 | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v12.9 (PWA Enabled) | AMES, IA</p>
+                
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <h3 style="font-size: 16px; color: var(--info); margin-top: 0;">App Features</h3>
+                    <p style="font-size: 14px; opacity: 0.8; margin-bottom: 15px;">You can install TJFWeather to your home screen directly from your browser menu for a full-screen app experience.</p>
+                    <button class="glass-btn" onclick="requestNotificationPermission()">
+                        <i class="ph-fill ph-bell-ringing"></i> Enable Notifications
+                    </button>
+                </div>
             </div>
         </div>
     </div>
+
+    <script>
+        // --- PWA Setup (Installable App & Service Worker) ---
+        const manifestData = {
+            "name": "TJFWeather",
+            "short_name": "TJFWeather",
+            "description": "Expert NWS forecasts, Radar, and Real-Time ASOS Observations.",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#0b0e11",
+            "theme_color": "#0b0e11",
+            "icons": [{
+                "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=",
+                "sizes": "512x512",
+                "type": "image/svg+xml",
+                "purpose": "any maskable"
+            }]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+        const manifestUrl = URL.createObjectURL(manifestBlob);
+        document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${manifestUrl}">`);
+
+        const swCode = `
+            self.addEventListener('install', (e) => self.skipWaiting());
+            self.addEventListener('activate', (e) => self.clients.claim());
+            self.addEventListener('fetch', (e) => {
+                // Minimal pass-through fetch handler required for PWA installation checks
+                e.respondWith(fetch(e.request).catch(() => new Response('TJFWeather is currently offline.')));
+            });
+            self.addEventListener('push', function(e) {
+                let body = 'New Weather Alert or Update!';
+                if (e.data) { body = e.data.text(); }
+                const options = { body: body, icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=', vibrate: [100, 50, 100] };
+                e.waitUntil(self.registration.showNotification('TJFWeather', options));
+            });
+        `;
+        const swBlob = new Blob([swCode], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(swBlob);
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register(swUrl).then(reg => {
+                console.log('TJFWeather PWA Service Worker Registered!');
+            }).catch(err => console.log('SW registration failed', err));
+        }
+
+        async function requestNotificationPermission() {
+            if (!('Notification' in window)) {
+                alert("Your browser doesn't support notifications.");
+                return;
+            }
+            if (Notification.permission === 'granted') {
+                alert("Notifications are already enabled!");
+                return;
+            }
+            if (Notification.permission !== 'denied' || Notification.permission === 'default') {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    alert("Awesome! You will now receive notifications.");
+                }
+            }
+        }
+        // ----------------------------------------------------
+    </script>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
@@ -521,7 +599,6 @@
             return response;
         }
 
-        // --- Feels Like / Wind Chill / Heat Index Helpers ---
         function getFeelsLike(tempF, windMph, rh = null) {
             let calcRh = rh !== null ? rh : 50; 
             let tempC = (tempF - 32) * 5 / 9;
@@ -1145,7 +1222,6 @@
                 }
             } catch(e) {}
 
-            // Enhanced Fallback Logic (Prevents the "Cross" Cloud icon error on failed NWS fetches)
             if (fallbackData && fallbackData.temp !== null && fallbackData.temp !== undefined) {
                 result.temp = fallbackData.temp;
                 result.wind = fallbackData.wind !== null ? fallbackData.wind : null;
@@ -1234,7 +1310,6 @@
                         if(cacheRes.ok) {
                             let cData = await cacheRes.json();
                             if (cData && cData.hourly && cData.hourly.properties) {
-                                // Strictly check startTime to prevent holding onto cached past hours
                                 let validPeriods = cData.hourly.properties.periods.filter(p => new Date(p.startTime).getTime() > Date.now() - 3600000);
                                 if (validPeriods.length >= 4) { nwsData = cData; cacheValid = true; }
                             }
@@ -1264,7 +1339,6 @@
                 }
 
                 if (nwsData && nwsData.hourly && nwsData.hourly.properties) {
-                    // Strictly check startTime to prevent holding onto cached past hours
                     let validHourly = nwsData.hourly.properties.periods.filter(p => new Date(p.startTime).getTime() > Date.now() - 3600000);
                     let tempsHtml = `<div style="display:flex; gap:10px; margin-top:20px; overflow-x: auto; padding-bottom: 5px;">`;
                     for (let i = 0; i < Math.min(4, validHourly.length); i++) {
@@ -1462,7 +1536,6 @@
                     if(nwsRes.ok) {
                         let cData = await nwsRes.json();
                         if (cData && cData.hourly && cData.hourly.properties) {
-                            // Strictly check startTime to prevent holding onto cached past hours
                             let validPeriods = cData.hourly.properties.periods.filter(p => new Date(p.startTime).getTime() > Date.now() - 3600000);
                             if (validPeriods.length >= 4) { nwsData = cData; cacheValid = true; }
                         }
@@ -1485,7 +1558,6 @@
                     let dailyPeriods = nwsData.daily.properties.periods;
                     let hourlyPeriods = (nwsData.hourly && nwsData.hourly.properties) ? nwsData.hourly.properties.periods : [];
                     
-                    // Strictly check startTime to prevent holding onto cached past hours
                     let validHourly = hourlyPeriods.filter(p => new Date(p.startTime).getTime() > Date.now() - 3600000);
                     
                     if (validHourly.length > 0) {
