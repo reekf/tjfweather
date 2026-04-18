@@ -2121,10 +2121,17 @@
             window._firebaseDb = db;
             
             const initAuth = async () => {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    console.error("Firebase Auth Error:", error);
+                    if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
+                        window.showModalMessage("Firebase Setup Required: Please go to your Firebase Console -> Authentication -> Sign-in method, and enable BOTH 'Email/Password' and 'Anonymous' sign-in.");
+                    }
                 }
             };
             initAuth();
