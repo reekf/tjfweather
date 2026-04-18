@@ -130,7 +130,7 @@
         .lf-city-item:hover, .lf-city-item.selected { background: rgba(0, 210, 255, 0.15); border-color: var(--accent); color: var(--accent); }
 
         .lf-hourly-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: thin; }
-        .lf-hour-col { min-width: 110px; text-align: center; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;}
+        .lf-hour-col { min-width: 125px; text-align: center; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;}
         .lf-hour-col .hr-label { opacity: 0.7; margin-bottom: 8px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
         .lf-hour-col .hr-temp { font-size: 20px; font-weight: 900; color: var(--accent); margin-top: 8px; }
 
@@ -1245,15 +1245,13 @@
                             if (ad.temp !== null && ad.wind !== null) {
                                 let fl = getFeelsLike(ad.temp, ad.wind);
                                 flStr = `Feels Like: ${fl}°F`;
-                                if (ad.temp <= 50) {
-                                    if (ad.gust && ad.gust > ad.wind) {
-                                        let mc = getFeelsLike(ad.temp, ad.gust);
-                                        if (mc < fl) {
-                                            flStr += ` | <span style="color:#a29bfe;">Min Chill (Gusts): ${mc}°F</span> <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a>`;
-                                        }
-                                    } else {
-                                        flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">No gusts past hour</span>`;
+                                if (ad.gust && ad.gust > ad.wind) {
+                                    let mc = getFeelsLike(ad.temp, ad.gust);
+                                    if (mc < fl) {
+                                        flStr += ` | <span style="color:#a29bfe;">Min Chill (Gusts): ${mc}°F</span> <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a>`;
                                     }
+                                } else {
+                                    flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">No gusts past hour</span>`;
                                 }
                             }
 
@@ -1292,9 +1290,9 @@
                                         let hWinds = parseWinds(p.windSpeed, p.windGust);
                                         let hRh = p.relativeHumidity?.value || null;
                                         let hFl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
-                                        let flHtml = (hFl !== p.temperature) ? `<div style="font-size:11px; font-weight:bold; color:var(--info); margin-top:4px;">Feels Like: ${hFl}&deg;</div>` : '';
+                                        let flHtml = `<div style="font-size:11px; font-weight:bold; color:var(--info); margin-top:4px;">Feels Like: ${hFl}&deg;</div>`;
 
-                                        if (p.temperature <= 50 && hWinds.gust > hWinds.sustained) {
+                                        if (hWinds.gust > hWinds.sustained) {
                                             let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
                                             if (mc < hFl) flHtml += `<div style="font-size:11px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
                                         }
@@ -1312,7 +1310,7 @@
                                                 qpfStr = `<div style="color:transparent; font-size:11px; margin-top:6px;">0%</div>`;
                                             }
                                         }
-                                        tempsHtml += `<div class="lf-hour-col" style="min-width: 110px; padding: 12px 6px;">
+                                        tempsHtml += `<div class="lf-hour-col" style="min-width: 125px; padding: 12px 6px;">
                                             <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
                                             <i class="ph-fill ${pIcon}" style="font-size: 20px; margin: 4px 0;"></i>
                                             <div class="hr-temp" style="font-size:15px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
@@ -1373,15 +1371,13 @@
                             if (tempF !== null && windMph !== null) {
                                 let fl = getFeelsLike(tempF, windMph, rhVal);
                                 flStr = `Feels Like: ${fl}°F`;
-                                if (tempF <= 50) {
-                                    if (gustMph && gustMph > windMph) {
-                                        let mc = getFeelsLike(tempF, gustMph, rhVal);
-                                        if (mc < fl) {
-                                            flStr += ` | <span style="color:#a29bfe;">Min Chill (Gusts): ${mc}°F</span> <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a>`;
-                                        }
-                                    } else {
-                                        flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">No gusts past hour</span>`;
+                                if (gustMph && gustMph > windMph) {
+                                    let mc = getFeelsLike(tempF, gustMph, rhVal);
+                                    if (mc < fl) {
+                                        flStr += ` | <span style="color:#a29bfe;">Min Chill (Gusts): ${mc}°F</span> <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a>`;
                                     }
+                                } else {
+                                    flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">No gusts past hour</span>`;
                                 }
                             }
 
@@ -1414,10 +1410,15 @@
                                 let tDate = new Date(p.startTime);
                                 let pIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
                                 
-                                let hWind = parseMaxWind(p.windSpeed);
+                                let hWinds = parseWinds(p.windSpeed, p.windGust);
                                 let hRh = p.relativeHumidity?.value || null;
-                                let hFl = getFeelsLike(p.temperature, hWind, hRh);
-                                let flHtml = (hFl !== p.temperature) ? `<div style="font-size:12px; font-weight:bold; color:var(--info); margin-top:4px;">FL: ${hFl}&deg;</div>` : '';
+                                let hFl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
+                                let flHtml = `<div style="font-size:11px; font-weight:bold; color:var(--info); margin-top:4px;">Feels Like: ${hFl}&deg;</div>`;
+
+                                if (hWinds.gust > hWinds.sustained) {
+                                    let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
+                                    if (mc < hFl) flHtml += `<div style="font-size:11px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
+                                }
 
                                 let qpfVal = p.quantitativePrecipitation?.value;
                                 let qpfStr = '';
@@ -1432,7 +1433,7 @@
                                         qpfStr = `<div style="color:transparent; font-size:11px; margin-top:6px;">0%</div>`;
                                     }
                                 }
-                                tempsHtml += `<div class="lf-hour-col" style="min-width: 65px; padding: 12px 6px;">
+                                tempsHtml += `<div class="lf-hour-col" style="min-width: 125px; padding: 12px 6px;">
                                     <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
                                     <i class="ph-fill ${pIcon}" style="font-size: 20px; margin: 4px 0;"></i>
                                     <div class="hr-temp" style="font-size:15px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
@@ -1585,15 +1586,13 @@
                     
                     let fl = getFeelsLike(ad.temp, ad.wind || 0);
                     let minChillHtml = "";
-                    if (ad.temp <= 50) {
-                        if (ad.gust && ad.gust > ad.wind) {
-                            let mc = getFeelsLike(ad.temp, ad.gust);
-                            if (mc < fl) {
-                                minChillHtml = `<div style="color:#a29bfe; font-size:14px; margin-top:4px; font-weight:bold;"><i class="ph-fill ph-wind"></i> Min Chill (Gusts): ${mc}°F <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a></div>`;
-                            }
-                        } else {
-                            minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:4px; font-style:italic;"><i class="ph ph-wind"></i> No gusts past hour</div>`;
+                    if (ad.gust && ad.gust > ad.wind) {
+                        let mc = getFeelsLike(ad.temp, ad.gust);
+                        if (mc < fl) {
+                            minChillHtml = `<div style="color:#a29bfe; font-size:14px; margin-top:4px; font-weight:bold;"><i class="ph-fill ph-wind"></i> Min Chill (Gusts): ${mc}°F <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a></div>`;
                         }
+                    } else {
+                        minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:4px; font-style:italic;"><i class="ph ph-wind"></i> No gusts past hour</div>`;
                     }
 
                     asosHtml = `
@@ -1650,9 +1649,9 @@
                             let hWinds = parseWinds(p.windSpeed, p.windGust);
                             let hRh = p.relativeHumidity?.value || null;
                             let fl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
-                            let flHtml = (fl !== p.temperature) ? `<div style="font-size:11px; font-weight:bold; color:var(--info); margin-top:4px;">Feels Like: ${fl}&deg;</div>` : '';
+                            let flHtml = `<div style="font-size:11px; font-weight:bold; color:var(--info); margin-top:4px;">Feels Like: ${fl}&deg;</div>`;
 
-                            if (p.temperature <= 50 && hWinds.gust > hWinds.sustained) {
+                            if (hWinds.gust > hWinds.sustained) {
                                 let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
                                 if (mc < fl) flHtml += `<div style="font-size:11px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
                             }
@@ -1670,7 +1669,7 @@
                                     qpfStr = `<div style="color:transparent; font-size:12px; margin-top:8px;">0%</div>`;
                                 }
                             }
-                            return `<div class="lf-hour-col">
+                            return `<div class="lf-hour-col" style="min-width: 125px;">
                                 <div class="hr-label">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
                                 <i class="ph-fill ${hIcon}" style="font-size: 26px; margin: 4px 0; color: #fff;"></i>
                                 <div class="hr-temp">${p.temperature}&deg;</div>
@@ -1706,7 +1705,7 @@
                                 let fl = getFeelsLike(hi, dWinds.sustained, dRh);
                                 if (fl !== hi) dFl = `<div style="font-size:11px; color:var(--info); margin-top:2px; text-align:right;">Feels Like: ${fl}°</div>`;
 
-                                if (hi !== '--' && hi <= 50 && dWinds.gust > dWinds.sustained) {
+                                if (hi !== '--' && dWinds.gust > dWinds.sustained) {
                                     let mc = getFeelsLike(hi, dWinds.gust, dRh);
                                     if (mc < fl) dFl += `<div style="font-size:11px; color:#a29bfe; margin-top:2px; text-align:right;">Min Chill: ${mc}°</div>`;
                                 }
