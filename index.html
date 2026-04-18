@@ -453,7 +453,7 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v13.4 (Firebase Enabled) | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v13.5 (Auth UI Update) | AMES, IA</p>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <h3 style="font-size: 16px; color: var(--info); margin-top: 0;">App Features</h3>
@@ -473,7 +473,10 @@
                 <h2 id="authModalTitle" style="margin:0; font-size: 20px; font-weight:900;">Login</h2>
                 <button style="background:none; border:none; color:#fff; font-size:28px; cursor:pointer; padding:0; line-height:1;" onclick="window.closeAuthModal()">&times;</button>
             </div>
+            
+            <!-- Message Banners -->
             <div id="authError" style="color: var(--danger); font-size:13px; display:none; background:rgba(255,71,87,0.1); padding:10px; border-radius:8px; border:1px solid rgba(255,71,87,0.3);"></div>
+            <div id="authSuccess" style="color: var(--success); font-size:13px; display:none; background:rgba(46,204,113,0.1); padding:10px; border-radius:8px; border:1px solid rgba(46,204,113,0.3);"></div>
             
             <div id="authFormFields" style="display:flex; flex-direction:column; gap:15px;">
                 <input type="email" id="authEmail" placeholder="Email Address" style="background: rgba(0,0,0,0.5); border:1px solid var(--border); color:#fff; padding:14px; border-radius:12px; outline:none; font-family:inherit;" />
@@ -482,11 +485,14 @@
 
             <div id="authActionBtns" style="display:flex; flex-direction: column; gap:10px; margin-top:5px;">
                 <button id="mainAuthBtn" class="glass-btn" style="width: 100%;" onclick="window.handleAuthAction()">Login</button>
-                <button class="glass-btn" style="width: 100%; background:rgba(255,255,255,0.1)!important; border-color:var(--border)!important; color: #fff!important;" onclick="window.doGoogleLogin()">
+                
+                <button id="googleAuthBtn" class="glass-btn" style="width: 100%; background:rgba(255,255,255,0.1)!important; border-color:var(--border)!important; color: #fff!important;" onclick="window.doGoogleLogin()">
                     <i class="ph-fill ph-google-logo"></i> Sign in with Google
                 </button>
-                <div style="text-align:center; margin-top:10px; font-size: 13px;">
-                    <a href="#" id="authToggleLink" style="color: var(--accent); text-decoration: none;" onclick="window.toggleAuthMode(event)">Don't have an account? Register here</a>
+                
+                <div style="text-align:center; margin-top:10px; font-size: 13px; display:flex; flex-direction:column; gap: 8px;">
+                    <a href="#" id="authForgotLink" style="color: var(--text); opacity:0.7; text-decoration: none;" onclick="window.toggleAuthMode('forgot', event)">Forgot Password?</a>
+                    <a href="#" id="authToggleLink" style="color: var(--accent); text-decoration: none; font-weight: bold;" onclick="window.toggleAuthMode('register', event)">Don't have an account? Register here</a>
                 </div>
             </div>
         </div>
@@ -498,31 +504,62 @@
         window.pinnedCities = [];
         window.currentHomeCityId = null;
         window.renderPinnedCities = function(){};
-        window.authMode = 'login';
+        window.authMode = 'login'; // 'login', 'register', or 'forgot'
         
         // Modal Handlers
-        window.toggleAuthMode = function(e) {
+        window.toggleAuthMode = function(mode, e) {
             if(e) e.preventDefault();
-            window.authMode = window.authMode === 'login' ? 'register' : 'login';
-            document.getElementById('authModalTitle').innerText = window.authMode === 'login' ? 'Login' : 'Create Account';
-            document.getElementById('mainAuthBtn').innerText = window.authMode === 'login' ? 'Login' : 'Register';
-            document.getElementById('authToggleLink').innerText = window.authMode === 'login' ? "Don't have an account? Register here" : "Already have an account? Login here";
+            window.authMode = mode;
+            
+            const title = document.getElementById('authModalTitle');
+            const mainBtn = document.getElementById('mainAuthBtn');
+            const toggleLink = document.getElementById('authToggleLink');
+            const forgotLink = document.getElementById('authForgotLink');
+            const passField = document.getElementById('authPass');
+            const googleBtn = document.getElementById('googleAuthBtn');
+            
             document.getElementById('authError').style.display = 'none';
+            document.getElementById('authSuccess').style.display = 'none';
+
+            if (mode === 'login') {
+                title.innerText = 'Login';
+                mainBtn.innerText = 'Login';
+                toggleLink.innerText = "Don't have an account? Register here";
+                toggleLink.onclick = (event) => window.toggleAuthMode('register', event);
+                forgotLink.style.display = 'block';
+                passField.style.display = 'block';
+                googleBtn.style.display = 'flex';
+            } else if (mode === 'register') {
+                title.innerText = 'Create Account';
+                mainBtn.innerText = 'Register';
+                toggleLink.innerText = "Already have an account? Login here";
+                toggleLink.onclick = (event) => window.toggleAuthMode('login', event);
+                forgotLink.style.display = 'none';
+                passField.style.display = 'block';
+                googleBtn.style.display = 'flex';
+            } else if (mode === 'forgot') {
+                title.innerText = 'Reset Password';
+                mainBtn.innerText = 'Send Reset Link';
+                toggleLink.innerText = "Back to Login";
+                toggleLink.onclick = (event) => window.toggleAuthMode('login', event);
+                forgotLink.style.display = 'none';
+                passField.style.display = 'none';
+                googleBtn.style.display = 'none';
+            }
         };
 
         window.openAuthModal = function(msg = "") {
             document.getElementById('authFormFields').style.display = 'flex';
             document.getElementById('authActionBtns').style.display = 'flex';
             
-            window.authMode = 'login';
-            document.getElementById('authModalTitle').innerText = 'Login';
-            document.getElementById('mainAuthBtn').innerText = 'Login';
-            document.getElementById('authToggleLink').innerText = "Don't have an account? Register here";
+            // Force reset to login state
+            window.toggleAuthMode('login');
             
             const errDiv = document.getElementById('authError');
             if (msg) { errDiv.innerText = msg; errDiv.style.display = 'block'; }
             else { errDiv.style.display = 'none'; }
             
+            document.getElementById('authSuccess').style.display = 'none';
             document.getElementById('authEmail').value = '';
             document.getElementById('authPass').value = '';
             
@@ -532,11 +569,19 @@
         window.closeAuthModal = function() {
             document.getElementById('authModal').style.display = 'none';
             document.getElementById('authError').style.display = 'none';
+            document.getElementById('authSuccess').style.display = 'none';
         };
 
-        window.showModalMessage = function(msg) {
-            document.getElementById('authError').innerText = msg;
-            document.getElementById('authError').style.display = 'block';
+        window.showModalMessage = function(msg, isSuccess = false) {
+            if (isSuccess) {
+                document.getElementById('authSuccess').innerText = msg;
+                document.getElementById('authSuccess').style.display = 'block';
+                document.getElementById('authError').style.display = 'none';
+            } else {
+                document.getElementById('authError').innerText = msg;
+                document.getElementById('authError').style.display = 'block';
+                document.getElementById('authSuccess').style.display = 'none';
+            }
             document.getElementById('authModal').style.display = 'flex';
         };
 
@@ -544,15 +589,25 @@
             const email = document.getElementById('authEmail').value;
             const pass = document.getElementById('authPass').value;
             const errDiv = document.getElementById('authError');
+            const succDiv = document.getElementById('authSuccess');
             
-            if(!email || !pass) { errDiv.innerText = "Please enter email and password."; errDiv.style.display='block'; return; }
             errDiv.style.display = 'none';
+            succDiv.style.display = 'none';
+            
+            if(!email) { errDiv.innerText = "Please enter an email address."; errDiv.style.display='block'; return; }
+            if(window.authMode !== 'forgot' && !pass) { errDiv.innerText = "Please enter a password."; errDiv.style.display='block'; return; }
             
             let success = false;
             if (window.authMode === 'login' && window.doLogin) {
                 success = await window.doLogin(email, pass);
             } else if (window.authMode === 'register' && window.doRegister) {
                 success = await window.doRegister(email, pass);
+            } else if (window.authMode === 'forgot' && window.doResetPassword) {
+                success = await window.doResetPassword(email);
+                if(success) {
+                    window.showModalMessage("Password reset email sent! Check your inbox.", true);
+                    return; // Return early so we don't close the modal before they read it
+                }
             }
             
             if(success) window.closeAuthModal();
@@ -595,7 +650,7 @@
             self.addEventListener('push', function(e) {
                 let body = 'New Weather Alert or Update!';
                 if (e.data) { body = e.data.text(); }
-                const options = { body: body, icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=', vibrate: [100, 50, 100] };
+                const options = { body: body, icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=', vibrate: [100, 50, 100] };
                 e.waitUntil(self.registration.showNotification('TJFWeather', options));
             });
         `;
@@ -613,13 +668,13 @@
                 return;
             }
             if (Notification.permission === 'granted') {
-                window.showModalMessage("Notifications are already enabled!");
+                window.showModalMessage("Notifications are already enabled!", true);
                 return;
             }
             if (Notification.permission !== 'denied' || Notification.permission === 'default') {
                 const permission = await Notification.requestPermission();
                 if (permission === 'granted') {
-                    window.showModalMessage("Awesome! You will now receive notifications.");
+                    window.showModalMessage("Awesome! You will now receive notifications.", true);
                 }
             }
         };
@@ -2126,7 +2181,7 @@
     <!-- FIREBASE MODULE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==============================================================================
@@ -2234,6 +2289,17 @@
             if (!auth) { window.showModalMessage("Database connection not established."); return false; }
             try { await signInWithEmailAndPassword(auth, email, pass); return true; } 
             catch(e) { window.showModalMessage(e.message.replace('Firebase: ', '')); return false; }
+        }
+        
+        window.doResetPassword = async function(email) {
+            if (!auth) { window.showModalMessage("Database connection not established."); return false; }
+            try { 
+                await sendPasswordResetEmail(auth, email); 
+                return true; 
+            } catch(e) { 
+                window.showModalMessage(e.message.replace('Firebase: ', '')); 
+                return false; 
+            }
         }
 
         window.doLogout = async function() {
