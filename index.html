@@ -51,6 +51,7 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
             transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             position: relative; z-index: 1;
+            overflow-wrap: break-word; word-wrap: break-word;
         }
 
         .glass-btn {
@@ -154,6 +155,12 @@
         .home-weather-content { display: flex; gap: 20px; align-items: center; }
         .home-temp-val { font-size: 54px; font-weight: 900; color: var(--text); line-height: 1; }
 
+        /* Responsive Layouts for ASOS & NWS side-by-side */
+        .current-detailed-wrapper { display: flex; gap: 20px; margin-bottom: 20px; align-items: stretch; flex-wrap: wrap; }
+        .current-detailed-wrapper > div { margin-bottom: 0 !important; }
+        .asos-panel { flex: 1; min-width: 250px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .nws-panel { flex: 2; min-width: 280px; display: flex; flex-direction: column; justify-content: center; }
+
         @media (max-width: 1000px) {
             .mobile-menu-btn { display: block; margin-right: auto; }
             .logo { position: absolute; left: 50%; transform: translateX(-50%); }
@@ -165,7 +172,9 @@
 
         @media (max-width: 768px) {
             .tab-content { height: calc(100vh - 65px); overflow-y: auto; overflow-x: hidden; }
-            .radar-controls { width: 90% !important; padding: 12px; bottom: 100px !important; flex-wrap: wrap; justify-content: center; z-index: 4000 !important; }
+            #home > div { padding: 15px !important; gap: 15px !important; }
+            .glass { min-width: 0 !important; width: 100% !important; padding: 15px !important; box-sizing: border-box; }
+            .radar-controls { width: 95% !important; padding: 10px; flex-direction: column; gap: 10px; }
             .lf-container { display: block; overflow-y: visible; height: auto; }
             .lf-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); height: auto; overflow: visible; padding: 15px; }
             .lf-city-list { max-height: 220px; }
@@ -174,8 +183,12 @@
             #radarAlertsPanel.open { transform: translateX(0) !important; }
             #mobileSettingsBtn { display: block; position: fixed; top: 80px; right: 15px; z-index: 4000; background: rgba(0, 210, 255, 0.2) !important; border: 1px solid rgba(0, 210, 255, 0.5) !important; padding: 8px 16px; border-radius: 12px; font-weight: 900; font-size: 13px; text-transform: uppercase; color: #fff; display: flex; align-items: center; gap: 6px; }
             
-            .home-weather-content { flex-direction: column; align-items: flex-start; gap: 12px; }
-            .home-temp-val { font-size: 48px; }
+            .home-weather-content { flex-direction: row; align-items: center; gap: 15px; flex-wrap: wrap; }
+            .home-temp-val { font-size: 42px; }
+            #homeLocationName { font-size: 10px; }
+
+            .current-detailed-wrapper { flex-direction: column; gap: 15px; }
+            .asos-panel, .nws-panel { width: 100%; min-width: 0 !important; flex: none !important; }
         }
     </style>
 </head>
@@ -221,14 +234,14 @@
                         style="background: rgba(0,210,255,0.05); border: 1px solid var(--accent); padding: 20px; cursor:pointer; transition: transform 0.2s;"
                         onclick="showTab('localforecast', document.querySelector('.nav-item:nth-child(2)')); if(lfSelectedCity) selectLFCity(lfSelectedCity);"
                         onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                        <div id="homeLocationName" style="opacity:0.6; font-size:11px; font-weight: 800; letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; color: var(--accent);">
+                        <div id="homeLocationName" style="opacity:0.6; font-size:11px; font-weight: 800; letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; color: var(--accent); word-break: break-word; line-height: 1.4;">
                             Official NWS Forecast &mdash; Locating...
                         </div>
                         <div id="homeWeatherContent" class="home-weather-content">
                             <div class="home-temp-val" id="homeTempVal">&mdash;</div>
                             <div style="display:flex; flex-direction:column; justify-content:center;">
-                                <div id="homeWxVal" style="font-size:18px; font-weight:800; color:var(--accent); display:flex; align-items:center; gap: 8px;">
-                                    <i class="ph-fill ph-spinner ph-spin"></i> Loading...
+                                <div id="homeWxVal" style="display:flex; align-items:center; justify-content: flex-start; gap: 8px;">
+                                    <i class="ph-fill ph-spinner ph-spin" style="font-size: 36px; color: #fff;"></i>
                                 </div>
                                 <div id="homeWindVal" style="font-size:14px; opacity:0.8; font-weight:600; margin-top: 6px;">Wind: &mdash;</div>
                                 <div id="homeFeelsLikeVal" style="font-size:13px; font-weight:bold; color:var(--info); margin-top: 4px;"></div>
@@ -413,7 +426,7 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v12.1 | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v12.2 | AMES, IA</p>
             </div>
         </div>
     </div>
@@ -1262,7 +1275,7 @@
                 document.getElementById('homeTempVal').innerText = tempStr;
                 document.getElementById('homeWindVal').innerText = windStr;
                 document.getElementById('homeFeelsLikeVal').innerHTML = flStr;
-                document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIcon}"></i> ${wxStr}`;
+                document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIcon}" style="font-size: 36px; color: #fff;"></i>`;
 
                 try {
                     const nwsRes = await fetch('static/nws/Ames.json?t=' + Date.now());
@@ -1276,7 +1289,10 @@
                         try {
                             if (nwsData.hourly && nwsData.hourly.properties) {
                                 let now = new Date();
-                                let validHourly = nwsData.hourly.properties.periods.filter(p => new Date(p.endTime) > now);
+                                let cutoff = new Date(now);
+                                cutoff.setMinutes(0, 0, 0); // Filters out any forecast block that starts before the current hour
+                                
+                                let validHourly = nwsData.hourly.properties.periods.filter(p => new Date(p.startTime) >= cutoff);
                                 
                                 let tempsHtml = `<div style="display:flex; gap:10px; margin-top:20px; overflow-x: auto; padding-bottom: 5px;">`;
                                 for (let i = 0; i < Math.min(4, validHourly.length); i++) {
@@ -1398,7 +1414,7 @@
                 document.getElementById('homeTempVal').innerText = tempStr;
                 document.getElementById('homeWindVal').innerText = windStr;
                 document.getElementById('homeFeelsLikeVal').innerHTML = flStr;
-                document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIcon}"></i> ${wxStr}`;
+                document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIcon}" style="font-size: 36px; color: #fff;"></i>`;
 
                 const fData = await robustNWSFetch(ptData.properties.forecast);
                 if (fData && fData.properties) {
@@ -1410,7 +1426,10 @@
                     const hData = await robustNWSFetch(ptData.properties.forecastHourly);
                     if (hData && hData.properties) {
                         let now = new Date();
-                        let validHourly = hData.properties.periods.filter(p => new Date(p.endTime) > now);
+                        let cutoff = new Date(now);
+                        cutoff.setMinutes(0, 0, 0); // Filters out any forecast block that starts before the current hour
+                        
+                        let validHourly = hData.properties.periods.filter(p => new Date(p.startTime) >= cutoff);
                         
                         let tempsHtml = `<div style="display:flex; gap:10px; margin-top:20px; overflow-x: auto; padding-bottom: 5px;">`;
                         for (let i = 0; i < Math.min(4, validHourly.length); i++) {
@@ -1613,14 +1632,14 @@
                     }
 
                     asosHtml = `
-                    <div class="glass" style="margin-bottom: 20px; background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(20, 30, 40, 0.6) 100%); border-color: var(--accent); padding: 25px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                    <div class="glass asos-panel" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(20, 30, 40, 0.6) 100%); border-color: var(--accent); padding: 25px;">
                         <div style="font-size:12px; font-weight: 900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase;">
                             <i class="ph-fill ph-thermometer"></i> LIVE ASOS OBSERVATIONS
                         </div>
-                        <i class="ph-fill ${wxIcon}" style="font-size: 48px; margin-bottom: 12px; color: #fff;"></i>
-                        <div style="font-size:36px; font-weight:900; color:var(--danger); line-height:1; margin-bottom:15px;">${ad.temp}°F</div>
+                        <i class="ph-fill ${wxIcon}" style="font-size: 56px; margin-bottom: 12px; color: #fff;"></i>
+                        <div style="font-size:42px; font-weight:900; color:var(--danger); line-height:1; margin-bottom:15px;">${ad.temp}°F</div>
                         
-                        <div style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 300px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+                        <div style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
                             <div style="font-size: 14px; font-weight: 600; opacity: 0.85;">Wind: ${ad.wind !== null ? ad.wind + ' mph' : '--'}${ad.gust ? ` (Gusts: ${ad.gust} mph)` : ''}</div>
                             <div style="font-size: 14px; font-weight: bold; color: var(--info);">Feels Like: ${fl}°F</div>
                             ${minChillHtml}
@@ -1656,7 +1675,10 @@
                     
                     let hourlyPeriods = (nwsData.hourly && nwsData.hourly.properties) ? nwsData.hourly.properties.periods : [];
                     let now = new Date();
-                    let validHourly = hourlyPeriods.filter(p => new Date(p.endTime) > now);
+                    let cutoff = new Date(now);
+                    cutoff.setMinutes(0, 0, 0); // Filters out any forecast block that starts before the current hour
+                    
+                    let validHourly = hourlyPeriods.filter(p => new Date(p.startTime) >= cutoff);
                     
                     if (validHourly.length > 0) {
                         let hCols = validHourly.slice(0, 24).map(p => {
@@ -1802,7 +1824,7 @@
 
                     let period = dailyPeriods[0];
                     nwsHtml = `
-                    <div class="glass" style="padding: 25px; margin-bottom: 20px; background: rgba(0, 210, 255, 0.05);">
+                    <div class="glass nws-panel" style="background: rgba(0, 210, 255, 0.05); padding: 25px;">
                         <div style="font-size:22px; font-weight:900; margin-bottom: 15px;">${period.name}: ${period.temperature}°F</div>
                         <div style="font-size:15px; opacity:0.9; line-height: 1.6;">${period.detailedForecast}</div>
                         ${buildMeteorologistCreditHTML(gridId, cityObj.lat, cityObj.lon)}
@@ -1931,12 +1953,16 @@
                     <div style="opacity: 0.8; font-style: italic; color: var(--warning);"><i class="ph-fill ph-warning"></i> MOS data is actively generating or unavailable for this location. Ensure the GitHub Action has completed.</div>
                 </div>`;
             }
+            
+            let currentAndDetailedHtml = `<div class="current-detailed-wrapper">`;
+            if (asosHtml) currentAndDetailedHtml += asosHtml;
+            if (nwsHtml) currentAndDetailedHtml += nwsHtml;
+            currentAndDetailedHtml += `</div>`;
 
             main.innerHTML = `
                 <h2 style="font-size: 36px; font-weight: 900; margin-top: 0; margin-bottom: 25px;">${cityObj.display}</h2>
                 ${alertsHtml}
-                ${asosHtml}
-                ${nwsHtml}
+                ${currentAndDetailedHtml}
                 ${spcHtml}
                 ${hourlyHtml}
                 ${dailyHtml}
