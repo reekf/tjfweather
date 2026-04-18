@@ -650,7 +650,7 @@
             self.addEventListener('push', function(e) {
                 let body = 'New Weather Alert or Update!';
                 if (e.data) { body = e.data.text(); }
-                const options = { body: body, icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=', vibrate: [100, 50, 100] };
+                const options = { body: body, icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=', vibrate: [100, 50, 100] };
                 e.waitUntil(self.registration.showNotification('TJFWeather', options));
             });
         `;
@@ -2276,7 +2276,15 @@
                 const provider = new GoogleAuthProvider();
                 await signInWithPopup(auth, provider);
                 return true;
-            } catch(e) { window.showModalMessage(e.message.replace('Firebase: ', '')); return false; }
+            } catch(e) {
+                console.error(e);
+                if (e.code === 'auth/unauthorized-domain') {
+                    window.showModalMessage("Google Sign-In blocked. Add this website's domain to your Firebase Console under Authentication -> Settings -> Authorized domains.");
+                } else {
+                    window.showModalMessage(e.message.replace('Firebase: ', '')); 
+                }
+                return false; 
+            }
         }
         
         window.doRegister = async function(email, pass) {
