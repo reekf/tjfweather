@@ -173,7 +173,15 @@
         @media (max-width: 768px) {
             .tab-content { height: calc(100vh - 65px); overflow-y: auto; overflow-x: hidden; }
             #home > div { padding: 15px !important; gap: 15px !important; }
-            .glass { min-width: 0 !important; width: 100% !important; padding: 15px !important; box-sizing: border-box; }
+            
+            /* Home Page specifically needs to break flex layout on mobile */
+            .home-panels-container { flex-direction: column !important; flex-wrap: nowrap !important; width: 100%; }
+            .home-panels-container > .glass { flex: none !important; width: 100% !important; max-width: 100% !important; min-width: 0 !important; padding: 20px !important; box-sizing: border-box; }
+            
+            /* General glass padding adjustments */
+            .glass { box-sizing: border-box; width: 100%; max-width: 100%; }
+            .lf-main > .glass, .lf-main > div > .glass { padding: 15px !important; box-sizing: border-box; }
+            
             .radar-controls { width: 95% !important; padding: 10px; flex-direction: column; gap: 10px; }
             .lf-container { display: block; overflow-y: visible; height: auto; }
             .lf-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); height: auto; overflow: visible; padding: 15px; }
@@ -214,7 +222,7 @@
     <!-- HOME TAB -->
     <div id="home" class="tab-content active">
         <div style="padding: 30px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; padding-bottom: 80px;">
-            <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
+            <div class="home-panels-container" style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
 
                 <div class="glass home-alerts-panel" style="padding: 20px; display: flex; flex-direction: column; flex: 1; min-width: 300px; max-width: 400px; max-height: 400px; overflow-y: auto;">
                     <h3 style="margin: 0 0 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--danger); font-weight: 900; display: flex; align-items: center; gap: 8px;">
@@ -426,7 +434,7 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v12.2 | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v12.3 | AMES, IA</p>
             </div>
         </div>
     </div>
@@ -1275,7 +1283,7 @@
                 document.getElementById('homeTempVal').innerText = tempStr;
                 document.getElementById('homeWindVal').innerText = windStr;
                 document.getElementById('homeFeelsLikeVal').innerHTML = flStr;
-                document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIcon}" style="font-size: 36px; color: #fff;"></i>`;
+                document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIcon}"></i> ${wxStr}`;
 
                 try {
                     const nwsRes = await fetch('static/nws/Ames.json?t=' + Date.now());
@@ -1678,7 +1686,7 @@
                     let cutoff = new Date(now);
                     cutoff.setMinutes(0, 0, 0); // Filters out any forecast block that starts before the current hour
                     
-                    let validHourly = hourlyPeriods.filter(p => new Date(p.startTime) >= cutoff);
+                    let validHourly = hourlyPeriods.filter(p => new Date(p.endTime) >= cutoff);
                     
                     if (validHourly.length > 0) {
                         let hCols = validHourly.slice(0, 24).map(p => {
