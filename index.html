@@ -163,6 +163,7 @@
         .home-weather-content { display: flex; gap: 20px; align-items: center; }
         .home-temp-val { font-size: 54px; font-weight: 900; color: var(--text); line-height: 1; }
 
+        /* Responsive Layouts for ASOS & NWS side-by-side */
         .current-detailed-wrapper { display: flex; gap: 20px; margin-bottom: 20px; align-items: stretch; flex-wrap: wrap; }
         .current-detailed-wrapper > div { margin-bottom: 0 !important; }
         .asos-panel { flex: 1; min-width: 250px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -181,9 +182,11 @@
             .tab-content { height: calc(100vh - 65px); overflow-y: auto; overflow-x: hidden; }
             #home > div { padding: 15px !important; gap: 15px !important; }
             
+            /* Home Page specifically needs to break flex layout on mobile */
             .home-panels-container { flex-direction: column !important; flex-wrap: nowrap !important; width: 100%; }
             .home-panels-container > .glass { flex: none !important; width: 100% !important; max-width: 100% !important; min-width: 0 !important; padding: 20px !important; box-sizing: border-box; }
             
+            /* General glass padding adjustments */
             .glass { box-sizing: border-box; width: 100%; max-width: 100%; }
             .lf-main > .glass, .lf-main > div > .glass { padding: 15px !important; box-sizing: border-box; }
             
@@ -464,7 +467,7 @@
     </div>
     
     <!-- Auth Custom Modal UI -->
-    <div id="authModal" class="bg-overlay" style="display:none; z-index: 9999; justify-content:center; align-items:center;">
+    <div id="authModal" class="bg-overlay" style="display:none; z-index: 9999; justify-content:center; align-items:center; pointer-events: auto;">
         <div class="glass" style="padding: 30px; width: 90%; max-width: 350px; display:flex; flex-direction:column; gap: 15px; background: rgba(11, 14, 17, 0.95); border: 1px solid var(--accent);">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h2 style="margin:0; font-size: 20px; font-weight:900;">Account Access</h2>
@@ -511,6 +514,7 @@
         window.showModalMessage = function(msg) {
             document.getElementById('authError').innerText = msg;
             document.getElementById('authError').style.display = 'block';
+            // Keep inputs visible to allow the user to easily retry typing the password!
             document.getElementById('authModal').style.display = 'flex';
         };
 
