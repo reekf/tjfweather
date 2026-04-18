@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://d3js.org/topojson.v3.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Universal Box-Sizing */
         *, *::before, *::after { box-sizing: border-box; }
@@ -130,25 +131,12 @@
         .lf-city-item:hover, .lf-city-item.selected { background: rgba(0, 210, 255, 0.15); border-color: var(--accent); color: var(--accent); }
 
         .lf-hourly-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: thin; }
-        .lf-hour-col { min-width: 125px; text-align: center; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;}
+        .lf-hour-col { min-width: 140px; text-align: center; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;}
         .lf-hour-col .hr-label { opacity: 0.7; margin-bottom: 8px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
         .lf-hour-col .hr-temp { font-size: 20px; font-weight: 900; color: var(--accent); margin-top: 8px; }
 
-        .lf-daily-col { min-width: 140px; text-align: center; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 10px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; transition: background 0.2s; }
-        .lf-daily-col:hover { background: rgba(255, 255, 255, 0.05); }
-        .lf-daily-col .day-hi { color: var(--danger); font-weight: 900; font-size: 18px; }
-        .lf-daily-col .day-lo { color: var(--info); font-weight: 900; font-size: 18px; }
-
-        /* Premium MOS Grid Styles */
-        .mos-grid { display: flex; flex-direction: column; gap: 8px; }
-        .mos-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr 1.2fr; background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 12px; align-items: center; text-align: center; border: 1px solid transparent; transition: 0.2s; }
-        .mos-row:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
-        .mos-header { background: transparent; padding: 0 16px 10px; border-bottom: 1px solid var(--border); border-radius: 0; font-weight: 800; font-size: 11px; text-transform: uppercase; opacity: 0.7; }
-        .mos-header:hover { background: transparent; border-color: var(--border); }
-        .mos-time { text-align: left; font-weight: 700; display: flex; align-items: center; gap: 8px; opacity: 0.9; }
-        .mos-nws { font-weight: 900; color: var(--accent); font-size: 16px; background: rgba(0,210,255,0.1); padding: 6px 0; border-radius: 8px; display: inline-block; width: 60px; margin: 0 auto; }
-        .mos-model { opacity: 0.8; font-weight: 600; font-size: 15px; }
-        .mos-spread { font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 15px; }
+        .lf-daily-col { min-width: 160px; text-align: center; background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(20, 30, 40, 0.6) 100%); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.2s; }
+        .lf-daily-col:hover { background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(30, 45, 60, 0.8) 100%); border-color: var(--accent); transform: translateY(-2px); }
 
         .alert-badge { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.4; border-left: 4px solid currentColor; background: rgba(0, 0, 0, 0.5); word-wrap: break-word; white-space: normal; height: auto; min-height: min-content; }
         .alert-badge .ab-title { font-weight: 900; font-size: 14px; text-transform: uppercase; word-break: break-word; }
@@ -423,7 +411,6 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         const LF_CITIES = [
             { id: 'New York', display: 'New York, NY', lat: 40.71, lon: -74.00 }, { id: 'Los Angeles', display: 'Los Angeles, CA', lat: 34.05, lon: -118.24 },
@@ -491,30 +478,22 @@
 
         // --- Feels Like / Wind Chill / Heat Index Helpers ---
         function getFeelsLike(tempF, windMph, rh = null) {
-            // If RH is not provided, estimate a moderate 50% humidity to allow the continuous formula to work
             let calcRh = rh !== null ? rh : 50; 
             
-            // Steadman Apparent Temperature Formula (Continuous RealFeel)
             let tempC = (tempF - 32) * 5 / 9;
             let windMs = windMph * 0.44704;
             
-            // Vapor pressure (e)
             let e = (calcRh / 100) * 6.105 * Math.exp((17.27 * tempC) / (237.7 + tempC));
             
-            // Steadman Apparent Temp in Celsius
             let atC = tempC + 0.33 * e - 0.70 * windMs - 4.00;
             
-            // Convert back to Fahrenheit
             let apparentTempF = (atC * 9 / 5) + 32;
 
-            // NWS Wind Chill (Only applies if Temp <= 50F and Wind > 3mph)
             if (tempF <= 50 && windMph > 3) {
                 let wc = 35.74 + (0.6215 * tempF) - (35.75 * Math.pow(windMph, 0.16)) + (0.4275 * tempF * Math.pow(windMph, 0.16));
-                // Use whichever is colder between Apparent Temp and Wind Chill
                 return Math.round(Math.min(apparentTempF, wc));
             }
             
-            // NWS Heat Index Formula (Only applies if Temp >= 80F and RH >= 40%)
             if (tempF >= 80 && calcRh >= 40) {
                 let hi = 0.5 * (tempF + 61.0 + ((tempF - 68.0) * 1.2) + (calcRh * 0.094));
                 if (hi >= 80) {
@@ -525,11 +504,9 @@
                         hi += ((calcRh - 85) / 10) * ((87 - tempF) / 5);
                     }
                 }
-                // Use whichever is hotter between Apparent Temp and Heat Index
                 return Math.round(Math.max(apparentTempF, hi));
             }
             
-            // For the 50F - 80F range, return the Steadman continuous calculation
             return Math.round(apparentTempF); 
         }
 
@@ -539,7 +516,6 @@
                 let matches = String(windStr).match(/\d+/g);
                 if (matches && matches.length > 0) {
                     sustained = parseInt(matches[0]);
-                    // If range given (e.g. "10 to 15"), use upper bound as gust, lower as sustained
                     if (matches.length > 1) gust = Math.max(...matches.map(Number));
                     else gust = sustained;
                 }
@@ -1289,30 +1265,30 @@
                                         let hWinds = parseWinds(p.windSpeed, p.windGust);
                                         let hRh = p.relativeHumidity?.value || null;
                                         let hFl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
-                                        let flHtml = `<div style="font-size:11px; font-weight:bold; color:var(--info); margin-top:4px;">Feels Like: ${hFl}&deg;</div>`;
+                                        let flHtml = `<div style="font-size:12px; font-weight:bold; color:var(--info); margin-top:6px;">Feels Like: ${hFl}&deg;</div>`;
 
                                         if (hWinds.gust > hWinds.sustained) {
                                             let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
-                                            if (mc < hFl) flHtml += `<div style="font-size:11px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
+                                            if (mc < hFl) flHtml += `<div style="font-size:12px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
                                         }
 
                                         let qpfVal = p.quantitativePrecipitation?.value;
                                         let qpfStr = '';
                                         if (qpfVal > 0) {
                                             let inches = (qpfVal / 25.4).toFixed(2);
-                                            qpfStr = `<div style="color:var(--success); font-size:11px; font-weight:900; margin-top:6px;">${inches}"</div>`;
+                                            qpfStr = `<div style="color:var(--success); font-size:11px; font-weight:900; margin-top:8px;">${inches}"</div>`;
                                         } else {
                                             let pop = p.probabilityOfPrecipitation?.value || 0;
                                             if (pop > 0) {
-                                                qpfStr = `<div style="color:var(--info); font-size:11px; font-weight:bold; margin-top:6px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
+                                                qpfStr = `<div style="color:var(--info); font-size:12px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
                                             } else {
-                                                qpfStr = `<div style="color:transparent; font-size:11px; margin-top:6px;">0%</div>`;
+                                                qpfStr = `<div style="color:transparent; font-size:12px; margin-top:8px;">0%</div>`;
                                             }
                                         }
-                                        tempsHtml += `<div class="lf-hour-col" style="min-width: 125px; padding: 12px 6px;">
-                                            <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
-                                            <i class="ph-fill ${pIcon}" style="font-size: 20px; margin: 4px 0;"></i>
-                                            <div class="hr-temp" style="font-size:15px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
+                                        tempsHtml += `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
+                                            <div class="hr-label">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
+                                            <i class="ph-fill ${pIcon}" style="font-size: 26px; margin: 4px 0;"></i>
+                                            <div class="hr-temp">${p.temperature}&deg;</div>
                                             ${flHtml}
                                             ${qpfStr}
                                         </div>`;
@@ -1412,30 +1388,30 @@
                                 let hWinds = parseWinds(p.windSpeed, p.windGust);
                                 let hRh = p.relativeHumidity?.value || null;
                                 let hFl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
-                                let flHtml = `<div style="font-size:11px; font-weight:bold; color:var(--info); margin-top:4px;">Feels Like: ${hFl}&deg;</div>`;
+                                let flHtml = `<div style="font-size:12px; font-weight:bold; color:var(--info); margin-top:6px;">Feels Like: ${hFl}&deg;</div>`;
 
                                 if (hWinds.gust > hWinds.sustained) {
                                     let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
-                                    if (mc < hFl) flHtml += `<div style="font-size:11px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
+                                    if (mc < hFl) flHtml += `<div style="font-size:12px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
                                 }
 
                                 let qpfVal = p.quantitativePrecipitation?.value;
                                 let qpfStr = '';
                                 if (qpfVal > 0) {
                                     let inches = (qpfVal / 25.4).toFixed(2);
-                                    qpfStr = `<div style="color:var(--success); font-size:11px; font-weight:900; margin-top:6px;">${inches}"</div>`;
+                                    qpfStr = `<div style="color:var(--success); font-size:11px; font-weight:900; margin-top:8px;">${inches}"</div>`;
                                 } else {
                                     let pop = p.probabilityOfPrecipitation?.value || 0;
                                     if (pop > 0) {
-                                        qpfStr = `<div style="color:var(--info); font-size:11px; font-weight:bold; margin-top:6px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
+                                        qpfStr = `<div style="color:var(--info); font-size:12px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
                                     } else {
-                                        qpfStr = `<div style="color:transparent; font-size:11px; margin-top:6px;">0%</div>`;
+                                        qpfStr = `<div style="color:transparent; font-size:12px; margin-top:8px;">0%</div>`;
                                     }
                                 }
-                                tempsHtml += `<div class="lf-hour-col" style="min-width: 125px; padding: 12px 6px;">
-                                    <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
-                                    <i class="ph-fill ${pIcon}" style="font-size: 20px; margin: 4px 0;"></i>
-                                    <div class="hr-temp" style="font-size:15px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
+                                tempsHtml += `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
+                                    <div class="hr-label">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
+                                    <i class="ph-fill ${pIcon}" style="font-size: 26px; margin: 4px 0; color: #fff;"></i>
+                                    <div class="hr-temp">${p.temperature}&deg;</div>
                                     ${flHtml}
                                     ${qpfStr}
                                 </div>`;
@@ -1648,11 +1624,11 @@
                             let hWinds = parseWinds(p.windSpeed, p.windGust);
                             let hRh = p.relativeHumidity?.value || null;
                             let fl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
-                            let flHtml = `<div style="font-size:11px; font-weight:bold; color:var(--info); margin-top:4px;">Feels Like: ${fl}&deg;</div>`;
+                            let flHtml = `<div style="font-size:12px; font-weight:bold; color:var(--info); margin-top:6px;">Feels Like: ${fl}&deg;</div>`;
 
                             if (hWinds.gust > hWinds.sustained) {
                                 let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
-                                if (mc < fl) flHtml += `<div style="font-size:11px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
+                                if (mc < fl) flHtml += `<div style="font-size:12px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
                             }
 
                             let qpfVal = p.quantitativePrecipitation?.value;
@@ -1668,7 +1644,7 @@
                                     qpfStr = `<div style="color:transparent; font-size:12px; margin-top:8px;">0%</div>`;
                                 }
                             }
-                            return `<div class="lf-hour-col" style="min-width: 125px;">
+                            return `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
                                 <div class="hr-label">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
                                 <i class="ph-fill ${hIcon}" style="font-size: 26px; margin: 4px 0; color: #fff;"></i>
                                 <div class="hr-temp">${p.temperature}&deg;</div>
@@ -1703,17 +1679,17 @@
                                 let dWinds = parseWinds(p1.windSpeed, p1.windGust);
                                 let dRh = p1.relativeHumidity?.value || null;
                                 let dFl = getFeelsLike(hi, dWinds.sustained, dRh);
-                                if (dFl !== hi) dayFlHtml = `<div style="font-size:11px; color:var(--warning); margin-top:6px; font-weight:bold;">Day FL: ${dFl}°</div>`;
+                                if (dFl !== hi) dayFlHtml = `<div style="font-size:12px; color:var(--warning); margin-top:6px; font-weight:bold;">Day FL: ${dFl}°</div>`;
 
                                 if (p2 && !p2.isDaytime) {
                                     let nWinds = parseWinds(p2.windSpeed, p2.windGust);
                                     let nRh = p2.relativeHumidity?.value || null;
                                     let nFl = getFeelsLike(lo, nWinds.sustained, nRh);
-                                    if (nFl !== lo) eveFlHtml = `<div style="font-size:11px; color:var(--info); margin-top:2px; font-weight:bold;">Eve FL: ${nFl}°</div>`;
+                                    if (nFl !== lo) eveFlHtml = `<div style="font-size:12px; color:var(--info); margin-top:6px; font-weight:bold;">Eve FL: ${nFl}°</div>`;
 
                                     if (lo !== '--' && nWinds.gust > nWinds.sustained) {
                                         let nMc = getFeelsLike(lo, nWinds.gust, nRh);
-                                        if (nMc < nFl) nightMcHtml = `<div style="font-size:11px; color:#a29bfe; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
+                                        if (nMc < nFl) nightMcHtml = `<div style="font-size:12px; color:#a29bfe; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
                                     }
                                 }
 
@@ -1726,26 +1702,30 @@
                                 let nWinds = parseWinds(p1.windSpeed, p1.windGust);
                                 let nRh = p1.relativeHumidity?.value || null;
                                 let nFl = getFeelsLike(lo, nWinds.sustained, nRh);
-                                if (nFl !== lo) eveFlHtml = `<div style="font-size:11px; color:var(--info); margin-top:6px; font-weight:bold;">Eve FL: ${nFl}°</div>`;
+                                if (nFl !== lo) eveFlHtml = `<div style="font-size:12px; color:var(--info); margin-top:6px; font-weight:bold;">Eve FL: ${nFl}°</div>`;
                                 
                                 if (lo !== '--' && nWinds.gust > nWinds.sustained) {
                                     let nMc = getFeelsLike(lo, nWinds.gust, nRh);
-                                    if (nMc < nFl) nightMcHtml = `<div style="font-size:11px; color:#a29bfe; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
+                                    if (nMc < nFl) nightMcHtml = `<div style="font-size:12px; color:#a29bfe; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
                                 }
                                 dayIdx++;
                             }
                             
                             dCols += `
                             <div class="lf-daily-col">
-                                <div style="font-weight: 800; font-size: 13px; margin-bottom: 8px;">${dayName}</div>
-                                <i class="ph-fill ${dIcon}" style="font-size: 28px; margin-bottom: 8px; color: #fff;"></i>
-                                <div style="display: flex; gap: 8px; align-items: center; justify-content: center; margin-bottom: 2px;">
-                                    <span class="day-hi">${hi !== '--' ? hi+'°' : '--'}</span>
-                                    <span class="day-lo" style="opacity: 0.85;">${lo !== '--' ? lo+'°' : '--'}</span>
+                                <div style="font-weight: 800; font-size: 14px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">${dayName}</div>
+                                <i class="ph-fill ${dIcon}" style="font-size: 36px; margin-bottom: 12px; color: #fff;"></i>
+                                
+                                <div style="margin-bottom: 10px; min-height: 45px;">
+                                    <div style="font-size: 24px; font-weight: 900; color: var(--danger); line-height: 1;">${hi !== '--' ? hi+'°' : '--'}</div>
+                                    ${dayFlHtml}
                                 </div>
-                                ${dayFlHtml}
-                                ${eveFlHtml}
-                                ${nightMcHtml}
+                                
+                                <div style="margin-top: 4px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; min-height: 65px;">
+                                    <div style="font-size: 18px; font-weight: 900; color: var(--info); line-height: 1;">${lo !== '--' ? lo+'°' : '--'}</div>
+                                    ${eveFlHtml}
+                                    ${nightMcHtml}
+                                </div>
                             </div>`;
                         }
                         
@@ -1799,97 +1779,85 @@
                 let gfs = (mosDataCache.gfsmos && mosDataCache.gfsmos[cityId]) ? mosDataCache.gfsmos[cityId].temp : [];
                 let nam = (mosDataCache.nammos && mosDataCache.nammos[cityId]) ? mosDataCache.nammos[cityId].temp : [];
                 
-                let tableRows = "";
-                let now = new Date();
-                let currentHour = Math.floor(now.getTime() / 3600000) * 3600000; 
-                let baseDate = new Date(currentHour);
-
-                for(let i=24; i<=144; i+=24) {
-                    let nVal = nbm[i] ?? nbm[i-6] ?? nbm[i+6];
-                    let gVal = gfs[i] ?? gfs[i-6] ?? gfs[i+6];
-                    let mVal = nam[i] ?? nam[i-6] ?? nam[i+6];
-                    
-                    if (nVal != null || gVal != null || mVal != null) {
-                        let tDate = new Date(baseDate.getTime() + (i * 3600000));
-                        let timeStr = tDate.toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'});
-                        
-                        let nStr = nVal != null ? nVal + '°' : '-';
-                        let gStr = gVal != null ? gVal + '°' : '-';
-                        let mStr = mVal != null ? mVal + '°' : '-';
-                        
-                        let vals = [nVal, gVal, mVal].filter(v => v != null);
-                        let spread = "-";
-                        let spreadClass = "";
-                        let spreadIcon = "";
-                        
-                        if(vals.length > 1) {
-                            let diff = Math.max(...vals) - Math.min(...vals);
-                            spread = diff + '°';
-                            if (diff >= 5) {
-                                spreadClass = "color: var(--danger);";
-                                spreadIcon = `<i class="ph-fill ph-warning-circle" style="font-size: 18px; margin-right: 4px; vertical-align: middle;"></i>`;
-                            }
-                            else if (diff >= 3) {
-                                spreadClass = "color: var(--warning);";
-                                spreadIcon = `<i class="ph-fill ph-warning" style="font-size: 18px; margin-right: 4px; vertical-align: middle;"></i>`;
-                            }
-                            else {
-                                spreadClass = "color: var(--success);";
-                                spreadIcon = `<i class="ph-fill ph-check-circle" style="font-size: 18px; margin-right: 4px; vertical-align: middle;"></i>`;
-                            }
-                        }
-                        
-                        tableRows += `
-                            <div class="mos-row">
-                                <div class="mos-time"><i class="ph ph-calendar-blank" style="font-size: 16px;"></i> ${timeStr}</div>
-                                <div><span class="mos-nws">${nStr}</span></div>
-                                <div class="mos-model">${gStr}</div>
-                                <div class="mos-model">${mStr}</div>
-                                <div class="mos-spread" style="${spreadClass}">${spreadIcon} ${spread}</div>
-                            </div>
-                        `;
-                    }
-                }
+                let labels = [];
+                let nbmH = [], nbmL = [], gfsH = [], gfsL = [], namH = [], namL = [];
+                let baseDate = new Date();
                 
-                if (tableRows) {
-                    mosHtml = `
-                    <div class="glass" style="padding: 25px; margin-bottom: 20px;">
-                        <div style="display:flex; align-items:center; gap:8px; font-size:15px; font-weight:900; margin-bottom: 10px; color: var(--accent);">
-                            <i class="ph-fill ph-chart-bar" style="font-size: 24px;"></i> DAILY STATISTICAL UNCERTAINTY (MOS)
-                        </div>
-                        <div style="font-size:13px; opacity:0.8; margin-bottom: 20px; line-height: 1.6;">
-                            Comparing the official human consensus against raw computer statistics algorithms (GFS & NAM MOS). 
-                            <span style="color:var(--danger); font-weight:bold;">Higher spread = lower confidence in the forecast.</span>
-                        </div>
-                        <div style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 10px;">
-                            <div class="mos-grid" style="min-width: 550px;">
-                                <div class="mos-row mos-header">
-                                    <div class="mos-time" style="opacity:1;"><i class="ph-fill ph-calendar"></i> Valid Date</div>
-                                    <div style="color:var(--accent);"><i class="ph-fill ph-target"></i> NWS Consensus</div>
-                                    <div><i class="ph-fill ph-cpu"></i> GFS MOS</div>
-                                    <div><i class="ph-fill ph-cpu"></i> NAM MOS</div>
-                                    <div><i class="ph-fill ph-arrows-out-line-horizontal"></i> Model Spread</div>
-                                </div>
-                                ${tableRows}
-                            </div>
-                        </div>
-                    </div>`;
-                } else {
-                    mosHtml = `
-                    <div class="glass" style="padding: 25px; margin-bottom: 20px;">
-                        <div style="display:flex; align-items:center; gap:8px; font-size:15px; font-weight:900; margin-bottom: 10px; color: var(--accent);">
-                            <i class="ph-fill ph-chart-bar" style="font-size: 24px;"></i> DAILY STATISTICAL UNCERTAINTY (MOS)
-                        </div>
-                        <div style="opacity: 0.8; font-style: italic; color: var(--warning);"><i class="ph-fill ph-warning"></i> MOS data is actively generating or unavailable for this location. Ensure the GitHub Action has completed.</div>
-                    </div>`;
+                for(let d=0; d<7; d++) {
+                    let startIdx = d * 24;
+                    let endIdx = startIdx + 24;
+                    
+                    let dDate = new Date(baseDate.getTime() + (d * 86400000));
+                    let dayName = d === 0 ? "Today" : dDate.toLocaleDateString([], {weekday: 'short'});
+                    labels.push(dayName);
+                    
+                    let nbmSlice = nbm.slice(startIdx, endIdx).filter(v => v != null);
+                    let gfsSlice = gfs.slice(startIdx, endIdx).filter(v => v != null);
+                    let namSlice = nam.slice(startIdx, endIdx).filter(v => v != null);
+                    
+                    nbmH.push(nbmSlice.length ? Math.max(...nbmSlice) : null);
+                    nbmL.push(nbmSlice.length ? Math.min(...nbmSlice) : null);
+                    gfsH.push(gfsSlice.length ? Math.max(...gfsSlice) : null);
+                    gfsL.push(gfsSlice.length ? Math.min(...gfsSlice) : null);
+                    namH.push(namSlice.length ? Math.max(...namSlice) : null);
+                    namL.push(namSlice.length ? Math.min(...namSlice) : null);
                 }
+
+                mosHtml = `
+                <div class="glass" style="padding: 25px; margin-bottom: 20px;">
+                    <div style="display:flex; align-items:center; gap:8px; font-size:15px; font-weight:900; margin-bottom: 10px; color: var(--accent);">
+                        <i class="ph-fill ph-chart-line-up" style="font-size: 24px;"></i> 7-DAY STATISTICAL UNCERTAINTY (MOS)
+                    </div>
+                    <div style="font-size:13px; opacity:0.8; margin-bottom: 20px; line-height: 1.6;">
+                        Plotting the daily High and Low temperature spread between the official NBM consensus, GFS MOS, and NAM MOS models.
+                        <span style="color:var(--danger); font-weight:bold;">Wider gaps = lower confidence in the forecast.</span>
+                    </div>
+                    <div style="width: 100%; height: 350px; position: relative;">
+                        <canvas id="mosChart"></canvas>
+                    </div>
+                </div>`;
+
+                // Render the Chart.js graphic
+                setTimeout(() => {
+                    const ctx = document.getElementById('mosChart');
+                    if (ctx) {
+                        new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: labels,
+                                datasets: [
+                                    { label: 'NBM High', data: nbmH, borderColor: '#00d2ff', backgroundColor: '#00d2ff', borderWidth: 3, pointRadius: 4, fill: false, tension: 0.3 },
+                                    { label: 'NBM Low', data: nbmL, borderColor: '#00d2ff', backgroundColor: '#00d2ff', borderWidth: 3, pointRadius: 4, fill: false, borderDash: [5, 5], tension: 0.3 },
+                                    { label: 'GFS High', data: gfsH, borderColor: '#ff4757', backgroundColor: '#ff4757', borderWidth: 2, pointRadius: 3, fill: false, tension: 0.3 },
+                                    { label: 'GFS Low', data: gfsL, borderColor: '#ff4757', backgroundColor: '#ff4757', borderWidth: 2, pointRadius: 3, fill: false, borderDash: [5, 5], tension: 0.3 },
+                                    { label: 'NAM High', data: namH, borderColor: '#2ecc71', backgroundColor: '#2ecc71', borderWidth: 2, pointRadius: 3, fill: false, tension: 0.3 },
+                                    { label: 'NAM Low', data: namL, borderColor: '#2ecc71', backgroundColor: '#2ecc71', borderWidth: 2, pointRadius: 3, fill: false, borderDash: [5, 5], tension: 0.3 }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { labels: { color: '#fff', font: { family: 'Inter', size: 11 } } },
+                                    tooltip: { mode: 'index', intersect: false }
+                                },
+                                scales: {
+                                    x: { ticks: { color: '#aaa' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                                    y: { ticks: { color: '#aaa', callback: function(value){ return value + '°'; } }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                                },
+                                interaction: { mode: 'nearest', axis: 'x', intersect: false }
+                            }
+                        });
+                    }
+                }, 100);
+
             } else {
                 mosHtml = `
                 <div class="glass" style="padding: 25px; margin-bottom: 20px;">
                     <div style="display:flex; align-items:center; gap:8px; font-size:15px; font-weight:900; margin-bottom: 10px; color: var(--accent);">
                         <i class="ph-fill ph-chart-bar" style="font-size: 24px;"></i> DAILY STATISTICAL UNCERTAINTY (MOS)
                     </div>
-                    <div style="opacity: 0.8; font-style: italic; color: var(--warning);"><i class="ph-fill ph-warning"></i> Data unavailable. The static JSON files could not be loaded.</div>
+                    <div style="opacity: 0.8; font-style: italic; color: var(--warning);"><i class="ph-fill ph-warning"></i> MOS data is actively generating or unavailable for this location. Ensure the GitHub Action has completed.</div>
                 </div>`;
             }
 
