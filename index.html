@@ -2219,27 +2219,8 @@
             
             window._firebaseAuth = auth;
             window._firebaseDb = db;
-            
-            const initAuth = async () => {
-                try {
-                    const isUsingCustomConfig = Object.keys(myFirebaseConfig).length > 0;
-                    if (!isUsingCustomConfig && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                } catch (error) {
-                    console.error("Firebase Auth Error:", error);
-                    if (error.code === 'auth/custom-token-mismatch') {
-                        try { await signInAnonymously(auth); } catch(e) { console.error(e); }
-                    } else if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
-                        window.showModalMessage("Firebase Setup Required: Please go to your Firebase Console -> Authentication -> Sign-in method, and enable BOTH 'Email/Password' and 'Anonymous' sign-in.");
-                    }
-                }
-            };
-            initAuth();
 
-            onAuthStateChanged(auth, (user) => {
+            onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     if (!user.isAnonymous) {
                         document.getElementById('authNavBtn').innerHTML = `<i class="ph ph-sign-out"></i> LOGOUT`;
@@ -2266,6 +2247,23 @@
                     window.pinnedCities = [];
                     if(window.renderPinnedCities) window.renderPinnedCities();
                     if(window.buildLFCityList) window.buildLFCityList();
+                    
+                    // Automatically sign in anonymously if no user session is found
+                    try {
+                        const isUsingCustomConfig = Object.keys(myFirebaseConfig).length > 0;
+                        if (!isUsingCustomConfig && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Firebase Auth Error:", error);
+                        if (error.code === 'auth/custom-token-mismatch') {
+                            try { await signInAnonymously(auth); } catch(e) { console.error(e); }
+                        } else if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
+                            window.showModalMessage("Firebase Setup Required: Please go to your Firebase Console -> Authentication -> Sign-in method, and enable BOTH 'Email/Password' and 'Anonymous' sign-in.");
+                        }
+                    }
                 }
             });
         }
