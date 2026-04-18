@@ -434,7 +434,7 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v12.3 | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v12.4 | AMES, IA</p>
             </div>
         </div>
     </div>
@@ -1211,6 +1211,69 @@
                 </div>
             </div>`;
         }
+        
+        async function fetchLiveASOS(lat, lon, fallbackData) {
+            let result = { temp: '--', wind: null, gust: null, wx: 'Loading...', icon: 'ph-cloud-slash', rh: 50, interpolated: false };
+            
+            try {
+                let ptData = await robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
+                let stationsRes = await robustNWSFetch(ptData.properties.observationStations);
+                let stationId = stationsRes.features[0].properties.stationIdentifier;
+                
+                let awcRes = await fetch(`https://aviationweather.gov/api/data/metar?ids=${stationId}&format=json&hours=3`);
+                let awcData = await awcRes.json();
+                
+                if (awcData && awcData.length > 0) {
+                    awcData.sort((a, b) => new Date(b.obsTime) - new Date(a.obsTime));
+                    let latest = awcData[0];
+                    
+                    let tempC = latest.temp;
+                    let isInterpolated = false;
+                    let latestTime = new Date(latest.obsTime).getTime();
+                    let hoursSinceLast = (Date.now() - latestTime) / 3600000;
+                    
+                    if (hoursSinceLast > 0.15 && awcData.length > 1) { // If older than 9 minutes, try to interpolate
+                        let older = awcData.find(m => {
+                            let diff = (latestTime - new Date(m.obsTime).getTime()) / 3600000;
+                            return diff >= 0.8 && m.temp !== null; // Find reading roughly an hour older
+                        });
+                        
+                        if (older) {
+                            let timeDiff = (latestTime - new Date(older.obsTime).getTime()) / 3600000;
+                            let tempRate = (latest.temp - older.temp) / timeDiff;
+                            tempRate = Math.max(-3, Math.min(3, tempRate)); // Cap rate at 3C/hr
+                            tempC = latest.temp + (tempRate * hoursSinceLast);
+                            isInterpolated = true;
+                        }
+                    }
+
+                    result.temp = Math.round((tempC * 9/5) + 32);
+                    result.interpolated = isInterpolated;
+                    
+                    if (latest.wspd !== null) result.wind = Math.round(latest.wspd * 1.15078);
+                    if (latest.wgst !== null) result.gust = Math.round(latest.wgst * 1.15078);
+                    
+                    if (latest.dewp !== null && latest.temp !== null) {
+                        result.rh = 100 * Math.exp((17.625 * latest.dewp)/(243.04 + latest.dewp)) / Math.exp((17.625 * latest.temp)/(243.04 + latest.temp));
+                    }
+                    
+                    let transWx = translateWx(latest.wxString || "");
+                    result.wx = transWx || "Clear";
+                    result.icon = getWeatherIcon(result.wx, true);
+                    return result;
+                }
+            } catch(e) {}
+
+            if (fallbackData) {
+                if (fallbackData.temp !== null) result.temp = fallbackData.temp;
+                if (fallbackData.wind !== null) result.wind = fallbackData.wind;
+                if (fallbackData.gust !== null) result.gust = fallbackData.gust;
+                let transWx = translateWx(fallbackData.wx || "");
+                result.wx = transWx || "Clear";
+                result.icon = getWeatherIcon(result.wx, true);
+            }
+            return result;
+        }
 
         async function setupHomeLocation() {
             window.currentHomeLat = 42.03; window.currentHomeLon = -93.62;
@@ -1242,255 +1305,150 @@
             let flStr = "";
             let wxStr = "Observation Unavailable";
             let wxIcon = "ph-cloud-slash";
+            let fallbackAd = null;
 
             if (!isGeo && lat === 42.03 && lon === -93.62) {
                 try {
                     const asosRes = await fetch('static/asos_conditions.json?t=' + Date.now());
                     if (asosRes.ok) {
                         const asosData = await asosRes.json();
-                        if (asosData['Ames']) {
-                            let ad = asosData['Ames'];
-                            if (ad.temp !== null) tempStr = `${ad.temp}°F`;
-                            if (ad.wind !== null) {
-                                windStr = `Wind: ${ad.wind} mph`;
-                                if(ad.gust) windStr += ` (Gusts: ${ad.gust} mph)`;
-                            }
-                            
-                            if (ad.temp !== null && ad.wind !== null) {
-                                let fl = getFeelsLike(ad.temp, ad.wind);
-                                flStr = `Feels Like: ${fl}°F`;
-                                if (ad.gust && ad.gust > ad.wind) {
-                                    let mc = getFeelsLike(ad.temp, ad.gust);
-                                    if (mc < fl) {
-                                        flStr += ` | <span style="color:#a29bfe;">Min Chill (Gusts): ${mc}°F</span> <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a>`;
-                                    } else {
-                                        flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">Gusts don't lower temp</span>`;
-                                    }
-                                } else {
-                                    flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">No gusts past hour</span>`;
-                                }
-                            }
-
-                            if (ad.wx !== undefined) {
-                                let trans = translateWx(ad.wx);
-                                wxStr = trans || (ad.temp !== null ? "Clear / VFR" : wxStr);
-                                wxIcon = getWeatherIcon(wxStr, true);
-                            }
-                        }
-                    }
-                } catch (e) { }
-
-                document.getElementById('homeTempVal').innerText = tempStr;
-                document.getElementById('homeWindVal').innerText = windStr;
-                document.getElementById('homeFeelsLikeVal').innerHTML = flStr;
-                document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIcon}"></i> ${wxStr}`;
-
-                try {
-                    const nwsRes = await fetch('static/nws/Ames.json?t=' + Date.now());
-                    if (nwsRes.ok) {
-                        const nwsData = await nwsRes.json();
-                        if (nwsData.daily && nwsData.daily.properties) {
-                            const cp = nwsData.daily.properties.periods[0];
-                            document.getElementById('homeQpfVal').innerText = `Forecast: ${cp.shortForecast}`;
-                        }
-
-                        try {
-                            if (nwsData.hourly && nwsData.hourly.properties) {
-                                let now = new Date();
-                                let cutoff = new Date(now);
-                                cutoff.setMinutes(0, 0, 0); // Filters out any forecast block that starts before the current hour
-                                
-                                let validHourly = nwsData.hourly.properties.periods.filter(p => new Date(p.startTime) >= cutoff);
-                                
-                                let tempsHtml = `<div style="display:flex; gap:10px; margin-top:20px; overflow-x: auto; padding-bottom: 5px;">`;
-                                for (let i = 0; i < Math.min(4, validHourly.length); i++) {
-                                    let p = validHourly[i];
-                                    if (p) {
-                                        let tDate = new Date(p.startTime);
-                                        let pIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
-                                        
-                                        let hWinds = parseWinds(p.windSpeed, p.windGust);
-                                        let hRh = p.relativeHumidity?.value || null;
-                                        let hFl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
-                                        let flHtml = `<div style="font-size:12px; font-weight:bold; color:var(--info); margin-top:6px;">Feels Like: ${hFl}&deg;</div>`;
-
-                                        if (hWinds.gust > hWinds.sustained) {
-                                            let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
-                                            if (mc < hFl) {
-                                                flHtml += `<div style="font-size:12px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
-                                            } else {
-                                                flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
-                                            }
-                                        } else {
-                                            flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">No gusts<br>expected</div>`;
-                                        }
-
-                                        let qpfVal = p.quantitativePrecipitation?.value;
-                                        let qpfStr = '';
-                                        if (qpfVal > 0) {
-                                            let inches = (qpfVal / 25.4).toFixed(2);
-                                            qpfStr = `<div style="color:var(--success); font-size:11px; font-weight:900; margin-top:8px;">${inches}"</div>`;
-                                        } else {
-                                            let pop = p.probabilityOfPrecipitation?.value || 0;
-                                            if (pop > 0) {
-                                                qpfStr = `<div style="color:var(--info); font-size:11px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
-                                            } else {
-                                                qpfStr = `<div style="color:transparent; font-size:11px; margin-top:8px;">0%</div>`;
-                                            }
-                                        }
-                                        tempsHtml += `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
-                                            <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
-                                            <i class="ph-fill ${pIcon}" style="font-size: 26px; margin: 4px 0;"></i>
-                                            <div class="hr-temp" style="font-size:15px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
-                                            ${flHtml}
-                                            ${qpfStr}
-                                        </div>`;
-                                    }
-                                }
-                                tempsHtml += `</div>`;
-                                document.getElementById('homeNextTemps').innerHTML = tempsHtml;
-                            }
-                        } catch (he) { }
-
-                        document.getElementById('homeForecastFootnote').innerHTML = buildMeteorologistCreditHTML("DMX", lat, lon);
-                        return;
+                        if (asosData['Ames']) fallbackAd = asosData['Ames'];
                     }
                 } catch (e) { }
             }
 
+            // Real-Time ASOS Fetch & Interpolation Engine
+            let liveASOS = await fetchLiveASOS(lat, lon, fallbackAd);
+            tempStr = liveASOS.temp !== '--' ? `${liveASOS.temp}°F` : '--';
+            wxIcon = liveASOS.icon;
+            wxStr = liveASOS.wx;
+            
+            if (liveASOS.wind !== null) {
+                windStr = `Wind: ${liveASOS.wind} mph`;
+                if(liveASOS.gust) windStr += ` (Gusts: ${liveASOS.gust} mph)`;
+            }
+            
+            if (liveASOS.temp !== '--' && liveASOS.wind !== null) {
+                let fl = getFeelsLike(liveASOS.temp, liveASOS.wind, liveASOS.rh);
+                flStr = `Feels Like: ${fl}°F`;
+                if (liveASOS.gust && liveASOS.gust > liveASOS.wind) {
+                    let mc = getFeelsLike(liveASOS.temp, liveASOS.gust, liveASOS.rh);
+                    if (mc < fl) {
+                        flStr += ` | <span style="color:#a29bfe;">Min Chill (Gusts): ${mc}°F</span> <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a>`;
+                    } else {
+                        flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">Gusts don't lower temp</span>`;
+                    }
+                } else {
+                    flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">No gusts past hour</span>`;
+                }
+            }
+
+            document.getElementById('homeTempVal').innerText = tempStr;
+            document.getElementById('homeWindVal').innerText = windStr;
+            document.getElementById('homeFeelsLikeVal').innerHTML = flStr;
+            
+            let interpTag = liveASOS.interpolated ? `<span style="font-size:10px; color:var(--warning); vertical-align:super;" title="Interpolated from recent trend">*</span>` : '';
+            document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIcon}" style="font-size: 36px; color: #fff;"></i> ${interpTag}`;
+
             try {
-                const ptData = await robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
-                if (!ptData || !ptData.properties) throw new Error("Invalid NWS Point Data");
+                let ptData = null;
+                let gridId = "NWS";
+                let nwsData = null;
+                let cacheValid = false;
+                
+                let staticFile = (!isGeo && lat === 42.03 && lon === -93.62) ? 'Ames' : null;
 
-                const city = ptData.properties.relativeLocation?.properties?.city || "Unknown";
-                const state = ptData.properties.relativeLocation?.properties?.state || "";
-                document.getElementById('homeLocationName').innerText = `Official NWS Forecast — ${city}, ${state}`;
-
-                try {
-                    let stationsRes = await robustNWSFetch(ptData.properties.observationStations);
-                    if (stationsRes && stationsRes.features && stationsRes.features.length > 0) {
-                        let stationId = stationsRes.features[0].properties.stationIdentifier;
-                        let obsRes = await robustNWSFetch(`https://api.weather.gov/stations/${stationId}/observations/latest`);
-                        let props = obsRes?.properties;
-                        if (props) {
-                            let tempC = props.temperature?.value;
-                            let tempF = null;
-                            if (tempC !== null && tempC !== undefined) {
-                                tempF = Math.round(tempC * 9 / 5 + 32);
-                                tempStr = `${tempF}°F`;
-                            }
-                            
-                            let windKmh = props.windSpeed?.value;
-                            let windMph = null;
-                            if (windKmh !== null && windKmh !== undefined) {
-                                windMph = Math.round(windKmh / 1.60934);
-                                windStr = `Wind: ${windMph} mph`;
-                            }
-
-                            let gustKmh = props.windGust?.value;
-                            let gustMph = null;
-                            if (gustKmh !== null && gustKmh !== undefined) {
-                                gustMph = Math.round(gustKmh / 1.60934);
-                                windStr += ` (Gusts: ${gustMph} mph)`;
-                            }
-                            
-                            let rhVal = props.relativeHumidity?.value || null;
-
-                            if (tempF !== null && windMph !== null) {
-                                let fl = getFeelsLike(tempF, windMph, rhVal);
-                                flStr = `Feels Like: ${fl}°F`;
-                                if (gustMph && gustMph > windMph) {
-                                    let mc = getFeelsLike(tempF, gustMph, rhVal);
-                                    if (mc < fl) {
-                                        flStr += ` | <span style="color:#a29bfe;">Min Chill (Gusts): ${mc}°F</span> <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a>`;
-                                    } else {
-                                        flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">Gusts don't lower temp</span>`;
-                                    }
-                                } else {
-                                    flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">No gusts past hour</span>`;
+                if (staticFile) {
+                    try {
+                        let cacheRes = await fetch(`static/nws/${staticName}.json?t=${Date.now()}`);
+                        if(cacheRes.ok) {
+                            let cData = await cacheRes.json();
+                            if (cData && cData.hourly && cData.hourly.properties) {
+                                let validPeriods = cData.hourly.properties.periods.filter(p => new Date(p.endTime) > new Date());
+                                if (validPeriods.length >= 4) {
+                                    nwsData = cData;
+                                    cacheValid = true;
                                 }
                             }
-
-                            let wx = props.textDescription || "";
-                            let trans = translateWx(wx);
-                            wxStr = trans || (tempC !== null ? "Clear / VFR" : wxStr);
-                            wxIcon = getWeatherIcon(wxStr, true);
                         }
+                    } catch(e){}
+                }
+
+                if (!cacheValid) {
+                    ptData = await robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
+                    if (!ptData || !ptData.properties) throw new Error("Invalid NWS Point Data");
+                    
+                    if(isGeo) {
+                        const city = ptData.properties.relativeLocation?.properties?.city || "Unknown";
+                        const state = ptData.properties.relativeLocation?.properties?.state || "";
+                        document.getElementById('homeLocationName').innerText = `Official NWS Forecast — ${city}, ${state}`;
                     }
-                } catch (e) { }
 
-                document.getElementById('homeTempVal').innerText = tempStr;
-                document.getElementById('homeWindVal').innerText = windStr;
-                document.getElementById('homeFeelsLikeVal').innerHTML = flStr;
-                document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIcon}" style="font-size: 36px; color: #fff;"></i>`;
+                    gridId = ptData.properties.gridId;
+                    let fData = await robustNWSFetch(ptData.properties.forecast);
+                    let hData = await robustNWSFetch(ptData.properties.forecastHourly);
+                    nwsData = { daily: fData, hourly: hData };
+                }
 
-                const fData = await robustNWSFetch(ptData.properties.forecast);
-                if (fData && fData.properties) {
-                    const cp = fData.properties.periods[0];
+                if (nwsData && nwsData.daily && nwsData.daily.properties) {
+                    const cp = nwsData.daily.properties.periods[0];
                     document.getElementById('homeQpfVal').innerText = `Forecast: ${cp.shortForecast}`;
                 }
 
-                try {
-                    const hData = await robustNWSFetch(ptData.properties.forecastHourly);
-                    if (hData && hData.properties) {
-                        let now = new Date();
-                        let cutoff = new Date(now);
-                        cutoff.setMinutes(0, 0, 0); // Filters out any forecast block that starts before the current hour
-                        
-                        let validHourly = hData.properties.periods.filter(p => new Date(p.startTime) >= cutoff);
-                        
-                        let tempsHtml = `<div style="display:flex; gap:10px; margin-top:20px; overflow-x: auto; padding-bottom: 5px;">`;
-                        for (let i = 0; i < Math.min(4, validHourly.length); i++) {
-                            let p = validHourly[i];
-                            if (p) {
-                                let tDate = new Date(p.startTime);
-                                let pIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
-                                
-                                let hWinds = parseWinds(p.windSpeed, p.windGust);
-                                let hRh = p.relativeHumidity?.value || null;
-                                let hFl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
-                                let flHtml = `<div style="font-size:12px; font-weight:bold; color:var(--info); margin-top:6px;">Feels Like: ${hFl}&deg;</div>`;
+                if (nwsData && nwsData.hourly && nwsData.hourly.properties) {
+                    let validHourly = nwsData.hourly.properties.periods.filter(p => new Date(p.endTime) > new Date());
+                    
+                    let tempsHtml = `<div style="display:flex; gap:10px; margin-top:20px; overflow-x: auto; padding-bottom: 5px;">`;
+                    for (let i = 0; i < Math.min(4, validHourly.length); i++) {
+                        let p = validHourly[i];
+                        if (p) {
+                            let tDate = new Date(p.startTime);
+                            let pIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
+                            
+                            let hWinds = parseWinds(p.windSpeed, p.windGust);
+                            let hRh = p.relativeHumidity?.value || null;
+                            let hFl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
+                            let flHtml = `<div style="font-size:12px; font-weight:bold; color:var(--info); margin-top:6px;">Feels Like: ${hFl}&deg;</div>`;
 
-                                if (hWinds.gust > hWinds.sustained) {
-                                    let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
-                                    if (mc < hFl) {
-                                        flHtml += `<div style="font-size:12px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
-                                    } else {
-                                        flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
-                                    }
+                            if (hWinds.gust > hWinds.sustained) {
+                                let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
+                                if (mc < hFl) {
+                                    flHtml += `<div style="font-size:12px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
                                 } else {
-                                    flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">No gusts<br>expected</div>`;
+                                    flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
                                 }
-
-                                let qpfVal = p.quantitativePrecipitation?.value;
-                                let qpfStr = '';
-                                if (qpfVal > 0) {
-                                    let inches = (qpfVal / 25.4).toFixed(2);
-                                    qpfStr = `<div style="color:var(--success); font-size:11px; font-weight:900; margin-top:8px;">${inches}"</div>`;
-                                } else {
-                                    let pop = p.probabilityOfPrecipitation?.value || 0;
-                                    if (pop > 0) {
-                                        qpfStr = `<div style="color:var(--info); font-size:11px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
-                                    } else {
-                                        qpfStr = `<div style="color:transparent; font-size:11px; margin-top:8px;">0%</div>`;
-                                    }
-                                }
-                                tempsHtml += `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
-                                    <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
-                                    <i class="ph-fill ${pIcon}" style="font-size: 26px; margin: 4px 0;"></i>
-                                    <div class="hr-temp" style="font-size:15px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
-                                    ${flHtml}
-                                    ${qpfStr}
-                                </div>`;
+                            } else {
+                                flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">No gusts<br>expected</div>`;
                             }
-                        }
-                        tempsHtml += `</div>`;
-                        document.getElementById('homeNextTemps').innerHTML = tempsHtml;
-                    }
-                } catch (he) { }
 
-                let gridId = ptData.properties.gridId || "NWS";
+                            let qpfVal = p.quantitativePrecipitation?.value;
+                            let qpfStr = '';
+                            if (qpfVal > 0) {
+                                let inches = (qpfVal / 25.4).toFixed(2);
+                                qpfStr = `<div style="color:var(--success); font-size:11px; font-weight:900; margin-top:8px;">${inches}"</div>`;
+                            } else {
+                                let pop = p.probabilityOfPrecipitation?.value || 0;
+                                if (pop > 0) {
+                                    qpfStr = `<div style="color:var(--info); font-size:11px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
+                                } else {
+                                    qpfStr = `<div style="color:transparent; font-size:11px; margin-top:8px;">0%</div>`;
+                                }
+                            }
+                            tempsHtml += `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
+                                <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
+                                <i class="ph-fill ${pIcon}" style="font-size: 26px; margin: 4px 0;"></i>
+                                <div class="hr-temp" style="font-size:15px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
+                                ${flHtml}
+                                ${qpfStr}
+                            </div>`;
+                        }
+                    }
+                    tempsHtml += `</div>`;
+                    document.getElementById('homeNextTemps').innerHTML = tempsHtml;
+                }
+                
                 document.getElementById('homeForecastFootnote').innerHTML = buildMeteorologistCreditHTML(gridId, lat, lon);
+
             } catch (err) {
                 console.error("Home NWS load failed", err);
             }
@@ -1616,45 +1574,51 @@
                 </div>`;
             }
 
-            let asosHtml = "";
+            let fallbackAd = null;
             try {
                 let asosRes = await fetch('static/asos_conditions.json?t=' + Date.now());
-                let asosData = await asosRes.json();
-                if (asosData[cityId]) {
-                    let ad = asosData[cityId];
-                    let transWx = translateWx(ad.wx);
-                    let displayWx = transWx || (ad.temp !== null ? "Clear" : "");
-                    let wxIcon = getWeatherIcon(displayWx, true);
-                    
-                    let fl = getFeelsLike(ad.temp, ad.wind || 0);
-                    let minChillHtml = "";
-                    if (ad.gust && ad.gust > ad.wind) {
-                        let mc = getFeelsLike(ad.temp, ad.gust);
-                        if (mc < fl) {
-                            minChillHtml = `<div style="color:#a29bfe; font-size:14px; margin-top:2px; font-weight:bold;"><i class="ph-fill ph-wind"></i> Min Chill (Gusts): ${mc}°F <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a></div>`;
-                        } else {
-                            minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:2px; font-style:italic;"><i class="ph ph-wind"></i> Gusts don't lower perceived temp</div>`;
-                        }
-                    } else {
-                        minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:2px; font-style:italic;"><i class="ph ph-wind"></i> No gusts past hour</div>`;
-                    }
-
-                    asosHtml = `
-                    <div class="glass asos-panel" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(20, 30, 40, 0.6) 100%); border-color: var(--accent); padding: 25px;">
-                        <div style="font-size:12px; font-weight: 900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase;">
-                            <i class="ph-fill ph-thermometer"></i> LIVE ASOS OBSERVATIONS
-                        </div>
-                        <i class="ph-fill ${wxIcon}" style="font-size: 56px; margin-bottom: 12px; color: #fff;"></i>
-                        <div style="font-size:42px; font-weight:900; color:var(--danger); line-height:1; margin-bottom:15px;">${ad.temp}°F</div>
-                        
-                        <div style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
-                            <div style="font-size: 14px; font-weight: 600; opacity: 0.85;">Wind: ${ad.wind !== null ? ad.wind + ' mph' : '--'}${ad.gust ? ` (Gusts: ${ad.gust} mph)` : ''}</div>
-                            <div style="font-size: 14px; font-weight: bold; color: var(--info);">Feels Like: ${fl}°F</div>
-                            ${minChillHtml}
-                        </div>
-                    </div>`;
+                if(asosRes.ok) {
+                    let asosData = await asosRes.json();
+                    if(asosData[cityId]) fallbackAd = asosData[cityId];
                 }
             } catch(e) {}
+
+            let liveASOS = await fetchLiveASOS(cityObj.lat, cityObj.lon, fallbackAd);
+            let asosHtml = "";
+
+            if (liveASOS.temp !== '--') {
+                let fl = getFeelsLike(liveASOS.temp, liveASOS.wind || 0, liveASOS.rh);
+                let minChillHtml = "";
+                if (liveASOS.gust && liveASOS.gust > liveASOS.wind) {
+                    let mc = getFeelsLike(liveASOS.temp, liveASOS.gust, liveASOS.rh);
+                    if (mc < fl) {
+                        minChillHtml = `<div style="color:#a29bfe; font-size:14px; margin-top:2px; font-weight:bold;"><i class="ph-fill ph-wind"></i> Min Chill (Gusts): ${mc}°F <a href="#datasources" onclick="showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a></div>`;
+                    } else {
+                        minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:2px; font-style:italic;"><i class="ph ph-wind"></i> Gusts don't lower perceived temp</div>`;
+                    }
+                } else {
+                    minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:2px; font-style:italic;"><i class="ph ph-wind"></i> No gusts past hour</div>`;
+                }
+
+                let titleHtml = liveASOS.interpolated 
+                    ? `<i class="ph-fill ph-thermometer"></i> LIVE ASOS (INTERPOLATED) <span style="color:var(--warning); cursor:help;" title="Temperature calculated from recent hourly trend">*</span>`
+                    : `<i class="ph-fill ph-thermometer"></i> LIVE ASOS OBSERVATION`;
+
+                asosHtml = `
+                <div class="glass asos-panel" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(20, 30, 40, 0.6) 100%); border-color: var(--accent); padding: 25px;">
+                    <div style="font-size:12px; font-weight: 900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase;">
+                        ${titleHtml}
+                    </div>
+                    <i class="ph-fill ${liveASOS.icon}" style="font-size: 56px; margin-bottom: 12px; color: #fff;"></i>
+                    <div style="font-size:42px; font-weight:900; color:var(--danger); line-height:1; margin-bottom:15px;">${liveASOS.temp}°F</div>
+                    
+                    <div style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+                        <div style="font-size: 14px; font-weight: 600; opacity: 0.85;">Wind: ${liveASOS.wind !== null ? liveASOS.wind + ' mph' : '--'}${liveASOS.gust ? ` (Gusts: ${liveASOS.gust} mph)` : ''}</div>
+                        <div style="font-size: 14px; font-weight: bold; color: var(--info);">Feels Like: ${fl}°F</div>
+                        ${minChillHtml}
+                    </div>
+                </div>`;
+            }
 
             let nwsHtml = "";
             let hourlyHtml = "";
@@ -1663,12 +1627,24 @@
             
             try {
                 let safeName = cityId.replace(/ /g, "_");
-                let nwsRes = await fetch(`static/nws/${safeName}.json?t=${Date.now()}`);
                 let nwsData = null;
+                let cacheValid = false;
                 
-                if(nwsRes.ok) {
-                    nwsData = await nwsRes.json();
-                } else {
+                try {
+                    let nwsRes = await fetch(`static/nws/${safeName}.json?t=${Date.now()}`);
+                    if(nwsRes.ok) {
+                        let cData = await nwsRes.json();
+                        if (cData && cData.hourly && cData.hourly.properties) {
+                            let validPeriods = cData.hourly.properties.periods.filter(p => new Date(p.endTime) > new Date());
+                            if (validPeriods.length >= 4) {
+                                nwsData = cData;
+                                cacheValid = true;
+                            }
+                        }
+                    }
+                } catch(e) {}
+                
+                if (!cacheValid) {
                     let ptData = await robustNWSFetch(`https://api.weather.gov/points/${cityObj.lat},${cityObj.lon}`);
                     if(ptData && ptData.properties) {
                         gridId = ptData.properties.gridId;
@@ -1676,17 +1652,15 @@
                         let hData = await robustNWSFetch(ptData.properties.forecastHourly);
                         nwsData = { daily: fData, hourly: hData };
                     }
+                } else if(nwsData && nwsData.daily && nwsData.daily.properties) {
+                    gridId = nwsData.daily.properties.gridId || "NWS";
                 }
                 
                 if (nwsData && nwsData.daily && nwsData.daily.properties) {
                     let dailyPeriods = nwsData.daily.properties.periods;
                     
                     let hourlyPeriods = (nwsData.hourly && nwsData.hourly.properties) ? nwsData.hourly.properties.periods : [];
-                    let now = new Date();
-                    let cutoff = new Date(now);
-                    cutoff.setMinutes(0, 0, 0); // Filters out any forecast block that starts before the current hour
-                    
-                    let validHourly = hourlyPeriods.filter(p => new Date(p.endTime) >= cutoff);
+                    let validHourly = hourlyPeriods.filter(p => new Date(p.endTime) > new Date());
                     
                     if (validHourly.length > 0) {
                         let hCols = validHourly.slice(0, 24).map(p => {
