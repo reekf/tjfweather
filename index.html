@@ -453,7 +453,7 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v13.0 (Firebase Enabled) | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v13.1 (Firebase Enabled) | AMES, IA</p>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <h3 style="font-size: 16px; color: var(--info); margin-top: 0;">App Features</h3>
@@ -471,14 +471,14 @@
         <div class="glass" style="padding: 30px; width: 90%; max-width: 350px; display:flex; flex-direction:column; gap: 15px; background: rgba(11, 14, 17, 0.85);">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h2 style="margin:0; font-size: 20px; font-weight:900;">Account Access</h2>
-                <i class="ph ph-x" style="cursor:pointer; font-size:24px; opacity:0.7;" onclick="closeAuthModal()"></i>
+                <button style="background:none; border:none; color:#fff; font-size:28px; cursor:pointer; padding:0; line-height:1;" onclick="window.closeAuthModal()">&times;</button>
             </div>
             <div id="authError" style="color: var(--danger); font-size:13px; display:none; background:rgba(255,71,87,0.1); padding:10px; border-radius:8px; border:1px solid rgba(255,71,87,0.3);"></div>
             <input type="email" id="authEmail" placeholder="Email Address" style="background: rgba(0,0,0,0.5); border:1px solid var(--border); color:#fff; padding:14px; border-radius:12px; outline:none; font-family:inherit;" />
             <input type="password" id="authPass" placeholder="Password" style="background: rgba(0,0,0,0.5); border:1px solid var(--border); color:#fff; padding:14px; border-radius:12px; outline:none; font-family:inherit;" />
             <div id="authActionBtns" style="display:flex; gap:10px; margin-top:10px;">
-                <button class="glass-btn" style="flex:1;" onclick="handleAuthAction('login')">Login</button>
-                <button class="glass-btn" style="flex:1; background:rgba(255,255,255,0.1)!important; border-color:var(--border)!important;" onclick="handleAuthAction('register')">Register</button>
+                <button class="glass-btn" style="flex:1;" onclick="window.handleAuthAction('login')">Login</button>
+                <button class="glass-btn" style="flex:1; background:rgba(255,255,255,0.1)!important; border-color:var(--border)!important;" onclick="window.handleAuthAction('register')">Register</button>
             </div>
         </div>
     </div>
@@ -498,6 +498,10 @@
             const errDiv = document.getElementById('authError');
             if (msg) { errDiv.innerText = msg; errDiv.style.display = 'block'; }
             else { errDiv.style.display = 'none'; }
+            
+            document.getElementById('authEmail').value = '';
+            document.getElementById('authPass').value = '';
+            
             document.getElementById('authModal').style.display = 'flex';
         };
 
@@ -509,9 +513,7 @@
         window.showModalMessage = function(msg) {
             document.getElementById('authError').innerText = msg;
             document.getElementById('authError').style.display = 'block';
-            document.getElementById('authEmail').style.display = 'none';
-            document.getElementById('authPass').style.display = 'none';
-            document.getElementById('authActionBtns').style.display = 'none';
+            // Inputs are kept visible so the user can actually fix their password!
             document.getElementById('authModal').style.display = 'flex';
         };
 
@@ -524,17 +526,20 @@
             errDiv.style.display = 'none';
             
             let success = false;
-            if (action === 'login' && window.doLogin) success = await window.doLogin(email, pass);
-            else if (window.doRegister) success = await window.doRegister(email, pass);
+            if (action === 'login' && window.doLogin) {
+                success = await window.doLogin(email, pass);
+            } else if (action === 'register' && window.doRegister) {
+                success = await window.doRegister(email, pass);
+            }
             
-            if(success) closeAuthModal();
+            if(success) window.closeAuthModal();
         };
 
         window.toggleAuth = function() {
             if (window._firebaseAuth && window._firebaseAuth.currentUser && !window._firebaseAuth.currentUser.isAnonymous) {
                 if(window.doLogout) window.doLogout();
             } else {
-                openAuthModal();
+                window.openAuthModal();
             }
         };
 
@@ -2132,10 +2137,12 @@
         }
         
         window.doRegister = async function(email, pass) {
+            if (!auth) { window.showModalMessage("Database connection not established."); return false; }
             try { await createUserWithEmailAndPassword(auth, email, pass); return true; } 
             catch(e) { window.showModalMessage(e.message); return false; }
         }
         window.doLogin = async function(email, pass) {
+            if (!auth) { window.showModalMessage("Database connection not established."); return false; }
             try { await signInWithEmailAndPassword(auth, email, pass); return true; } 
             catch(e) { window.showModalMessage(e.message); return false; }
         }
