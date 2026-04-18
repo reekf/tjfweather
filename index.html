@@ -222,6 +222,7 @@
             <div class="nav-item" onclick="showTab('about', this); toggleNavMenu(true);">ABOUT</div>
             <div class="nav-item" onclick="showTab('feedback', this); toggleNavMenu(true);">FEEDBACK</div>
             <a href="https://www.buymeacoffee.com/tyreek" target="_blank" rel="noopener noreferrer" class="nav-item donate-btn"><i class="ph ph-coffee"></i> DONATE</a>
+            <div id="authNavBtn" class="nav-item" onclick="toggleAuth()"><i class="ph ph-user"></i> LOGIN / REGISTER</div>
         </div>
     </nav>
 
@@ -268,8 +269,18 @@
                         <div id="homeForecastFootnote"></div>
                     </div>
                 </div>
+                
+                <!-- Pinned Cities Section -->
+                <div id="homePinnedSection" style="display:none; flex-direction:column; gap:15px; width:100%; margin-bottom:20px; order: 2;">
+                    <h3 style="margin:0; font-size:12px; opacity:0.6; text-transform:uppercase; letter-spacing:2px; display:flex; align-items:center; gap:8px;">
+                        <i class="ph-fill ph-push-pin"></i> Pinned Locations
+                    </h3>
+                    <div id="homePinnedCards" style="display:flex; gap:15px; overflow-x:auto; padding-bottom:10px; scrollbar-width:thin;">
+                        <!-- Cards injected here -->
+                    </div>
+                </div>
 
-                <div class="glass" style="padding: 25px; flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 15px;">
+                <div class="glass" style="padding: 25px; flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 15px; order: 3;">
                     <div>
                         <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; opacity:0.5; margin-bottom:10px; display: flex; align-items: center; gap: 6px;">
                             <i class="ph-fill ph-calendar-blank"></i> Today's SPC Outlook
@@ -284,7 +295,7 @@
                     </div>
                 </div>
 
-                <div class="glass" style="padding: 20px; flex: 1; min-width: 300px; cursor: pointer; transition: 0.3s;" onclick="document.getElementById('navRadarBtn').click()">
+                <div class="glass" style="padding: 20px; flex: 1; min-width: 300px; cursor: pointer; transition: 0.3s; order: 3;" onclick="document.getElementById('navRadarBtn').click()">
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
                         <h3 style="margin:0; color:var(--accent); font-size:12px; letter-spacing:1px; text-transform:uppercase; display: flex; align-items: center; gap: 6px;">
                             <i class="ph-fill ph-radar" style="font-size: 16px;"></i> Local Composite Radar
@@ -442,7 +453,7 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v12.9 (PWA Enabled) | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v13.0 (Firebase Enabled) | AMES, IA</p>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <h3 style="font-size: 16px; color: var(--info); margin-top: 0;">App Features</h3>
@@ -454,8 +465,79 @@
             </div>
         </div>
     </div>
+    
+    <!-- Auth Custom Modal UI -->
+    <div id="authModal" class="bg-overlay" style="display:none; z-index: 9999; justify-content:center; align-items:center;">
+        <div class="glass" style="padding: 30px; width: 90%; max-width: 350px; display:flex; flex-direction:column; gap: 15px; background: rgba(11, 14, 17, 0.85);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="margin:0; font-size: 20px; font-weight:900;">Account Access</h2>
+                <i class="ph ph-x" style="cursor:pointer; font-size:24px; opacity:0.7;" onclick="closeAuthModal()"></i>
+            </div>
+            <div id="authError" style="color: var(--danger); font-size:13px; display:none; background:rgba(255,71,87,0.1); padding:10px; border-radius:8px; border:1px solid rgba(255,71,87,0.3);"></div>
+            <input type="email" id="authEmail" placeholder="Email Address" style="background: rgba(0,0,0,0.5); border:1px solid var(--border); color:#fff; padding:14px; border-radius:12px; outline:none; font-family:inherit;" />
+            <input type="password" id="authPass" placeholder="Password" style="background: rgba(0,0,0,0.5); border:1px solid var(--border); color:#fff; padding:14px; border-radius:12px; outline:none; font-family:inherit;" />
+            <div id="authActionBtns" style="display:flex; gap:10px; margin-top:10px;">
+                <button class="glass-btn" style="flex:1;" onclick="handleAuthAction('login')">Login</button>
+                <button class="glass-btn" style="flex:1; background:rgba(255,255,255,0.1)!important; border-color:var(--border)!important;" onclick="handleAuthAction('register')">Register</button>
+            </div>
+        </div>
+    </div>
 
     <script>
+        // GLOBALS FOR MODULE COMMUNICATION
+        window.pinnedCities = [];
+        window.currentHomeCityId = null;
+        window.renderPinnedCities = function(){};
+        
+        // Modal Handlers
+        window.openAuthModal = function(msg = "") {
+            document.getElementById('authEmail').style.display = 'block';
+            document.getElementById('authPass').style.display = 'block';
+            document.getElementById('authActionBtns').style.display = 'flex';
+            
+            const errDiv = document.getElementById('authError');
+            if (msg) { errDiv.innerText = msg; errDiv.style.display = 'block'; }
+            else { errDiv.style.display = 'none'; }
+            document.getElementById('authModal').style.display = 'flex';
+        };
+
+        window.closeAuthModal = function() {
+            document.getElementById('authModal').style.display = 'none';
+            document.getElementById('authError').style.display = 'none';
+        };
+
+        window.showModalMessage = function(msg) {
+            document.getElementById('authError').innerText = msg;
+            document.getElementById('authError').style.display = 'block';
+            document.getElementById('authEmail').style.display = 'none';
+            document.getElementById('authPass').style.display = 'none';
+            document.getElementById('authActionBtns').style.display = 'none';
+            document.getElementById('authModal').style.display = 'flex';
+        };
+
+        window.handleAuthAction = async function(action) {
+            const email = document.getElementById('authEmail').value;
+            const pass = document.getElementById('authPass').value;
+            const errDiv = document.getElementById('authError');
+            
+            if(!email || !pass) { errDiv.innerText = "Please enter email and password."; errDiv.style.display='block'; return; }
+            errDiv.style.display = 'none';
+            
+            let success = false;
+            if (action === 'login' && window.doLogin) success = await window.doLogin(email, pass);
+            else if (window.doRegister) success = await window.doRegister(email, pass);
+            
+            if(success) closeAuthModal();
+        };
+
+        window.toggleAuth = function() {
+            if (window._firebaseAuth && window._firebaseAuth.currentUser && !window._firebaseAuth.currentUser.isAnonymous) {
+                if(window.doLogout) window.doLogout();
+            } else {
+                openAuthModal();
+            }
+        };
+
         // --- PWA Setup (Installable App & Service Worker) ---
         const manifestData = {
             "name": "TJFWeather",
@@ -480,7 +562,6 @@
             self.addEventListener('install', (e) => self.skipWaiting());
             self.addEventListener('activate', (e) => self.clients.claim());
             self.addEventListener('fetch', (e) => {
-                // Minimal pass-through fetch handler required for PWA installation checks
                 e.respondWith(fetch(e.request).catch(() => new Response('TJFWeather is currently offline.')));
             });
             self.addEventListener('push', function(e) {
@@ -500,21 +581,20 @@
 
         async function requestNotificationPermission() {
             if (!('Notification' in window)) {
-                alert("Your browser doesn't support notifications.");
+                window.showModalMessage("Your browser doesn't support notifications.");
                 return;
             }
             if (Notification.permission === 'granted') {
-                alert("Notifications are already enabled!");
+                window.showModalMessage("Notifications are already enabled!");
                 return;
             }
             if (Notification.permission !== 'denied' || Notification.permission === 'default') {
                 const permission = await Notification.requestPermission();
                 if (permission === 'granted') {
-                    alert("Awesome! You will now receive notifications.");
+                    window.showModalMessage("Awesome! You will now receive notifications.");
                 }
             }
         }
-        // ----------------------------------------------------
     </script>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -1244,19 +1324,85 @@
             return result;
         }
 
+        window.renderPinnedCities = async function() {
+            const sec = document.getElementById('homePinnedSection');
+            const cards = document.getElementById('homePinnedCards');
+            if (!window.pinnedCities || window.pinnedCities.length === 0) {
+                sec.style.display = 'none';
+                return;
+            }
+            
+            let html = "";
+            let validCards = 0;
+            for (let pc of window.pinnedCities) {
+                if (pc.id === window.currentHomeCityId) continue; 
+                validCards++;
+                
+                html += `<div id="pinned-card-${pc.id}" class="glass" style="min-width: 240px; padding: 20px; cursor: pointer; display: flex; flex-direction: column; gap: 10px; transition:0.2s;" onclick="showTab('localforecast'); selectLFCity('${pc.id}', false);" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="font-size:13px; font-weight:800; color:var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform:uppercase;">${pc.display}</div>
+                    <div style="display:flex; align-items:center; gap:12px; margin-top:5px;">
+                        <i class="ph ph-spinner ph-spin" style="font-size:32px; opacity:0.5;"></i>
+                        <span style="font-size:14px; opacity:0.6; font-weight:600;">Loading...</span>
+                    </div>
+                </div>`;
+                
+                fetchPinnedCityData(pc);
+            }
+            
+            if(validCards > 0) {
+                sec.style.display = 'flex';
+                cards.innerHTML = html;
+            } else {
+                sec.style.display = 'none';
+            }
+        };
+
+        async function fetchPinnedCityData(pc) {
+            try {
+                let liveASOS = await fetchLiveASOS(pc.lat, pc.lon, null);
+                const card = document.getElementById(`pinned-card-${pc.id}`);
+                if(card) {
+                    card.innerHTML = `
+                        <div style="font-size:13px; font-weight:800; color:var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform:uppercase;">${pc.display}</div>
+                        <div style="display:flex; align-items:center; gap:15px; margin-top:5px;">
+                            <i class="ph-fill ${liveASOS.icon}" style="font-size:36px; color:#fff;"></i>
+                            <div>
+                                <div style="font-size:26px; font-weight:900; line-height:1; color:var(--danger);">${liveASOS.temp !== '--' ? liveASOS.temp+'°F' : '--'}</div>
+                                <div style="font-size:12px; opacity:0.8; margin-top:4px; font-weight:600;">${liveASOS.wx}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch(e) {}
+        }
+
         async function setupHomeLocation() {
             window.currentHomeLat = 42.03; window.currentHomeLon = -93.62;
+            window.currentHomeCityId = "Ames_IA";
             document.getElementById('homeLocationName').innerText = `Official NWS Forecast — Ames, IA`;
             loadHomeNWS(42.03, -93.62, false); updateHomeAlerts(42.03, -93.62); updateHomeSPC();
+            if(window.renderPinnedCities) window.renderPinnedCities();
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    pos => {
+                    async pos => {
                         window.currentHomeLat = pos.coords.latitude; window.currentHomeLon = pos.coords.longitude;
                         document.getElementById('homeLocationName').innerText = `Official NWS Forecast — Locating...`;
+                        
+                        try {
+                            let res = await robustNWSFetch(`https://api.weather.gov/points/${pos.coords.latitude},${pos.coords.longitude}`);
+                            if(res && res.properties) {
+                                let c = res.properties.relativeLocation.properties.city;
+                                let s = res.properties.relativeLocation.properties.state;
+                                let mCity = LF_CITIES.find(city => city.display.includes(c) && city.display.includes(s));
+                                window.currentHomeCityId = mCity ? mCity.id : `${c}_${s}`;
+                            }
+                        } catch(e) {}
+                        
                         loadHomeNWS(pos.coords.latitude, pos.coords.longitude, true);
                         miniRadarMap.setView([pos.coords.latitude, pos.coords.longitude], 6);
                         updateHomeAlerts(pos.coords.latitude, pos.coords.longitude); updateHomeSPC();
+                        if(window.renderPinnedCities) window.renderPinnedCities();
                     },
                     err => {}, { timeout: 5000, maximumAge: 60000 }
                 );
@@ -1387,13 +1533,29 @@
         // ==========================================
         function filterLFCities(val) {
             const el = document.getElementById('lfCityList');
+            let pinnedHtml = "";
+            let remainingCities = LF_CITIES;
+            
             if (!val || val.length < 2) {
-                const filtered = LF_CITIES.filter(c => c.display.toLowerCase().includes(val?.toLowerCase() || ''));
-                el.innerHTML = filtered.map(c => `<div class="lf-city-item${c.id === lfSelectedCity ? ' selected' : ''}" onclick="selectLFCity('${c.id}')">${c.display}</div>`).join('');
+                if (window.pinnedCities && window.pinnedCities.length > 0) {
+                    let pIds = window.pinnedCities.map(p => p.id);
+                    let pCities = LF_CITIES.filter(c => pIds.includes(c.id));
+                    if(pCities.length > 0) {
+                        pinnedHtml = `<div style="font-size:10px; opacity:0.5; margin: 10px 0 4px 10px; text-transform:uppercase; font-weight:800; letter-spacing:1px;">Pinned Cities</div>` + 
+                                     pCities.map(c => `<div class="lf-city-item${c.id === lfSelectedCity ? ' selected' : ''}" onclick="selectLFCity('${c.id}', false)"><i class="ph-fill ph-push-pin" style="color:var(--accent); margin-right:6px;"></i> ${c.display}</div>`).join('');
+                        remainingCities = LF_CITIES.filter(c => !pIds.includes(c.id));
+                    }
+                }
+            }
+
+            let filtered = remainingCities.filter(c => c.display.toLowerCase().includes((val||'').toLowerCase()));
+            let localHtml = filtered.map(c => `<div class="lf-city-item${c.id === lfSelectedCity ? ' selected' : ''}" onclick="selectLFCity('${c.id}', false)">${c.display}</div>`).join('');
+            
+            if (!val || val.length < 2) {
+                el.innerHTML = pinnedHtml + (pinnedHtml ? `<div style="height:1px; background:var(--border); margin:8px 10px;"></div>` : '') + localHtml;
                 return;
             }
-            let filtered = LF_CITIES.filter(c => c.display.toLowerCase().includes(val.toLowerCase()));
-            let localHtml = filtered.map(c => `<div class="lf-city-item${c.id === lfSelectedCity ? ' selected' : ''}" onclick="selectLFCity('${c.id}')">${c.display}</div>`).join('');
+
             el.innerHTML = localHtml + `<div style="padding:10px; opacity:0.5; font-size:12px; text-align:center;"><i class="ph ph-spinner ph-spin"></i> Searching worldwide...</div>`;
 
             clearTimeout(searchTimeout);
@@ -1446,6 +1608,32 @@
             try { let gfsRes = await fetchWithTimeout('static/gfsmos_timeseries_latest.json?t=' + Date.now(), { timeout: 5000 }); if(gfsRes.ok) mosDataCache.gfsmos = await gfsRes.json(); } catch(e) {}
             try { let namRes = await fetchWithTimeout('static/nammos_timeseries_latest.json?t=' + Date.now(), { timeout: 5000 }); if(namRes.ok) mosDataCache.nammos = await namRes.json(); } catch(e) {}
         }
+
+        window.updatePinBtnUI = function(cityId) {
+            const btnText = document.getElementById('pinCityText');
+            const btnIcon = document.getElementById('pinCityIcon');
+            if(!btnText || !btnIcon) return;
+            let isNowPinned = window.pinnedCities && window.pinnedCities.some(c => c.id === cityId);
+            btnText.innerText = isNowPinned ? 'Pinned' : 'Pin to Dashboard';
+            btnIcon.className = isNowPinned ? 'ph-fill ph-push-pin' : 'ph ph-push-pin';
+            btnIcon.style.color = isNowPinned ? 'var(--accent)' : '#fff';
+        };
+
+        window.togglePinCity = async function(cityId) {
+            if (!window._firebaseAuth || !window._firebaseAuth.currentUser || window._firebaseAuth.currentUser.isAnonymous) {
+                window.showModalMessage("Please Login or Register to pin cities to your dashboard.");
+                return;
+            }
+            
+            const btnText = document.getElementById('pinCityText');
+            if(btnText) btnText.innerText = "Saving...";
+            
+            let cityObj = LF_CITIES.find(c => c.id === cityId);
+            if(!cityObj) return;
+
+            if(window.toggleFirestorePin) await window.toggleFirestorePin(cityObj);
+            // Re-render UI handles visually confirming it
+        };
 
         async function selectLFCity(cityId, noPush = false) {
             lfSelectedCity = cityId;
@@ -1833,16 +2021,21 @@
             if (nwsHtml) currentAndDetailedHtml += nwsHtml;
             currentAndDetailedHtml += `</div>`;
 
-            main.innerHTML = `
-                <h2 style="font-size: 36px; font-weight: 900; margin-top: 0; margin-bottom: 25px;">${cityObj.display}</h2>
-                ${alertsHtml}
-                ${currentAndDetailedHtml}
-                ${spcHtml}
-                ${hourlyHtml}
-                ${dailyHtml}
-                ${mosHtml}
-                <div style="padding-bottom: 50px;"></div>
+            let isPinned = window.pinnedCities && window.pinnedCities.some(c => c.id === cityId);
+            let pinIcon = isPinned ? 'ph-fill ph-push-pin' : 'ph ph-push-pin';
+            let pinColor = isPinned ? 'var(--accent)' : '#fff';
+            let pinText = isPinned ? 'Pinned' : 'Pin City';
+            
+            let headerHtml = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 25px; flex-wrap:wrap; gap:10px;">
+                    <h2 style="font-size: 36px; font-weight: 900; margin: 0;">${cityObj.display}</h2>
+                    <button id="pinCityBtn" onclick="togglePinCity('${cityId}')" class="glass-btn" style="font-size:12px; padding:8px 16px;">
+                        <i id="pinCityIcon" class="${pinIcon}" style="color:${pinColor}; font-size:16px;"></i> <span id="pinCityText">${pinText}</span>
+                    </button>
+                </div>
             `;
+
+            main.innerHTML = headerHtml + alertsHtml + currentAndDetailedHtml + spcHtml + hourlyHtml + dailyHtml + mosHtml + `<div style="padding-bottom: 50px;"></div>`;
         }
 
         window.onload = () => {
@@ -1876,6 +2069,93 @@
                     selectLFCity(lfSelectedCity, true);
                 }
             });
+        };
+    </script>
+    
+    <!-- FIREBASE MODULE INTEGRATION -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        let app, auth, db;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'tjf-weather-app';
+        let firebaseConfig = null;
+        try { firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null; } catch(e) {}
+
+        if (firebaseConfig) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            
+            window._firebaseAuth = auth;
+            window._firebaseDb = db;
+            
+            const initAuth = async () => {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            };
+            initAuth();
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    if (!user.isAnonymous) {
+                        document.getElementById('authNavBtn').innerHTML = `<i class="ph ph-sign-out"></i> LOGOUT`;
+                    } else {
+                        document.getElementById('authNavBtn').innerHTML = `<i class="ph ph-user"></i> LOGIN / REGISTER`;
+                    }
+                    
+                    const prefDoc = doc(db, 'artifacts', appId, 'users', user.uid, 'preferences', 'weather');
+                    onSnapshot(prefDoc, (docSnap) => {
+                        if (docSnap.exists() && docSnap.data().cities) {
+                            window.pinnedCities = docSnap.data().cities || [];
+                            // Ensure these exist in LF_CITIES for search mapping
+                            window.pinnedCities.forEach(pc => {
+                                if(!LF_CITIES.find(c => c.id === pc.id)) LF_CITIES.unshift(pc);
+                            });
+                        } else {
+                            window.pinnedCities = [];
+                        }
+                        if(window.renderPinnedCities) window.renderPinnedCities();
+                        if(window.buildLFCityList) window.buildLFCityList();
+                        if(window.lfSelectedCity && window.updatePinBtnUI) window.updatePinBtnUI(window.lfSelectedCity);
+                    }, (err) => { console.error(err); });
+                } else {
+                    window.pinnedCities = [];
+                    if(window.renderPinnedCities) window.renderPinnedCities();
+                    if(window.buildLFCityList) window.buildLFCityList();
+                }
+            });
+        }
+        
+        window.doRegister = async function(email, pass) {
+            try { await createUserWithEmailAndPassword(auth, email, pass); return true; } 
+            catch(e) { window.showModalMessage(e.message); return false; }
+        }
+        window.doLogin = async function(email, pass) {
+            try { await signInWithEmailAndPassword(auth, email, pass); return true; } 
+            catch(e) { window.showModalMessage(e.message); return false; }
+        }
+        window.doLogout = async function() {
+            await signOut(auth);
+            await signInAnonymously(auth);
+        }
+        window.toggleFirestorePin = async function(cityObj) {
+            if (!auth || !auth.currentUser || auth.currentUser.isAnonymous) return;
+            const uid = auth.currentUser.uid;
+            const prefDoc = doc(db, 'artifacts', appId, 'users', uid, 'preferences', 'weather');
+            
+            let newPins = [...(window.pinnedCities || [])];
+            let existsIdx = newPins.findIndex(c => c.id === cityObj.id);
+            if (existsIdx >= 0) {
+                newPins.splice(existsIdx, 1);
+            } else {
+                newPins.push({ id: cityObj.id, display: cityObj.display, lat: cityObj.lat, lon: cityObj.lon });
+            }
+            await setDoc(prefDoc, { cities: newPins }, { merge: true });
         };
     </script>
 </body>
