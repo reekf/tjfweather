@@ -453,14 +453,38 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v13.5 (Auth UI Update) | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v14.0 (Notifications Enabled) | AMES, IA</p>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
-                    <h3 style="font-size: 16px; color: var(--info); margin-top: 0;">App Features</h3>
-                    <p style="font-size: 14px; opacity: 0.8; margin-bottom: 15px;">You can install TJFWeather to your home screen directly from your browser menu for a full-screen app experience.</p>
-                    <button class="glass-btn" onclick="window.requestNotificationPermission()">
-                        <i class="ph-fill ph-bell-ringing"></i> Enable Notifications
-                    </button>
+                    <h3 style="font-size: 16px; color: var(--info); margin-top: 0;">App Features & Notifications</h3>
+                    <p style="font-size: 14px; opacity: 0.8; margin-bottom: 15px;">Configure daily briefings and severe weather alerts. (Note: Due to browser sandbox limitations, local notifications will only fire while the app is active or running as an installed PWA).</p>
+                    
+                    <div style="display:flex; flex-direction:column; gap:12px; max-width: 400px;">
+                        <label style="display:flex; align-items:center; gap:10px; font-size:14px; cursor:pointer;">
+                            <input type="checkbox" id="settingAlerts" onchange="window.updateNotifSettings()" style="accent-color:var(--accent); width:16px; height:16px;">
+                            Alerts for Pinned Cities
+                        </label>
+                        
+                        <label style="display:flex; align-items:center; gap:10px; font-size:14px; cursor:pointer;">
+                            <input type="checkbox" id="settingBriefs" onchange="window.updateNotifSettings()" style="accent-color:var(--accent); width:16px; height:16px;">
+                            Daily Forecast Briefings (Current Location)
+                        </label>
+                        
+                        <div style="display:flex; gap:15px; margin-top:5px;">
+                            <div style="flex:1;">
+                                <div style="font-size:11px; opacity:0.7; margin-bottom:4px; text-transform:uppercase; font-weight:bold;">Morning Brief</div>
+                                <input type="time" id="settingMorning" onchange="window.updateNotifSettings()" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--border); color:#fff; padding:10px; border-radius:8px; outline:none; font-family:inherit;">
+                            </div>
+                            <div style="flex:1;">
+                                <div style="font-size:11px; opacity:0.7; margin-bottom:4px; text-transform:uppercase; font-weight:bold;">Evening Brief</div>
+                                <input type="time" id="settingEvening" onchange="window.updateNotifSettings()" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--border); color:#fff; padding:10px; border-radius:8px; outline:none; font-family:inherit;">
+                            </div>
+                        </div>
+                        
+                        <button class="glass-btn" style="margin-top:10px; align-self:flex-start;" onclick="window.requestNotificationPermission()">
+                            <i class="ph-fill ph-bell-ringing"></i> Grant Browser Permission
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -505,6 +529,37 @@
         window.currentHomeCityId = null;
         window.renderPinnedCities = function(){};
         window.authMode = 'login'; // 'login', 'register', or 'forgot'
+        
+        // Settings Initialization
+        window.notifSettings = JSON.parse(localStorage.getItem('tjf_notif_settings')) || {
+            alertsEnabled: false,
+            morningTime: '07:00',
+            eveningTime: '18:00',
+            briefsEnabled: false,
+            lastMorning: null,
+            lastEvening: null,
+            seenAlerts: []
+        };
+
+        window.loadNotifSettingsUI = function() {
+            const setAlerts = document.getElementById('settingAlerts');
+            const setBriefs = document.getElementById('settingBriefs');
+            const setMorn = document.getElementById('settingMorning');
+            const setEve = document.getElementById('settingEvening');
+            
+            if(setAlerts) setAlerts.checked = window.notifSettings.alertsEnabled;
+            if(setBriefs) setBriefs.checked = window.notifSettings.briefsEnabled;
+            if(setMorn) setMorn.value = window.notifSettings.morningTime;
+            if(setEve) setEve.value = window.notifSettings.eveningTime;
+        };
+
+        window.updateNotifSettings = function() {
+            window.notifSettings.alertsEnabled = document.getElementById('settingAlerts').checked;
+            window.notifSettings.briefsEnabled = document.getElementById('settingBriefs').checked;
+            window.notifSettings.morningTime = document.getElementById('settingMorning').value || '07:00';
+            window.notifSettings.eveningTime = document.getElementById('settingEvening').value || '18:00';
+            localStorage.setItem('tjf_notif_settings', JSON.stringify(window.notifSettings));
+        };
         
         // Modal Handlers
         window.toggleAuthMode = function(mode, e) {
@@ -678,6 +733,95 @@
                 }
             }
         };
+
+        // --- NOTIFICATION POLLING ENGINE ---
+        window.sendMorningBrief = async function() {
+            if(!window.currentHomeLat) return;
+            try {
+                let ptData = await robustNWSFetch(`https://api.weather.gov/points/${window.currentHomeLat},${window.currentHomeLon}`);
+                let fData = await robustNWSFetch(ptData.properties.forecast);
+                let today = fData.properties.periods[0];
+                let cityName = document.getElementById('homeLocationName').innerText.replace('Official NWS Forecast — ', '');
+                
+                navigator.serviceWorker.ready.then(reg => {
+                    reg.showNotification(`Morning Forecast: ${cityName}`, {
+                        body: `${today.name}: ${today.shortForecast}, High ${today.temperature}°F.`,
+                        icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4='
+                    });
+                });
+            } catch(e) { console.error("Brief fetch failed", e); }
+        };
+
+        window.sendEveningBrief = async function() {
+            if(!window.currentHomeLat) return;
+            try {
+                let ptData = await robustNWSFetch(`https://api.weather.gov/points/${window.currentHomeLat},${window.currentHomeLon}`);
+                let fData = await robustNWSFetch(ptData.properties.forecast);
+                let periods = fData.properties.periods;
+                let tonight = periods[0].isDaytime ? periods[1] : periods[0];
+                let tomorrow = periods[0].isDaytime ? periods[2] : periods[1];
+                let cityName = document.getElementById('homeLocationName').innerText.replace('Official NWS Forecast — ', '');
+                
+                navigator.serviceWorker.ready.then(reg => {
+                    reg.showNotification(`Evening Forecast: ${cityName}`, {
+                        body: `${tonight.name}: ${tonight.shortForecast}, Low ${tonight.temperature}°F. ${tomorrow.name}: High ${tomorrow.temperature}°F.`,
+                        icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4='
+                    });
+                });
+            } catch(e) { console.error("Brief fetch failed", e); }
+        };
+
+        setInterval(async () => {
+            if (Notification.permission !== 'granted') return;
+            
+            const now = new Date();
+            const currentTimeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            const todayStr = now.toDateString();
+
+            // Daily Briefings
+            if (window.notifSettings.briefsEnabled) {
+                if (currentTimeStr === window.notifSettings.morningTime && window.notifSettings.lastMorning !== todayStr) {
+                    window.notifSettings.lastMorning = todayStr;
+                    localStorage.setItem('tjf_notif_settings', JSON.stringify(window.notifSettings));
+                    window.sendMorningBrief();
+                }
+                if (currentTimeStr === window.notifSettings.eveningTime && window.notifSettings.lastEvening !== todayStr) {
+                    window.notifSettings.lastEvening = todayStr;
+                    localStorage.setItem('tjf_notif_settings', JSON.stringify(window.notifSettings));
+                    window.sendEveningBrief();
+                }
+            }
+
+            // Severe Weather Alerts for Pinned Cities
+            if (window.notifSettings.alertsEnabled && window.pinnedCities && window.pinnedCities.length > 0 && window.nwsAlerts) {
+                let newAlerts = [];
+                window.pinnedCities.forEach(city => {
+                    let cityAlerts = window.getCityAlerts(city.lat, city.lon);
+                    cityAlerts.forEach(alert => {
+                        let alertId = alert.properties.id;
+                        if (!window.notifSettings.seenAlerts.includes(alertId)) {
+                            newAlerts.push({city: city.display, event: alert.properties.event, id: alertId});
+                            window.notifSettings.seenAlerts.push(alertId);
+                        }
+                    });
+                });
+                
+                if (newAlerts.length > 0) {
+                    if (window.notifSettings.seenAlerts.length > 100) window.notifSettings.seenAlerts = window.notifSettings.seenAlerts.slice(-100);
+                    localStorage.setItem('tjf_notif_settings', JSON.stringify(window.notifSettings));
+
+                    newAlerts.forEach(na => {
+                        navigator.serviceWorker.ready.then(reg => {
+                            reg.showNotification(`⚠️ Weather Alert: ${na.city}`, {
+                                body: na.event,
+                                icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=',
+                                vibrate: [200, 100, 200]
+                            });
+                        });
+                    });
+                }
+            }
+        }, 60000); // Check every minute
     </script>
 
     <!-- Map and App Scripts -->
@@ -2145,6 +2289,8 @@
         }
 
         window.onload = () => {
+            window.loadNotifSettingsUI();
+            
             const hashStr = window.location.hash.replace('#', '');
             const hashParts = hashStr.split('?');
             const tab = hashParts[0] || 'home';
@@ -2273,6 +2419,7 @@
             try {
                 const provider = new GoogleAuthProvider();
                 await signInWithPopup(auth, provider);
+                window.closeAuthModal();
                 return true;
             } catch(e) {
                 console.error(e);
