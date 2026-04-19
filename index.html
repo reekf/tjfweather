@@ -14,6 +14,7 @@
     <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://d3js.org/topojson.v3.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -212,21 +213,21 @@
 <body>
     <div class="bg-overlay" id="bgOverlay"></div>
     <nav>
-        <div class="mobile-menu-btn" onclick="toggleNavMenu()"><i class="ph ph-list"></i></div>
-        <div class="logo" onclick="showTab('home'); toggleNavMenu(true);">TJF<span style="color:var(--accent)">WEATHER</span></div>
+        <div class="mobile-menu-btn" onclick="window.toggleNavMenu()"><i class="ph ph-list"></i></div>
+        <div class="logo" onclick="window.showTab('home'); window.toggleNavMenu(true);">TJF<span style="color:var(--accent)">WEATHER</span></div>
         <div class="nav-links" id="navLinks">
-            <div class="nav-item active" onclick="showTab('home', this); toggleNavMenu(true);">HOME</div>
-            <div class="nav-item" onclick="showTab('localforecast', this); toggleNavMenu(true);">LOCAL FORECAST</div>
-            <div id="navRadarBtn" class="nav-item" onclick="showTab('radar', this); toggleNavMenu(true);">LIVE RADAR</div>
-            <div class="nav-item" onclick="showTab('datasources', this); toggleNavMenu(true);">DATA SOURCES</div>
-            <div class="nav-item" onclick="showTab('about', this); toggleNavMenu(true);">ABOUT</div>
-            <div class="nav-item" onclick="showTab('feedback', this); toggleNavMenu(true);">FEEDBACK</div>
+            <div class="nav-item active" onclick="window.showTab('home', this); window.toggleNavMenu(true);">HOME</div>
+            <div class="nav-item" onclick="window.showTab('localforecast', this); window.toggleNavMenu(true);">LOCAL FORECAST</div>
+            <div id="navRadarBtn" class="nav-item" onclick="window.showTab('radar', this); window.toggleNavMenu(true);">LIVE RADAR</div>
+            <div class="nav-item" onclick="window.showTab('datasources', this); window.toggleNavMenu(true);">DATA SOURCES</div>
+            <div class="nav-item" onclick="window.showTab('about', this); window.toggleNavMenu(true);">ABOUT</div>
+            <div class="nav-item" onclick="window.showTab('feedback', this); window.toggleNavMenu(true);">FEEDBACK</div>
             <a href="https://www.buymeacoffee.com/tyreek" target="_blank" rel="noopener noreferrer" class="nav-item donate-btn"><i class="ph ph-coffee"></i> DONATE</a>
             <div id="authNavBtn" class="nav-item" onclick="window.toggleAuth()"><i class="ph ph-user"></i> LOGIN / REGISTER</div>
         </div>
     </nav>
 
-    <button id="mobileSettingsBtn" onclick="toggleMobileSettings()" style="display: none;"><i class="ph ph-warning"></i> ALERTS</button>
+    <button id="mobileSettingsBtn" onclick="window.toggleMobileSettings()" style="display: none;"><i class="ph ph-warning"></i> ALERTS</button>
 
     <!-- HOME TAB -->
     <div id="home" class="tab-content active">
@@ -249,7 +250,7 @@
 
                     <div id="homeLocalWeather" class="glass"
                         style="background: rgba(0,210,255,0.05); border: 1px solid var(--accent); padding: 20px; cursor:pointer; transition: transform 0.2s;"
-                        onclick="showTab('localforecast', document.querySelector('.nav-item:nth-child(2)')); if(window.lfSelectedCity) window.selectLFCity(window.lfSelectedCity, true);"
+                        onclick="window.showTab('localforecast', document.querySelector('.nav-item:nth-child(2)')); if(window.lfSelectedCity) window.selectLFCity(window.lfSelectedCity, true);"
                         onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
                         <div id="homeLocationName" style="opacity:0.6; font-size:11px; font-weight: 800; letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; color: var(--accent); word-break: break-word; line-height: 1.4;">
                             Official NWS Forecast &mdash; Locating...
@@ -349,7 +350,7 @@
                 <div style="font-size:12px; text-transform:uppercase; letter-spacing:1px; font-weight:900; color: var(--danger); display: flex; align-items: center; gap: 8px;">
                     <i class="ph-fill ph-warning-circle" style="font-size: 16px;"></i> Active Alerts
                 </div>
-                <button class="close-btn" style="display:block; background:none; border:none; color:#fff; font-size:24px; cursor:pointer;" onclick="toggleMobileSettings()">&times;</button>
+                <button class="close-btn" style="display:block; background:none; border:none; color:#fff; font-size:24px; cursor:pointer;" onclick="window.toggleMobileSettings()">&times;</button>
             </div>
             <div id="radarAlertsList" style="flex:1; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 10px; border: 1px solid rgba(255,255,255,0.05);">
                 <div style="opacity:0.4; font-size:12px;"><i class="ph ph-spinner ph-spin"></i> Loading...</div>
@@ -361,12 +362,12 @@
             </div>
         </div>
         <div class="radar-controls glass">
-            <button id="radarPlayBtn" onclick="toggleRadarPlay()" class="glass-btn"><i class="ph-fill ph-pause"></i> PAUSE</button>
+            <button id="radarPlayBtn" onclick="window.toggleRadarPlay()" class="glass-btn"><i class="ph-fill ph-pause"></i> PAUSE</button>
             <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 0; color: var(--text); font-size: 13px; font-weight: bold; border-left: 2px solid var(--border); padding-left: 15px;">
-                <input type="checkbox" id="nwsRadarToggle" checked onchange="toggleNWSLayer()" style="transform: scale(1.2); accent-color: var(--accent);"> Show Warnings
+                <input type="checkbox" id="nwsRadarToggle" checked onchange="window.toggleNWSLayer()" style="transform: scale(1.2); accent-color: var(--accent);"> Show Warnings
             </label>
             <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 0; color: var(--text); font-size: 13px; font-weight: bold; border-left: 2px solid var(--border); padding-left: 15px;">
-                <input type="checkbox" id="urgentRadarToggle" onchange="renderAlertPolygons()" style="transform: scale(1.2); accent-color: var(--accent);"> Urgent Only
+                <input type="checkbox" id="urgentRadarToggle" onchange="window.renderAlertPolygons()" style="transform: scale(1.2); accent-color: var(--accent);"> Urgent Only
             </label>
             <div style="display: flex; align-items: center; gap: 15px; border-left: 2px solid var(--border); padding-left: 15px;">
                 <span style="font-weight:800; font-size:12px; opacity:0.8; letter-spacing:1px;">LATEST LOOP</span>
@@ -445,15 +446,15 @@
 
     <!-- ABOUT TAB -->
     <div id="about" class="tab-content">
-        <div style="padding: 100px; max-width: 800px; margin: auto;">
-            <div class="glass" style="padding: 50px;">
+        <div style="padding: 60px 20px; max-width: 800px; margin: auto; box-sizing: border-box;">
+            <div class="glass" style="padding: 30px; box-sizing: border-box;">
                 <h1 style="font-size: 28px; margin-top: 0; margin-bottom: 10px; display: flex; align-items: center; gap: 12px;">
                     <i class="ph-fill ph-info"></i> About
                 </h1>
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v14.1 (PWA Notifications) | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v14.4 (Unified Bugfix) | AMES, IA</p>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <h3 style="font-size: 16px; color: var(--info); margin-top: 0;">App Features & Notifications</h3>
@@ -536,15 +537,21 @@
         window.authMode = 'login'; // 'login', 'register', or 'forgot'
         
         // Settings Initialization
-        window.notifSettings = JSON.parse(localStorage.getItem('tjf_notif_settings')) || {
-            alertsEnabled: false,
-            morningTime: '07:00',
-            eveningTime: '18:00',
-            briefsEnabled: false,
-            lastMorning: null,
-            lastEvening: null,
-            seenAlerts: []
-        };
+        window.notifSettings = null;
+        try {
+            window.notifSettings = JSON.parse(localStorage.getItem('tjf_notif_settings'));
+        } catch(e) {}
+        if (!window.notifSettings) {
+            window.notifSettings = {
+                alertsEnabled: false,
+                morningTime: '07:00',
+                eveningTime: '18:00',
+                briefsEnabled: false,
+                lastMorning: null,
+                lastEvening: null,
+                seenAlerts: []
+            };
+        }
 
         window.loadNotifSettingsUI = function() {
             const setAlerts = document.getElementById('settingAlerts');
@@ -580,6 +587,8 @@
             
             document.getElementById('authError').style.display = 'none';
             document.getElementById('authSuccess').style.display = 'none';
+            document.getElementById('authFormFields').style.display = 'flex';
+            document.getElementById('authActionBtns').style.display = 'flex';
 
             if (mode === 'login') {
                 title.innerText = 'Login';
@@ -685,46 +694,19 @@
             }
         };
 
-        // --- PWA Setup (Installable App & Service Worker) ---
-        const manifestData = {
-            "name": "TJFWeather",
-            "short_name": "TJFWeather",
-            "description": "Expert NWS forecasts, Radar, and Real-Time ASOS Observations.",
-            "start_url": ".",
-            "display": "standalone",
-            "background_color": "#0b0e11",
-            "theme_color": "#0b0e11",
-            "icons": [{
-                "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=",
-                "sizes": "512x512",
-                "type": "image/svg+xml",
-                "purpose": "any maskable"
-            }]
+        // Blob SW removed to fix the silent crash preventing notifications from firing on mobile browsers
+        window.fireNotification = function(title, body) {
+            const options = { body: body, vibrate: [200, 100, 200], icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=' };
+            try {
+                new Notification(title, options);
+            } catch(e) {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistration().then(reg => {
+                        if (reg && reg.showNotification) reg.showNotification(title, options);
+                    });
+                }
+            }
         };
-        const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
-        const manifestUrl = URL.createObjectURL(manifestBlob);
-        document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${manifestUrl}">`);
-
-        const swCode = `
-            self.addEventListener('install', (e) => self.skipWaiting());
-            self.addEventListener('activate', (e) => self.clients.claim());
-            self.addEventListener('fetch', (e) => {
-                e.respondWith(fetch(e.request).catch(() => new Response('TJFWeather is currently offline.')));
-            });
-            self.addEventListener('push', function(e) {
-                let body = 'New Weather Alert or Update!';
-                if (e.data) { body = e.data.text(); }
-                const options = { body: body, icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=', vibrate: [100, 50, 100] };
-                e.waitUntil(self.registration.showNotification('TJFWeather', options));
-            });
-        `;
-        const swBlob = new Blob([swCode], { type: 'application/javascript' });
-        const swUrl = URL.createObjectURL(swBlob);
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register(swUrl).then(reg => {
-                console.log('TJFWeather PWA Service Worker Registered!');
-            }).catch(err => console.log('SW registration failed', err));
-        }
 
         window.requestNotificationPermission = async function() {
             if (!('Notification' in window)) {
@@ -750,13 +732,7 @@
             }
             window.showModalMessage("Test notification scheduled! Put the app in the background now.", true);
             setTimeout(() => {
-                navigator.serviceWorker.ready.then(reg => {
-                    reg.showNotification('TJFWeather Test', {
-                        body: 'Notifications are working perfectly in the background!',
-                        icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=',
-                        vibrate: [200, 100, 200]
-                    });
-                });
+                window.fireNotification('TJFWeather Test', 'Notifications are working perfectly in the background!');
             }, 5000);
         };
 
@@ -764,36 +740,26 @@
         window.sendMorningBrief = async function() {
             if(!window.currentHomeLat) return;
             try {
-                let ptData = await robustNWSFetch(`https://api.weather.gov/points/${window.currentHomeLat},${window.currentHomeLon}`);
-                let fData = await robustNWSFetch(ptData.properties.forecast);
+                let ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${window.currentHomeLat},${window.currentHomeLon}`);
+                let fData = await window.robustNWSFetch(ptData.properties.forecast);
                 let today = fData.properties.periods[0];
                 let cityName = document.getElementById('homeLocationName').innerText.replace('Official NWS Forecast — ', '');
                 
-                navigator.serviceWorker.ready.then(reg => {
-                    reg.showNotification(`Morning Forecast: ${cityName}`, {
-                        body: `${today.name}: ${today.shortForecast}, High ${today.temperature}°F.`,
-                        icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4='
-                    });
-                });
+                window.fireNotification(`Morning Forecast: ${cityName}`, `${today.name}: ${today.shortForecast}, High ${today.temperature}°F.`);
             } catch(e) { console.error("Brief fetch failed", e); }
         };
 
         window.sendEveningBrief = async function() {
             if(!window.currentHomeLat) return;
             try {
-                let ptData = await robustNWSFetch(`https://api.weather.gov/points/${window.currentHomeLat},${window.currentHomeLon}`);
-                let fData = await robustNWSFetch(ptData.properties.forecast);
+                let ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${window.currentHomeLat},${window.currentHomeLon}`);
+                let fData = await window.robustNWSFetch(ptData.properties.forecast);
                 let periods = fData.properties.periods;
                 let tonight = periods[0].isDaytime ? periods[1] : periods[0];
                 let tomorrow = periods[0].isDaytime ? periods[2] : periods[1];
                 let cityName = document.getElementById('homeLocationName').innerText.replace('Official NWS Forecast — ', '');
                 
-                navigator.serviceWorker.ready.then(reg => {
-                    reg.showNotification(`Evening Forecast: ${cityName}`, {
-                        body: `${tonight.name}: ${tonight.shortForecast}, Low ${tonight.temperature}°F. ${tomorrow.name}: High ${tomorrow.temperature}°F.`,
-                        icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4='
-                    });
-                });
+                window.fireNotification(`Evening Forecast: ${cityName}`, `${tonight.name}: ${tonight.shortForecast}, Low ${tonight.temperature}°F. ${tomorrow.name}: High ${tomorrow.temperature}°F.`);
             } catch(e) { console.error("Brief fetch failed", e); }
         };
 
@@ -837,13 +803,7 @@
                     localStorage.setItem('tjf_notif_settings', JSON.stringify(window.notifSettings));
 
                     newAlerts.forEach(na => {
-                        navigator.serviceWorker.ready.then(reg => {
-                            reg.showNotification(`⚠️ Weather Alert: ${na.city}`, {
-                                body: na.event,
-                                icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=',
-                                vibrate: [200, 100, 200]
-                            });
-                        });
+                        window.fireNotification(`⚠️ Weather Alert: ${na.city}`, na.event);
                     });
                 }
             }
@@ -851,12 +811,7 @@
     </script>
 
     <!-- Map and App Scripts -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        if (typeof Chart !== 'undefined' && typeof ChartDataLabels !== 'undefined') {
-            Chart.register(ChartDataLabels);
-        }
-
         const LF_CITIES = [
             { id: 'New York', display: 'New York, NY', lat: 40.71, lon: -74.00 }, { id: 'Los Angeles', display: 'Los Angeles, CA', lat: 34.05, lon: -118.24 },
             { id: 'Chicago', display: 'Chicago, IL', lat: 41.87, lon: -87.62 }, { id: 'Houston', display: 'Houston, TX', lat: 29.76, lon: -95.36 },
@@ -906,23 +861,74 @@
             { name: 'Eugene, OR', lat: 44.05, lon: -123.09 }, { name: 'Surprise, AZ', lat: 33.63, lon: -112.37 }
         ];
 
-        let countyLayers = [], stateLayers = [];
-        let statusInterval, backgroundCheckInterval, radarInterval;
+        let radarInterval;
         let mainRadarLayers = [], miniRadarLayers = [], rvFrames = [], rvIndex = 0, isRadarPlaying = true;
-        let loadedLayers = {}, loadedData = {};
-        let nwsAlerts = [], alertPolygonLayer = null, alertPolygonLayerMini = null;
-        let lfSelectedCity = null, lfActiveModel = 'all', lfTsCache = {};
+        window.nwsAlerts = []; window.alertPolygonLayer = null; window.alertPolygonLayerMini = null;
+        window.lfSelectedCity = null; 
         let mosDataCache = { gfsmos: null, nammos: null, nbm: null };
         let mosChartInstance = null; 
-        
         let spcRiskCache = {};
+        let spcData = { day1: { cat: null, tor: null, wind: null, hail: null }, day2: { cat: null, tor: null, wind: null, hail: null } };
+        let searchTimeout = null;
 
-        let spcData = {
-            day1: { cat: null, tor: null, wind: null, hail: null },
-            day2: { cat: null, tor: null, wind: null, hail: null }
+        window.initMaps = function() {
+            if (window.fullRadarMap) window.fullRadarMap.remove();
+            if (window.miniRadarMap) window.miniRadarMap.remove();
+
+            const standardBasemap = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+            window.fullRadarMap = L.map('fullRadarMap', { center: [38.5, -96.5], zoom: 4.5, zoomControl: false });
+            L.tileLayer(standardBasemap).addTo(window.fullRadarMap);
+
+            window.isRadarInteracting = false;
+            window.fullRadarMap.on('movestart zoomstart', () => window.isRadarInteracting = true);
+            window.fullRadarMap.on('moveend zoomend', () => setTimeout(() => window.isRadarInteracting = false, 300));
+
+            window.miniRadarMap = L.map('miniRadarMap', { center: [42.03, -93.62], zoom: 6, zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false });
+            L.tileLayer(standardBasemap).addTo(window.miniRadarMap);
+
+            [window.fullRadarMap, window.miniRadarMap].forEach(m => {
+                m.createPane('alertsPane').style.zIndex = 350;
+                m.createPane('radarPane').style.zIndex = 400;
+                m.createPane('severeAlertsPane').style.zIndex = 450;
+                m.createPane('bordersPane').style.zIndex = 800;
+                m.createPane('citiesPane').style.zIndex = 900;
+            });
+
+            RADAR_CITIES_COORDS.forEach(c => {
+                let icon = L.divIcon({
+                    className: '',
+                    html: `<div class="city-label"><div style="width: 5px; height: 5px; background: white; border: 1px solid black; border-radius: 50%; margin: 0 auto 2px;"></div><span class="city-name">${c.name}</span></div>`,
+                    iconSize: [80, 25]
+                });
+                L.marker([c.lat, c.lon], { icon: icon, pane: 'citiesPane' }).addTo(window.fullRadarMap);
+            });
+
+            function getCountyStyle() { return { color: '#b0b0b0', weight: 0.8, fillOpacity: 0, opacity: 0.6 }; }
+            function getStateStyle() { return { color: '#000000', weight: 2.5, fillOpacity: 0, opacity: 0.8 }; }
+
+            fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json').then(res => res.json()).then(us => {
+                window.usCounties = topojson.feature(us, us.objects.counties).features;
+                [window.fullRadarMap, window.miniRadarMap].forEach(m => {
+                    L.geoJSON(topojson.feature(us, us.objects.counties), { pane: 'bordersPane', interactive: false, style: getCountyStyle }).addTo(m);
+                    L.geoJSON(topojson.feature(us, us.objects.states), { pane: 'bordersPane', interactive: false, style: getStateStyle }).addTo(m);
+                });
+                window.loadNWSAlerts();
+            });
         };
 
-        let searchTimeout = null;
+        window.robustNWSFetch = async function(url) {
+            try {
+                let res = await fetchWithTimeout(url, { headers: { 'Cache-Control': 'no-cache' }, timeout: 6000 });
+                if (res.ok) { let data = await res.json(); if (!data.status || data.status === 200) return data; }
+            } catch (e) { }
+            try {
+                let proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                let pRes = await fetchWithTimeout(proxied, { timeout: 6000 });
+                if (pRes.ok) { let data = await pRes.json(); if (!data.status || data.status === 200) return data; }
+            } catch (e) { }
+            throw new Error("NWS Fetch Failed");
+        }
 
         async function fetchWithTimeout(resource, options = {}) {
             const { timeout = 6000 } = options;
@@ -1014,116 +1020,6 @@
             trans = trans.replace(/\s+/g, ' ').trim();
             return trans || "Clear";
         }
-
-        window.showTab = function(id, element, noPush = false) {
-            document.querySelectorAll('.tab-content').forEach(t => { t.classList.remove('active'); t.style.display = 'none'; t.style.pointerEvents = 'none'; });
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-
-            const targetTab = document.getElementById(id) || document.getElementById('home');
-            targetTab.classList.add('active'); targetTab.style.display = 'block'; targetTab.style.pointerEvents = 'auto';
-
-            if (element) {
-                element.classList.add('active');
-            } else {
-                try {
-                    const navItem = document.querySelector(`.nav-item[onclick*="showTab('${id}')"]`);
-                    if (navItem) navItem.classList.add('active');
-                } catch(e) {}
-            }
-
-            if (!noPush) { try { window.history.pushState(null, '', '#' + id); } catch (e) {} }
-
-            if (id === 'radar') document.getElementById('bgOverlay').style.display = 'none';
-            else document.getElementById('bgOverlay').style.display = 'block';
-
-            if (typeof window.updateMobileBtn === 'function') window.updateMobileBtn();
-
-            setTimeout(() => {
-                if (id === 'radar' && typeof fullRadarMap !== 'undefined') fullRadarMap.invalidateSize();
-                if (id === 'home' && typeof miniRadarMap !== 'undefined') miniRadarMap.invalidateSize();
-            }, 150);
-        }
-
-        window.addEventListener('popstate', () => {
-            const hashStr = window.location.hash.replace('#', '');
-            const hashParts = hashStr.split('?');
-            const tab = hashParts[0] || 'home';
-            
-            let cityParam = null;
-            if (hashParts.length > 1) {
-                const urlParams = new URLSearchParams('?' + hashParts[1]);
-                cityParam = urlParams.get('city');
-            }
-
-            window.showTab(tab, null, true);
-            
-            if (tab === 'localforecast' && cityParam) {
-                if (window.lfSelectedCity !== cityParam) {
-                    let existingCity = LF_CITIES.find(c => c.id === cityParam);
-                    if (existingCity) window.selectLFCity(cityParam, true);
-                    else window.triggerSearch(cityParam.replace(/_/g, ' '), true);
-                }
-            }
-        });
-
-        window.updateMobileBtn = function() {
-            const isRadar = document.getElementById('radar').classList.contains('active');
-            const btn = document.getElementById('mobileSettingsBtn');
-            if (isRadar && window.innerWidth <= 768) btn.style.display = 'flex';
-            else { btn.style.display = 'none'; document.getElementById('radarAlertsPanel').classList.remove('open'); }
-        }
-        window.addEventListener('resize', window.updateMobileBtn);
-
-        window.toggleMobileSettings = function() {
-            if (document.getElementById('radar').classList.contains('active')) document.getElementById('radarAlertsPanel').classList.toggle('open');
-        }
-
-        window.toggleNavMenu = function(forceClose = false) {
-            const nav = document.getElementById('navLinks');
-            if (forceClose) nav.classList.remove('show-menu');
-            else nav.classList.toggle('show-menu');
-        }
-
-        const standardBasemap = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-
-        var fullRadarMap = L.map('fullRadarMap', { center: [38.5, -96.5], zoom: 4.5, zoomControl: false });
-        L.tileLayer(standardBasemap).addTo(fullRadarMap);
-
-        let isRadarInteracting = false;
-        fullRadarMap.on('movestart zoomstart', () => isRadarInteracting = true);
-        fullRadarMap.on('moveend zoomend', () => setTimeout(() => isRadarInteracting = false, 300));
-
-        var miniRadarMap = L.map('miniRadarMap', { center: [42.03, -93.62], zoom: 6, zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false });
-        L.tileLayer(standardBasemap).addTo(miniRadarMap);
-
-        [fullRadarMap, miniRadarMap].forEach(m => {
-            m.createPane('alertsPane').style.zIndex = 350;
-            m.createPane('radarPane').style.zIndex = 400;
-            m.createPane('severeAlertsPane').style.zIndex = 450;
-            m.createPane('bordersPane').style.zIndex = 800;
-            m.createPane('citiesPane').style.zIndex = 900;
-        });
-
-        RADAR_CITIES_COORDS.forEach(c => {
-            let icon = L.divIcon({
-                className: '',
-                html: `<div class="city-label"><div style="width: 5px; height: 5px; background: white; border: 1px solid black; border-radius: 50%; margin: 0 auto 2px;"></div><span class="city-name">${c.name}</span></div>`,
-                iconSize: [80, 25]
-            });
-            L.marker([c.lat, c.lon], { icon: icon, pane: 'citiesPane' }).addTo(fullRadarMap);
-        });
-
-        function getCountyStyle() { return { color: '#b0b0b0', weight: 0.8, fillOpacity: 0, opacity: 0.6 }; }
-        function getStateStyle() { return { color: '#000000', weight: 2.5, fillOpacity: 0, opacity: 0.8 }; }
-
-        fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json').then(res => res.json()).then(us => {
-            window.usCounties = topojson.feature(us, us.objects.counties).features;
-            [fullRadarMap, miniRadarMap].forEach(m => {
-                L.geoJSON(topojson.feature(us, us.objects.counties), { pane: 'bordersPane', interactive: false, style: getCountyStyle }).addTo(m);
-                L.geoJSON(topojson.feature(us, us.objects.states), { pane: 'bordersPane', interactive: false, style: getStateStyle }).addTo(m);
-            });
-            window.loadNWSAlerts();
-        });
 
         async function fetchSPCDynamic(day, type) {
             try {
@@ -1400,8 +1296,8 @@
         }
 
         window.renderAlertPolygons = function() {
-            if (alertPolygonLayer) fullRadarMap.removeLayer(alertPolygonLayer);
-            if (alertPolygonLayerMini) miniRadarMap.removeLayer(alertPolygonLayerMini);
+            if (window.alertPolygonLayer && window.fullRadarMap) window.fullRadarMap.removeLayer(window.alertPolygonLayer);
+            if (window.alertPolygonLayerMini && window.miniRadarMap) window.miniRadarMap.removeLayer(window.alertPolygonLayerMini);
 
             const colorMap = { 'alert-tornado': '#ff4444', 'alert-thunderstorm': '#ff9800', 'alert-flash-flood': '#00c853', 'alert-flood': '#00bcd4', 'alert-winter': '#9b9bff', 'alert-wind': '#f4e03b', 'alert-other': '#aaaaaa' };
             let geojsonFeatures = (window.nwsAlerts || []).filter(f => f.geometry);
@@ -1431,28 +1327,29 @@
 
             const onEachFn = (feature, layer) => { layer.bindTooltip(`<b>${feature.properties.event}</b><br/><small>${(feature.properties.areaDesc || '').split(';')[0]}</small>`, { sticky: true }); };
             
-            alertPolygonLayer = L.layerGroup([
+            window.alertPolygonLayer = L.layerGroup([
                 L.geoJSON({ type: 'FeatureCollection', features: severeFeatures }, { pane: 'severeAlertsPane', style: styleFn, onEachFeature: onEachFn }),
                 L.geoJSON({ type: 'FeatureCollection', features: otherFeatures }, { pane: 'alertsPane', style: styleFn, onEachFeature: onEachFn })
             ]);
-            alertPolygonLayerMini = L.layerGroup([
+            window.alertPolygonLayerMini = L.layerGroup([
                 L.geoJSON({ type: 'FeatureCollection', features: severeFeatures }, { pane: 'severeAlertsPane', style: styleFn, onEachFeature: onEachFn }),
                 L.geoJSON({ type: 'FeatureCollection', features: otherFeatures }, { pane: 'alertsPane', style: styleFn, onEachFeature: onEachFn })
             ]);
 
-            alertPolygonLayerMini.addTo(miniRadarMap);
-            if (document.getElementById('nwsRadarToggle').checked) alertPolygonLayer.addTo(fullRadarMap);
+            if (window.miniRadarMap) window.alertPolygonLayerMini.addTo(window.miniRadarMap);
+            if (document.getElementById('nwsRadarToggle').checked && window.fullRadarMap) window.alertPolygonLayer.addTo(window.fullRadarMap);
         }
 
         window.toggleNWSLayer = function() {
-            if (!alertPolygonLayer) return;
-            if (document.getElementById('nwsRadarToggle').checked) alertPolygonLayer.addTo(fullRadarMap);
-            else fullRadarMap.removeLayer(alertPolygonLayer);
+            if (!window.alertPolygonLayer || !window.fullRadarMap) return;
+            if (document.getElementById('nwsRadarToggle').checked) window.alertPolygonLayer.addTo(window.fullRadarMap);
+            else window.fullRadarMap.removeLayer(window.alertPolygonLayer);
         }
 
         window.initLiveRadar = async function() {
             try {
-                mainRadarLayers.forEach(l => fullRadarMap.removeLayer(l)); miniRadarLayers.forEach(l => miniRadarMap.removeLayer(l));
+                if (window.fullRadarMap) mainRadarLayers.forEach(l => window.fullRadarMap.removeLayer(l)); 
+                if (window.miniRadarMap) miniRadarLayers.forEach(l => window.miniRadarMap.removeLayer(l));
                 mainRadarLayers = []; miniRadarLayers = [];
                 if (radarInterval) clearInterval(radarInterval);
 
@@ -1463,8 +1360,8 @@
                 rvFrames.forEach((frame) => {
                     let url = `${data.host}${frame.path}/256/{z}/{x}/{y}/6/1_1.png`;
                     let radarOpts = { opacity: 0, pane: 'radarPane', keepBuffer: 8, updateWhenZooming: false };
-                    mainRadarLayers.push(L.tileLayer(url, radarOpts).addTo(fullRadarMap));
-                    miniRadarLayers.push(L.tileLayer(url, radarOpts).addTo(miniRadarMap));
+                    if (window.fullRadarMap) mainRadarLayers.push(L.tileLayer(url, radarOpts).addTo(window.fullRadarMap));
+                    if (window.miniRadarMap) miniRadarLayers.push(L.tileLayer(url, radarOpts).addTo(window.miniRadarMap));
                 });
 
                 if (mainRadarLayers.length > 0) {
@@ -1473,7 +1370,7 @@
                 }
 
                 radarInterval = setInterval(() => {
-                    if (!isRadarPlaying || mainRadarLayers.length === 0 || isRadarInteracting) return;
+                    if (!isRadarPlaying || mainRadarLayers.length === 0 || window.isRadarInteracting) return;
                     mainRadarLayers[rvIndex].setOpacity(0); miniRadarLayers[rvIndex].setOpacity(0);
                     rvIndex = (rvIndex + 1) % rvFrames.length;
                     mainRadarLayers[rvIndex].setOpacity(0.85); miniRadarLayers[rvIndex].setOpacity(0.85);
@@ -1487,19 +1384,6 @@
         window.toggleRadarPlay = function() {
             isRadarPlaying = !isRadarPlaying;
             document.getElementById('radarPlayBtn').innerHTML = isRadarPlaying ? '<i class="ph-fill ph-pause"></i> PAUSE' : '<i class="ph-fill ph-play"></i> PLAY';
-        }
-
-        async function robustNWSFetch(url) {
-            try {
-                let res = await fetchWithTimeout(url, { headers: { 'Cache-Control': 'no-cache' }, timeout: 6000 });
-                if (res.ok) { let data = await res.json(); if (!data.status || data.status === 200) return data; }
-            } catch (e) { }
-            try {
-                let proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-                let pRes = await fetchWithTimeout(proxied, { timeout: 6000 });
-                if (pRes.ok) { let data = await pRes.json(); if (!data.status || data.status === 200) return data; }
-            } catch (e) { }
-            throw new Error("NWS Fetch Failed");
         }
 
         function buildMeteorologistCreditHTML(wfo, lat, lon) {
@@ -1519,8 +1403,8 @@
         async function fetchLiveASOS(lat, lon, fallbackData) {
             let result = { temp: '--', wind: null, gust: null, wx: 'Loading...', icon: 'ph-cloud', rh: 50, interpolated: false };
             try {
-                let ptData = await robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
-                let stationsRes = await robustNWSFetch(ptData.properties.observationStations);
+                let ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
+                let stationsRes = await window.robustNWSFetch(ptData.properties.observationStations);
                 let stationId = stationsRes.features[0].properties.stationIdentifier;
                 
                 let awcRes = await fetchWithTimeout(`https://aviationweather.gov/api/data/metar?ids=${stationId}&format=json&hours=3&t=${Date.now()}`, { timeout: 6000 });
@@ -1663,7 +1547,7 @@
                         document.getElementById('homeLocationName').innerText = `Official NWS Forecast — Locating...`;
                         
                         try {
-                            let res = await robustNWSFetch(`https://api.weather.gov/points/${pos.coords.latitude},${pos.coords.longitude}`);
+                            let res = await window.robustNWSFetch(`https://api.weather.gov/points/${pos.coords.latitude},${pos.coords.longitude}`);
                             if(res && res.properties) {
                                 let c = res.properties.relativeLocation.properties.city;
                                 let s = res.properties.relativeLocation.properties.state;
@@ -1673,7 +1557,7 @@
                         } catch(e) {}
                         
                         window.loadHomeNWS(pos.coords.latitude, pos.coords.longitude, true);
-                        miniRadarMap.setView([pos.coords.latitude, pos.coords.longitude], 6);
+                        if (window.miniRadarMap) window.miniRadarMap.setView([pos.coords.latitude, pos.coords.longitude], 6);
                         window.updateHomeAlerts(pos.coords.latitude, pos.coords.longitude); window.updateHomeSPC();
                         if(window.renderPinnedCities) window.renderPinnedCities();
                     },
@@ -1737,7 +1621,7 @@
                 }
 
                 if (!cacheValid) {
-                    ptData = await robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
+                    ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
                     if (!ptData || !ptData.properties) throw new Error("Invalid NWS Point Data");
                     if(isGeo) {
                         const city = ptData.properties.relativeLocation?.properties?.city || "Unknown";
@@ -1745,8 +1629,8 @@
                         document.getElementById('homeLocationName').innerText = `Official NWS Forecast — ${city}, ${state}`;
                     }
                     gridId = ptData.properties.gridId;
-                    let fData = await robustNWSFetch(ptData.properties.forecast);
-                    let hData = await robustNWSFetch(ptData.properties.forecastHourly);
+                    let fData = await window.robustNWSFetch(ptData.properties.forecast);
+                    let hData = await window.robustNWSFetch(ptData.properties.forecastHourly);
                     nwsData = { daily: fData, hourly: hData };
                 } else if(nwsData && nwsData.daily && nwsData.daily.properties) {
                     gridId = nwsData.daily.properties.gridId || "NWS";
@@ -1801,9 +1685,6 @@
             } catch (err) {}
         }
 
-        // ==========================================
-        // Local Forecast Search & Selection
-        // ==========================================
         window.filterLFCities = function(val) {
             const el = document.getElementById('lfCityList');
             let pinnedHtml = "";
@@ -1818,7 +1699,7 @@
                                      pCities.map(c => {
                                          let cAlerts = window.getCityAlerts(c.lat, c.lon);
                                          let alertHtml = cAlerts.length > 0 ? `<i class="ph-fill ph-warning" style="color:var(--danger); margin-left:auto;" title="Active Alerts"></i>` : '';
-                                         return `<div class="lf-city-item${c.id === lfSelectedCity ? ' selected' : ''}" style="display:flex; align-items:center;" onclick="window.selectLFCity('${c.id}', false)"><i class="ph-fill ph-push-pin" style="color:var(--accent); margin-right:6px;"></i> <span>${c.display}</span> ${alertHtml}</div>`;
+                                         return `<div class="lf-city-item${c.id === window.lfSelectedCity ? ' selected' : ''}" style="display:flex; align-items:center;" onclick="window.selectLFCity('${c.id}', false)"><i class="ph-fill ph-push-pin" style="color:var(--accent); margin-right:6px;"></i> <span>${c.display}</span> ${alertHtml}</div>`;
                                      }).join('');
                         remainingCities = LF_CITIES.filter(c => !pIds.includes(c.id));
                     }
@@ -1826,7 +1707,7 @@
             }
 
             let filtered = remainingCities.filter(c => c.display.toLowerCase().includes((val||'').toLowerCase()));
-            let localHtml = filtered.map(c => `<div class="lf-city-item${c.id === lfSelectedCity ? ' selected' : ''}" onclick="window.selectLFCity('${c.id}', false)">${c.display}</div>`).join('');
+            let localHtml = filtered.map(c => `<div class="lf-city-item${c.id === window.lfSelectedCity ? ' selected' : ''}" onclick="window.selectLFCity('${c.id}', false)">${c.display}</div>`).join('');
             
             if (!val || val.length < 2) {
                 el.innerHTML = pinnedHtml + (pinnedHtml ? `<div style="height:1px; background:var(--border); margin:8px 10px;"></div>` : '') + localHtml;
@@ -1912,7 +1793,7 @@
         };
 
         window.selectLFCity = async function(cityId, noPush = false) {
-            lfSelectedCity = cityId;
+            window.lfSelectedCity = cityId;
             if (!noPush) window.history.pushState(null, '', '#localforecast?city=' + encodeURIComponent(cityId));
             
             clearTimeout(searchTimeout);
@@ -2007,11 +1888,11 @@
                 } catch(e) {}
                 
                 if (!cacheValid) {
-                    let ptData = await robustNWSFetch(`https://api.weather.gov/points/${cityObj.lat},${cityObj.lon}`);
+                    let ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${cityObj.lat},${cityObj.lon}`);
                     if(ptData && ptData.properties) {
                         gridId = ptData.properties.gridId;
-                        let fData = await robustNWSFetch(ptData.properties.forecast);
-                        let hData = await robustNWSFetch(ptData.properties.forecastHourly);
+                        let fData = await window.robustNWSFetch(ptData.properties.forecast);
+                        let hData = await window.robustNWSFetch(ptData.properties.forecastHourly);
                         nwsData = { daily: fData, hourly: hData };
                     }
                 } else if(nwsData && nwsData.daily && nwsData.daily.properties) {
@@ -2327,11 +2208,11 @@
                 cityParam = urlParams.get('city');
             }
 
+            window.initMaps();
             window.showTab(tab, null, true);
             
             window.buildLFCityList();
             window.initLiveRadar();
-            window.loadNWSAlerts();
             window.loadSPCOutlooks();
             window.setupHomeLocation();
             
@@ -2343,8 +2224,8 @@
                     } else {
                         window.triggerSearch(cityParam.replace(/_/g, ' '), true);
                     }
-                } else if (lfSelectedCity) {
-                    window.selectLFCity(lfSelectedCity, true);
+                } else if (window.lfSelectedCity) {
+                    window.selectLFCity(window.lfSelectedCity, true);
                 }
             });
         };
@@ -2362,19 +2243,12 @@
         // ==============================================================================
         let myFirebaseConfig = {
             apiKey: "AIzaSyDGujuIMmbcaxTVf2NOHBoR7Swzg2D2VUA",
-
             authDomain: "tjfwx-2b9b7.firebaseapp.com",
-
             projectId: "tjfwx-2b9b7",
-
             storageBucket: "tjfwx-2b9b7.firebasestorage.app",
-
             messagingSenderId: "665398157561",
-
             appId: "1:665398157561:web:a019e1b0e17ac4e74b4228",
-
             measurementId: "G-MLFVBH7KDH"
-
         };
 
         let app, auth, db;
@@ -2422,22 +2296,27 @@
                         if(window.renderPinnedCities) window.renderPinnedCities();
                         if(window.buildLFCityList) window.buildLFCityList();
                         
-                        // Only auto-login anonymously if no user session is found
-                        try {
-                            const isUsingCustomConfig = Object.keys(myFirebaseConfig).length > 0;
-                            if (!isUsingCustomConfig && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                                await signInWithCustomToken(auth, __initial_auth_token);
-                            } else {
-                                await signInAnonymously(auth);
+                        // Added 800ms delay to allow slow mobile browsers to securely retrieve the 
+                        // persistent IndexedDB session before erasing it with a new Anonymous account.
+                        setTimeout(async () => {
+                            if (!auth.currentUser) {
+                                try {
+                                    const isUsingCustomConfig = Object.keys(myFirebaseConfig).length > 0;
+                                    if (!isUsingCustomConfig && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                                        await signInWithCustomToken(auth, __initial_auth_token);
+                                    } else {
+                                        await signInAnonymously(auth);
+                                    }
+                                } catch (error) {
+                                    console.error("Firebase Auth Error:", error);
+                                    if (error.code === 'auth/custom-token-mismatch') {
+                                        try { await signInAnonymously(auth); } catch(e) { console.error(e); }
+                                    } else if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
+                                        window.showModalMessage("Firebase Setup Required: Please go to your Firebase Console -> Authentication -> Sign-in method, and enable BOTH 'Email/Password' and 'Anonymous' sign-in.");
+                                    }
+                                }
                             }
-                        } catch (error) {
-                            console.error("Firebase Auth Error:", error);
-                            if (error.code === 'auth/custom-token-mismatch') {
-                                try { await signInAnonymously(auth); } catch(e) { console.error(e); }
-                            } else if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
-                                window.showModalMessage("Firebase Setup Required: Please go to your Firebase Console -> Authentication -> Sign-in method, and enable BOTH 'Email/Password' and 'Anonymous' sign-in.");
-                            }
-                        }
+                        }, 800);
                     }
                 });
             }).catch(console.error);
