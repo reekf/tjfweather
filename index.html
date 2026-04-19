@@ -333,7 +333,7 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v16.0 (Pristine Core Engine) | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v16.1 (Stable Engine) | AMES, IA</p>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <h3 style="font-size: 16px; color: var(--info); margin-top: 0;">App Features & Notifications</h3>
@@ -572,15 +572,18 @@
         };
 
         window.fireNotification = function(title, body) {
-            const options = { body: body, vibrate: [200, 100, 200], icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=' };
-            try {
-                new Notification(title, options);
-            } catch(e) {
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.getRegistration().then(reg => {
-                        if (reg && reg.showNotification) reg.showNotification(title, options);
+            const options = { body: body, vibrate: [200, 100, 200] };
+            
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then(function(reg) {
+                    reg.showNotification(title, options).catch(function(err) {
+                        try { new Notification(title, options); } catch(e) {}
                     });
-                }
+                }).catch(function() {
+                    try { new Notification(title, options); } catch(e) {}
+                });
+            } else {
+                try { new Notification(title, options); } catch(e) {}
             }
         };
 
@@ -593,11 +596,19 @@
                 window.showModalMessage("Notifications are already enabled!", true);
                 return;
             }
-            if (Notification.permission !== 'denied' || Notification.permission === 'default') {
+            try {
                 const permission = await Notification.requestPermission();
                 if (permission === 'granted') {
                     window.showModalMessage("Awesome! You will now receive notifications.", true);
+                } else {
+                    window.showModalMessage("Permission was denied by the browser.");
                 }
+            } catch(e) {
+                Notification.requestPermission(function (permission) {
+                    if (permission === 'granted') {
+                        window.showModalMessage("Awesome! You will now receive notifications.", true);
+                    }
+                });
             }
         };
 
