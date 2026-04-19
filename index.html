@@ -453,7 +453,7 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v14.0 (Notifications Enabled) | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v14.1 (PWA Notifications) | AMES, IA</p>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <h3 style="font-size: 16px; color: var(--info); margin-top: 0;">App Features & Notifications</h3>
@@ -633,6 +633,10 @@
         };
 
         window.showModalMessage = function(msg, isSuccess = false) {
+            document.getElementById('authModalTitle').innerText = 'System Message';
+            document.getElementById('authFormFields').style.display = 'none';
+            document.getElementById('authActionBtns').style.display = 'none';
+
             if (isSuccess) {
                 document.getElementById('authSuccess').innerText = msg;
                 document.getElementById('authSuccess').style.display = 'block';
@@ -2311,7 +2315,7 @@
         }
 
         window.onload = () => {
-            window.loadNotifSettingsUI();
+            if(window.loadNotifSettingsUI) window.loadNotifSettingsUI();
             
             const hashStr = window.location.hash.replace('#', '');
             const hashParts = hashStr.split('?');
