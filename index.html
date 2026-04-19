@@ -481,9 +481,14 @@
                             </div>
                         </div>
                         
-                        <button class="glass-btn" style="margin-top:10px; align-self:flex-start;" onclick="window.requestNotificationPermission()">
-                            <i class="ph-fill ph-bell-ringing"></i> Grant Browser Permission
-                        </button>
+                        <div style="display:flex; gap:10px; margin-top:10px;">
+                            <button class="glass-btn" style="flex:1;" onclick="window.requestNotificationPermission()">
+                                <i class="ph-fill ph-bell-ringing"></i> Grant Permission
+                            </button>
+                            <button class="glass-btn" style="flex:1; background:rgba(255,255,255,0.1)!important; border-color:var(--border)!important;" onclick="window.testNotification()">
+                                <i class="ph-fill ph-paper-plane-tilt"></i> Test (5s Delay)
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -732,6 +737,23 @@
                     window.showModalMessage("Awesome! You will now receive notifications.", true);
                 }
             }
+        };
+
+        window.testNotification = function() {
+            if (Notification.permission !== 'granted') {
+                window.showModalMessage("Please grant notification permission first by clicking the button.");
+                return;
+            }
+            window.showModalMessage("Test notification scheduled! Put the app in the background now.", true);
+            setTimeout(() => {
+                navigator.serviceWorker.ready.then(reg => {
+                    reg.showNotification('TJFWeather Test', {
+                        body: 'Notifications are working perfectly in the background!',
+                        icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=',
+                        vibrate: [200, 100, 200]
+                    });
+                });
+            }, 5000);
         };
 
         // --- NOTIFICATION POLLING ENGINE ---
@@ -2327,7 +2349,7 @@
     <!-- FIREBASE MODULE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==============================================================================
@@ -2365,53 +2387,56 @@
             
             window._firebaseAuth = auth;
             window._firebaseDb = db;
-
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    if (!user.isAnonymous) {
-                        document.getElementById('authNavBtn').innerHTML = `<i class="ph ph-sign-out"></i> LOGOUT`;
-                    } else {
-                        document.getElementById('authNavBtn').innerHTML = `<i class="ph ph-user"></i> LOGIN / REGISTER`;
-                    }
-                    
-                    const prefDoc = doc(db, 'artifacts', appId, 'users', user.uid, 'preferences', 'weather');
-                    onSnapshot(prefDoc, (docSnap) => {
-                        if (docSnap.exists() && docSnap.data().cities) {
-                            window.pinnedCities = docSnap.data().cities || [];
-                            // Ensure these exist in LF_CITIES for search mapping
-                            window.pinnedCities.forEach(pc => {
-                                if(!LF_CITIES.find(c => c.id === pc.id)) LF_CITIES.unshift(pc);
-                            });
+            
+            // Force local persistence so PWA sessions survive app closures
+            setPersistence(auth, browserLocalPersistence).then(() => {
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        if (!user.isAnonymous) {
+                            document.getElementById('authNavBtn').innerHTML = `<i class="ph ph-sign-out"></i> LOGOUT`;
                         } else {
-                            window.pinnedCities = [];
+                            document.getElementById('authNavBtn').innerHTML = `<i class="ph ph-user"></i> LOGIN / REGISTER`;
                         }
+                        
+                        const prefDoc = doc(db, 'artifacts', appId, 'users', user.uid, 'preferences', 'weather');
+                        onSnapshot(prefDoc, (docSnap) => {
+                            if (docSnap.exists() && docSnap.data().cities) {
+                                window.pinnedCities = docSnap.data().cities || [];
+                                // Ensure these exist in LF_CITIES for search mapping
+                                window.pinnedCities.forEach(pc => {
+                                    if(!LF_CITIES.find(c => c.id === pc.id)) LF_CITIES.unshift(pc);
+                                });
+                            } else {
+                                window.pinnedCities = [];
+                            }
+                            if(window.renderPinnedCities) window.renderPinnedCities();
+                            if(window.buildLFCityList) window.buildLFCityList();
+                            if(window.lfSelectedCity && window.updatePinBtnUI) window.updatePinBtnUI(window.lfSelectedCity);
+                        }, (err) => { console.error(err); });
+                    } else {
+                        window.pinnedCities = [];
                         if(window.renderPinnedCities) window.renderPinnedCities();
                         if(window.buildLFCityList) window.buildLFCityList();
-                        if(window.lfSelectedCity && window.updatePinBtnUI) window.updatePinBtnUI(window.lfSelectedCity);
-                    }, (err) => { console.error(err); });
-                } else {
-                    window.pinnedCities = [];
-                    if(window.renderPinnedCities) window.renderPinnedCities();
-                    if(window.buildLFCityList) window.buildLFCityList();
-                    
-                    // Automatically sign in anonymously if no user session is found
-                    try {
-                        const isUsingCustomConfig = Object.keys(myFirebaseConfig).length > 0;
-                        if (!isUsingCustomConfig && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
-                    } catch (error) {
-                        console.error("Firebase Auth Error:", error);
-                        if (error.code === 'auth/custom-token-mismatch') {
-                            try { await signInAnonymously(auth); } catch(e) { console.error(e); }
-                        } else if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
-                            window.showModalMessage("Firebase Setup Required: Please go to your Firebase Console -> Authentication -> Sign-in method, and enable BOTH 'Email/Password' and 'Anonymous' sign-in.");
+                        
+                        // Only auto-login anonymously if no user session is found
+                        try {
+                            const isUsingCustomConfig = Object.keys(myFirebaseConfig).length > 0;
+                            if (!isUsingCustomConfig && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                                await signInWithCustomToken(auth, __initial_auth_token);
+                            } else {
+                                await signInAnonymously(auth);
+                            }
+                        } catch (error) {
+                            console.error("Firebase Auth Error:", error);
+                            if (error.code === 'auth/custom-token-mismatch') {
+                                try { await signInAnonymously(auth); } catch(e) { console.error(e); }
+                            } else if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
+                                window.showModalMessage("Firebase Setup Required: Please go to your Firebase Console -> Authentication -> Sign-in method, and enable BOTH 'Email/Password' and 'Anonymous' sign-in.");
+                            }
                         }
                     }
-                }
-            });
+                });
+            }).catch(console.error);
         }
 
         window.doGoogleLogin = async function() {
