@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TJFWeather | Dashboard</title>
+    
+    <!-- PWA Meta Tags for iOS & Android -->
     <meta name="theme-color" content="#0b0e11">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -18,48 +21,139 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     
     <style>
+        /* Universal Box-Sizing */
         *, *::before, *::after { box-sizing: border-box; }
-        :root { --bg: #0b0e11; --panel: rgba(15, 18, 22, 0.45); --text: #ffffff; --accent: #00d2ff; --border: rgba(255, 255, 255, 0.15); --danger: #ff4757; --warning: #ffa502; --success: #2ecc71; --info: #70a1ff; }
-        html, body { margin: 0; padding: 0; height: 100vh; width: 100vw; font-family: 'Inter', sans-serif; background-color: var(--bg); background-image: url('https://images.pexels.com/photos/1162251/pexels-photo-1162251.jpeg?auto=compress&cs=tinysrgb&w=2560'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed; color: var(--text); overflow: hidden; position: fixed; }
-        .bg-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(11, 14, 17, 0.40); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 0; pointer-events: none; }
-        .leaflet-image-layer, .leaflet-tile-container img { image-rendering: crisp-edges; image-rendering: pixelated; }
-        .glass { background: var(--panel); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4); transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); position: relative; z-index: 1; overflow-wrap: break-word; word-wrap: break-word; }
-        .glass-btn { background: rgba(0, 210, 255, 0.2) !important; backdrop-filter: blur(12px) !important; border: 1px solid rgba(0, 210, 255, 0.5) !important; color: #fff !important; padding: 10px 20px; border-radius: 12px; font-weight: 900; font-size: 14px; cursor: pointer; min-width: 100px; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-        .glass-btn:hover { background: rgba(0, 210, 255, 0.4) !important; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); transform: scale(1.05); }
-        nav { height: 65px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); z-index: 5000; position: relative; display: flex; align-items: center; justify-content: flex-start; padding: 0 25px; background: rgba(11, 14, 17, 0.55); backdrop-filter: blur(24px); }
-        @keyframes fadeInScale { 0% { opacity: 0; transform: translateY(10px) scale(0.99); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-        .tab-content { display: none; height: calc(100vh - 65px); position: relative; z-index: 1; overflow-y: auto; overflow-x: hidden; pointer-events: none; }
+
+        :root {
+            --bg: #0b0e11;
+            --panel: rgba(15, 18, 22, 0.45);
+            --text: #ffffff;
+            --accent: #00d2ff;
+            --border: rgba(255, 255, 255, 0.15);
+            --danger: #ff4757;
+            --warning: #ffa502;
+            --success: #2ecc71;
+            --info: #70a1ff;
+        }
+
+        html, body {
+            margin: 0; padding: 0; height: 100vh; width: 100vw;
+            font-family: 'Inter', sans-serif; background-color: var(--bg);
+            background-image: url('https://images.pexels.com/photos/1162251/pexels-photo-1162251.jpeg?auto=compress&cs=tinysrgb&w=2560');
+            background-size: cover; background-position: center;
+            background-repeat: no-repeat; background-attachment: fixed;
+            color: var(--text); overflow: hidden; position: fixed;
+        }
+
+        .bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(11, 14, 17, 0.40); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            z-index: 0; pointer-events: none;
+        }
+
+        .leaflet-image-layer, .leaflet-tile-container img {
+            image-rendering: crisp-edges; image-rendering: pixelated;
+        }
+
+        .glass {
+            background: var(--panel); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border); border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            position: relative; z-index: 1;
+            overflow-wrap: break-word; word-wrap: break-word;
+        }
+
+        .glass-btn {
+            background: rgba(0, 210, 255, 0.2) !important; backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(0, 210, 255, 0.5) !important; color: #fff !important;
+            padding: 10px 20px; border-radius: 12px; font-weight: 900; font-size: 14px;
+            cursor: pointer; min-width: 100px; transition: all 0.3s ease;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        .glass-btn:hover {
+            background: rgba(0, 210, 255, 0.4) !important;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); transform: scale(1.05);
+        }
+
+        nav {
+            height: 65px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 5000; position: relative; display: flex; align-items: center;
+            justify-content: flex-start; padding: 0 25px;
+            background: rgba(11, 14, 17, 0.55); backdrop-filter: blur(24px);
+        }
+
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: translateY(10px) scale(0.99); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .tab-content {
+            display: none; height: calc(100vh - 65px); position: relative;
+            z-index: 1; overflow-y: auto; overflow-x: hidden; pointer-events: none;
+        }
+
         .tab-content.active { display: block; pointer-events: auto; animation: fadeInScale 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+
         .logo { font-size: 24px; font-weight: 900; color: var(--text); letter-spacing: -0.5px; cursor: pointer; transition: 0.2s; z-index: 5100; }
         .logo:hover { transform: scale(1.05); }
-        .mobile-menu-btn { display: none; font-size: 24px; cursor: pointer; color: var(--text); z-index: 5100; background: rgba(0, 210, 255, 0.2) !important; backdrop-filter: blur(12px) !important; border: 1px solid rgba(0, 210, 255, 0.5) !important; padding: 4px 14px; border-radius: 8px; }
+
+        .mobile-menu-btn {
+            display: none; font-size: 24px; cursor: pointer; color: var(--text); z-index: 5100;
+            background: rgba(0, 210, 255, 0.2) !important; backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(0, 210, 255, 0.5) !important; padding: 4px 14px; border-radius: 8px;
+        }
+
         .nav-links { display: flex; gap: 10px; align-items: center; margin-left: auto; }
-        .nav-item { cursor: pointer; font-weight: 800; font-size: 12px; letter-spacing: 0.5px; padding: 8px 16px; border-radius: 12px; transition: all 0.3s ease; opacity: 0.9; background: rgba(0, 210, 255, 0.08); border: 1px solid rgba(0, 210, 255, 0.2); color: var(--text); text-transform: uppercase; }
+        .nav-item {
+            cursor: pointer; font-weight: 800; font-size: 12px; letter-spacing: 0.5px;
+            padding: 8px 16px; border-radius: 12px; transition: all 0.3s ease; opacity: 0.9;
+            background: rgba(0, 210, 255, 0.08); border: 1px solid rgba(0, 210, 255, 0.2);
+            color: var(--text); text-transform: uppercase;
+        }
         .nav-item:hover { background: rgba(0, 210, 255, 0.2); border-color: rgba(0, 210, 255, 0.4); transform: translateY(-2px); opacity: 1; }
         .nav-item.active { background: rgba(0, 210, 255, 0.3); border-color: rgba(0, 210, 255, 0.6); color: #fff; opacity: 1; }
-        .donate-btn { background: rgba(243, 156, 18, 0.15) !important; color: #f39c12 !important; text-decoration: none; border: 1px solid rgba(243, 156, 18, 0.4) !important; display: flex; align-items: center; gap: 6px; }
-        .radar-controls { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1600; padding: 12px 25px; display: flex; align-items: center; gap: 20px; border-radius: 20px; }
+
+        .donate-btn {
+            background: rgba(243, 156, 18, 0.15) !important; color: #f39c12 !important; text-decoration: none;
+            border: 1px solid rgba(243, 156, 18, 0.4) !important; display: flex; align-items: center; gap: 6px;
+        }
+
+        .radar-controls {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            z-index: 1600; padding: 12px 25px; display: flex; align-items: center; gap: 20px; border-radius: 20px;
+        }
+
         .map-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background-color: #0b0e11 !important; }
+
         .city-label { font-size: 13px; font-weight: 900; color: #ffffff; text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000; text-align: center; line-height: 1.1; }
         .city-name { font-size: 11px; }
+
         .lf-container { display: flex; height: 100%; overflow: hidden; }
         .lf-sidebar { width: 320px; min-width: 280px; padding: 20px; border-right: 1.5px solid var(--border); overflow-y: auto; background: var(--panel); display: flex; flex-direction: column; gap: 16px; z-index: 2; }
         .lf-main { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
+        
         .lf-search-wrap { display: flex; gap: 8px; }
         .lf-search-wrap input { flex: 1; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text); padding: 10px 14px; border-radius: 12px; outline: none; font-weight: 500; }
         .lf-search-wrap button { background: var(--accent); border: none; color: #000; font-weight: 900; padding: 10px 16px; border-radius: 12px; cursor: pointer; }
+        
         .lf-city-list { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
         .lf-city-item { padding: 10px 14px; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 600; border: 1px solid transparent; display: flex; align-items: center; }
         .lf-city-item:hover, .lf-city-item.selected { background: rgba(0, 210, 255, 0.15); border-color: var(--accent); color: var(--accent); }
+
         .lf-hourly-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: thin; }
         .lf-hour-col { min-width: 140px; text-align: center; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;}
         .lf-hour-col .hr-label { opacity: 0.7; margin-bottom: 8px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
         .lf-hour-col .hr-temp { font-size: 20px; font-weight: 900; color: var(--accent); margin-top: 8px; }
+
         .lf-daily-col { min-width: 190px; text-align: center; background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(20, 30, 40, 0.6) 100%); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.2s; }
         .lf-daily-col:hover { background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(30, 45, 60, 0.8) 100%); border-color: var(--accent); transform: translateY(-2px); }
+
         .alert-badge { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.4; border-left: 4px solid currentColor; background: rgba(0, 0, 0, 0.5); word-wrap: break-word; white-space: normal; height: auto; min-height: min-content; }
         .alert-badge .ab-title { font-weight: 900; font-size: 14px; text-transform: uppercase; word-break: break-word; }
         .alert-badge .ab-area { opacity: 0.8; font-size: 12px; margin-top: 4px; word-break: break-word; }
+
         .alert-tornado { color: var(--danger); border: 1px solid rgba(255, 0, 0, 0.4); box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.15); }
         .alert-thunderstorm { color: var(--warning); border: 1px solid rgba(255, 165, 0, 0.4); box-shadow: inset 0 0 20px rgba(255, 165, 0, 0.15); }
         .alert-flash-flood { color: var(--success); border: 1px solid rgba(0, 200, 83, 0.4); box-shadow: inset 0 0 20px rgba(0, 200, 83, 0.15); }
@@ -67,8 +161,11 @@
         .alert-winter { color: #9b9bff; border: 1px solid rgba(150, 150, 255, 0.4); }
         .alert-wind { color: #f4e03b; border: 1px solid rgba(255, 235, 59, 0.4); }
         .alert-other { color: #aaaaaa; border: 1px solid rgba(180, 180, 180, 0.4); }
+
         .home-weather-content { display: flex; gap: 20px; align-items: center; }
         .home-temp-val { font-size: 54px; font-weight: 900; color: var(--text); line-height: 1; }
+
+        /* Responsive Layouts for ASOS & NWS side-by-side */
         .current-detailed-wrapper { display: flex; gap: 20px; margin-bottom: 20px; align-items: stretch; flex-wrap: wrap; }
         .current-detailed-wrapper > div { margin-bottom: 0 !important; }
         .asos-panel { flex: 1; min-width: 250px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -82,13 +179,19 @@
             .nav-links.show-menu { visibility: visible; opacity: 1; transform: translateY(0) scale(1); }
             .nav-item { width: 90%; text-align: center; margin: 0 auto; padding: 12px; font-size: 15px; }
         }
+
         @media (max-width: 768px) {
             .tab-content { height: calc(100vh - 65px); overflow-y: auto; overflow-x: hidden; }
             #home > div { padding: 15px !important; gap: 15px !important; }
+            
+            /* Home Page specifically needs to break flex layout on mobile */
             .home-panels-container { flex-direction: column !important; flex-wrap: nowrap !important; width: 100%; }
             .home-panels-container > .glass { flex: none !important; width: 100% !important; max-width: 100% !important; min-width: 0 !important; padding: 20px !important; box-sizing: border-box; }
+            
+            /* General glass padding adjustments */
             .glass { box-sizing: border-box; width: 100%; max-width: 100%; }
             .lf-main > .glass, .lf-main > div > .glass { padding: 15px !important; box-sizing: border-box; }
+            
             .radar-controls { width: 95% !important; padding: 10px; flex-direction: column; gap: 10px; }
             .lf-container { display: block; overflow-y: visible; height: auto; }
             .lf-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); height: auto; overflow: visible; padding: 15px; }
@@ -97,9 +200,11 @@
             #radarAlertsPanel { position: fixed !important; top: 0 !important; left: 0 !important; transform: translateX(-105%) !important; width: 85% !important; max-width: 320px !important; height: 100vh !important; max-height: 100vh !important; background: rgba(11, 14, 17, 0.95) !important; z-index: 8000 !important; transition: transform 0.3s !important; display: block !important; border-radius: 0 24px 24px 0 !important; padding: 60px 20px 20px 20px !important; border: none !important; border-right: 1px solid var(--border) !important; }
             #radarAlertsPanel.open { transform: translateX(0) !important; }
             #mobileSettingsBtn { display: block; position: fixed; top: 80px; right: 15px; z-index: 4000; background: rgba(0, 210, 255, 0.2) !important; border: 1px solid rgba(0, 210, 255, 0.5) !important; padding: 8px 16px; border-radius: 12px; font-weight: 900; font-size: 13px; text-transform: uppercase; color: #fff; display: flex; align-items: center; gap: 6px; }
+            
             .home-weather-content { flex-direction: row; align-items: center; gap: 15px; flex-wrap: wrap; }
             .home-temp-val { font-size: 42px; }
             #homeLocationName { font-size: 10px; }
+
             .current-detailed-wrapper { flex-direction: column; gap: 15px; }
             .asos-panel, .nws-panel { width: 100%; min-width: 0 !important; flex: none !important; }
         }
@@ -129,6 +234,7 @@
     <div id="home" class="tab-content active">
         <div style="padding: 30px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; padding-bottom: 80px;">
             <div class="home-panels-container" style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
+
                 <div class="glass home-alerts-panel" style="padding: 20px; display: flex; flex-direction: column; flex: 1; min-width: 300px; max-width: 400px; max-height: 400px; overflow-y: auto;">
                     <h3 style="margin: 0 0 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--danger); font-weight: 900; display: flex; align-items: center; gap: 8px;">
                         <i class="ph-fill ph-warning-circle" style="font-size: 20px;"></i> ACTIVE WEATHER ALERTS
@@ -166,11 +272,14 @@
                     </div>
                 </div>
                 
+                <!-- Pinned Cities Section -->
                 <div id="homePinnedSection" style="display:none; flex-direction:column; gap:15px; width:100%; margin-bottom:20px; order: 2;">
                     <h3 style="margin:0; font-size:12px; opacity:0.6; text-transform:uppercase; letter-spacing:2px; display:flex; align-items:center; gap:8px;">
                         <i class="ph-fill ph-push-pin"></i> Pinned Locations
                     </h3>
-                    <div id="homePinnedCards" style="display:flex; gap:15px; overflow-x:auto; padding-bottom:10px; scrollbar-width:thin;"></div>
+                    <div id="homePinnedCards" style="display:flex; gap:15px; overflow-x:auto; padding-bottom:10px; scrollbar-width:thin;">
+                        <!-- Cards injected here -->
+                    </div>
                 </div>
 
                 <div class="glass" style="padding: 25px; flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 15px; order: 3;">
@@ -282,6 +391,7 @@
                     </h3>
                     <p style="font-size: 15px; line-height: 1.6; opacity: 0.85; margin: 0;">
                         The <strong>Storm Prediction Center (SPC)</strong> issues daily severe weather outlooks indicating the risk of organized severe thunderstorms (tornadoes, damaging winds, and large hail) over the contiguous United States.
+                        Risks are categorized from 1 to 5: <strong>Marginal, Slight, Enhanced, Moderate, and High</strong>.
                     </p>
                 </div>
 
@@ -290,18 +400,30 @@
                         <i class="ph-fill ph-chart-bar"></i> Numerical Weather Prediction
                     </h3>
                     <ul style="font-size: 15px; line-height: 1.8; opacity: 0.85; margin: 0; padding-left: 20px;">
-                        <li style="margin-bottom: 8px;"><strong>NBM:</strong> The gold-standard official NOAA ensemble.</li>
-                        <li style="margin-bottom: 8px;"><strong>MOS:</strong> Statistical post-processing that corrects known numerical model biases.</li>
-                        <li><strong>GFS:</strong> The flagship US medium-range model.</li>
+                        <li style="margin-bottom: 8px;"><strong>NBM:</strong> The gold-standard official NOAA ensemble, blending dozens of models for the most accurate consensus.</li>
+                        <li style="margin-bottom: 8px;"><strong>MOS:</strong> Statistical post-processing that corrects known numerical model biases for specific point locations based on historical data.</li>
+                        <li><strong>GFS:</strong> The flagship US medium-range model (0-384h+), useful for forecasting broad weather patterns days in advance.</li>
                     </ul>
+                </div>
+
+                <div>
+                    <h3 style="margin: 0 0 12px; color: var(--success); font-size: 18px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                        <i class="ph-fill ph-thermometer"></i> Live ASOS Observations
+                    </h3>
+                    <p style="font-size: 15px; line-height: 1.6; opacity: 0.85; margin: 0;">
+                        The <strong>Automated Surface Observing System (ASOS)</strong> is a massive network of climate sensors heavily concentrated at US airports. They provide highly accurate, minute-by-minute updates of the current temperature, wind speed, and visibility (METARs). When viewing the Local Forecast tab, TJFWeather queries the nearest aviation sensor to give you absolute ground truth.
+                    </p>
                 </div>
 
                 <div style="margin-top: 35px;">
                     <h3 style="margin: 0 0 12px; color: #a29bfe; font-size: 18px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
                         <i class="ph-fill ph-thermometer-cold"></i> Wind Chill & Min Chill
                     </h3>
+                    <p style="font-size: 15px; line-height: 1.6; opacity: 0.85; margin: 0 0 10px 0;">
+                        <strong>Feels Like / Wind Chill:</strong> Calculates the perceived decrease in air temperature felt by the body on exposed skin. It is calculated using the official NWS formula (valid for temps &le; 50°F and wind &gt; 3 mph). Between 50°F and 80°F, we use the Steadman Apparent Temperature formula to account for ambient humidity.
+                    </p>
                     <p style="font-size: 15px; line-height: 1.6; opacity: 0.85; margin: 0;">
-                        <strong>Min Chill (Gusts):</strong> A specialized calculation unique to TJFWeather. Instead of using the <em>sustained</em> wind speed, we use the highest forecasted or recently recorded <strong>wind gust</strong>.
+                        <strong>Min Chill (Gusts):</strong> A specialized calculation unique to TJFWeather. Instead of using the <em>sustained</em> wind speed, we use the highest forecasted or recently recorded <strong>wind gust</strong>. This tells you exactly how cold the air will feel the moment a strong gust hits you.
                     </p>
                 </div>
             </div>
@@ -333,7 +455,7 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v16.1 (Stable Engine) | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v16.3 (MOS Hotfix) | AMES, IA</p>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <h3 style="font-size: 16px; color: var(--info); margin-top: 0;">App Features & Notifications</h3>
@@ -375,6 +497,15 @@
         </div>
     </div>
     
+    <!-- System Message Modal UI -->
+    <div id="sysModal" class="bg-overlay" style="display:none; z-index: 99999; justify-content:center; align-items:center; pointer-events: auto;">
+        <div class="glass" style="padding: 25px; width: 90%; max-width: 320px; display:flex; flex-direction:column; gap: 15px; background: rgba(11, 14, 17, 0.95); border: 1px solid var(--info); text-align: center;">
+            <h2 style="margin:0; font-size: 18px; font-weight:900; color: var(--info);">System Message</h2>
+            <div id="sysModalText" style="font-size:14px; opacity:0.9; line-height:1.5;"></div>
+            <button class="glass-btn" style="width: 100%; margin-top: 10px; background: rgba(112, 161, 255, 0.2)!important; color: #fff!important; border-color: var(--info)!important;" onclick="document.getElementById('sysModal').style.display='none'">OK</button>
+        </div>
+    </div>
+
     <!-- Auth Custom Modal UI -->
     <div id="authModal" class="bg-overlay" style="display:none; z-index: 9999; justify-content:center; align-items:center; pointer-events: auto;">
         <div class="glass" style="padding: 30px; width: 90%; max-width: 350px; display:flex; flex-direction:column; gap: 15px; background: rgba(11, 14, 17, 0.95); border: 1px solid var(--accent);">
@@ -406,7 +537,6 @@
 
     <!-- UI Interaction Scripts -->
     <script>
-        // GLOBALS FOR MODULE COMMUNICATION
         window.pinnedCities = [];
         window.currentHomeCityId = null;
         window.renderPinnedCities = function(){};
@@ -519,11 +649,12 @@
             document.getElementById('authSuccess').style.display = 'none';
         };
 
-        window.showModalMessage = function(msg, isSuccess = false) {
-            document.getElementById('authModalTitle').innerText = 'System Message';
-            document.getElementById('authFormFields').style.display = 'none';
-            document.getElementById('authActionBtns').style.display = 'none';
+        window.showSysMessage = function(msg) {
+            document.getElementById('sysModalText').innerText = msg;
+            document.getElementById('sysModal').style.display = 'flex';
+        };
 
+        window.showAuthError = function(msg, isSuccess = false) {
             if (isSuccess) {
                 document.getElementById('authSuccess').innerText = msg;
                 document.getElementById('authSuccess').style.display = 'block';
@@ -533,7 +664,6 @@
                 document.getElementById('authError').style.display = 'block';
                 document.getElementById('authSuccess').style.display = 'none';
             }
-            document.getElementById('authModal').style.display = 'flex';
         };
 
         window.handleAuthAction = async function() {
@@ -556,7 +686,7 @@
             } else if (window.authMode === 'forgot' && window.doResetPassword) {
                 success = await window.doResetPassword(email);
                 if(success) {
-                    window.showModalMessage("Password reset email sent! Check your inbox.", true);
+                    window.showAuthError("Password reset email sent! Check your inbox.", true);
                     return; 
                 }
             }
@@ -576,9 +706,11 @@
             
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.ready.then(function(reg) {
-                    reg.showNotification(title, options).catch(function(err) {
+                    if (reg && reg.showNotification) {
+                        reg.showNotification(title, options);
+                    } else {
                         try { new Notification(title, options); } catch(e) {}
-                    });
+                    }
                 }).catch(function() {
                     try { new Notification(title, options); } catch(e) {}
                 });
@@ -589,24 +721,24 @@
 
         window.requestNotificationPermission = async function() {
             if (!('Notification' in window)) {
-                window.showModalMessage("Your browser doesn't support notifications.");
+                window.showSysMessage("Your browser doesn't support notifications.");
                 return;
             }
             if (Notification.permission === 'granted') {
-                window.showModalMessage("Notifications are already enabled!", true);
+                window.showSysMessage("Notifications are already enabled!");
                 return;
             }
             try {
                 const permission = await Notification.requestPermission();
                 if (permission === 'granted') {
-                    window.showModalMessage("Awesome! You will now receive notifications.", true);
+                    window.showSysMessage("Awesome! You will now receive notifications.");
                 } else {
-                    window.showModalMessage("Permission was denied by the browser.");
+                    window.showSysMessage("Permission was denied by the browser.");
                 }
             } catch(e) {
                 Notification.requestPermission(function (permission) {
                     if (permission === 'granted') {
-                        window.showModalMessage("Awesome! You will now receive notifications.", true);
+                        window.showSysMessage("Awesome! You will now receive notifications.");
                     }
                 });
             }
@@ -614,13 +746,13 @@
 
         window.testNotification = function() {
             if (Notification.permission !== 'granted') {
-                window.showModalMessage("Please grant notification permission first by clicking the button.");
+                window.showSysMessage("Please grant notification permission first by clicking the button.");
                 return;
             }
-            window.showModalMessage("Test notification scheduled! Put the app in the background now.", true);
+            window.showSysMessage("Test notification scheduled in 3 seconds!\n(Please keep the app open to see it)");
             setTimeout(() => {
-                window.fireNotification('TJFWeather Test', 'Notifications are working perfectly in the background!');
-            }, 5000);
+                window.fireNotification('TJFWeather Test', 'Notifications are working perfectly!');
+            }, 3000);
         };
 
         window.sendMorningBrief = async function() {
@@ -2024,11 +2156,11 @@
             } catch(e) { main.innerHTML = '<div style="padding:60px 20px; text-align:center; color:var(--danger);"><i class="ph-fill ph-warning" style="font-size: 32px; margin-bottom: 15px;"></i><br>Search failed. Please try again.</div>'; }
         }
 
-        async function fetchMOSData() {
+        window.fetchMOSData = async function() {
             try { let nbmRes = await fetchWithTimeout('static/nbm_timeseries_latest.json?t=' + Date.now(), { timeout: 5000 }); if(nbmRes.ok) mosDataCache.nbm = await nbmRes.json(); } catch(e) {}
             try { let gfsRes = await fetchWithTimeout('static/gfsmos_timeseries_latest.json?t=' + Date.now(), { timeout: 5000 }); if(gfsRes.ok) mosDataCache.gfsmos = await gfsRes.json(); } catch(e) {}
             try { let namRes = await fetchWithTimeout('static/nammos_timeseries_latest.json?t=' + Date.now(), { timeout: 5000 }); if(namRes.ok) mosDataCache.nammos = await namRes.json(); } catch(e) {}
-        }
+        };
 
         window.updatePinBtnUI = function(cityId) {
             const btnText = document.getElementById('pinCityText');
@@ -2042,7 +2174,7 @@
 
         window.togglePinCity = async function(cityId) {
             if (!window._firebaseAuth || !window._firebaseAuth.currentUser || window._firebaseAuth.currentUser.isAnonymous) {
-                window.showModalMessage("Please Login or Register to pin cities to your dashboard.");
+                window.showSysMessage("Please Login or Register to pin cities to your dashboard.");
                 return;
             }
             
@@ -2076,7 +2208,7 @@
             window.loadSPCOutlooks();
             window.setupHomeLocation();
             
-            fetchMOSData().then(() => {
+            window.fetchMOSData().then(() => {
                 if (tab === 'localforecast' && cityParam) {
                     let existingCity = LF_CITIES.find(c => c.id === cityParam);
                     if (existingCity) {
@@ -2165,7 +2297,7 @@
                                     if (error.code === 'auth/custom-token-mismatch') {
                                         try { await signInAnonymously(auth); } catch(e) { console.error(e); }
                                     } else if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
-                                        window.showModalMessage("Firebase Setup Required: Please go to your Firebase Console -> Authentication -> Sign-in method, and enable BOTH 'Email/Password' and 'Anonymous' sign-in.");
+                                        window.showSysMessage("Firebase Setup Required: Please go to your Firebase Console -> Authentication -> Sign-in method, and enable BOTH 'Email/Password' and 'Anonymous' sign-in.");
                                     }
                                 }
                             }
@@ -2176,7 +2308,7 @@
         }
 
         window.doGoogleLogin = async function() {
-            if (!auth) { window.showModalMessage("Database connection not established."); return false; }
+            if (!auth) { window.showSysMessage("Database connection not established."); return false; }
             try {
                 const provider = new GoogleAuthProvider();
                 await signInWithPopup(auth, provider);
@@ -2185,33 +2317,33 @@
             } catch(e) {
                 console.error(e);
                 if (e.code === 'auth/unauthorized-domain') {
-                    window.showModalMessage("Google Sign-In blocked. Add this website's domain to your Firebase Console under Authentication -> Settings -> Authorized domains.");
+                    window.showSysMessage("Google Sign-In blocked. Add this website's domain to your Firebase Console under Authentication -> Settings -> Authorized domains.");
                 } else {
-                    window.showModalMessage(e.message.replace('Firebase: ', '')); 
+                    window.showAuthError(e.message.replace('Firebase: ', '')); 
                 }
                 return false; 
             }
         }
         
         window.doRegister = async function(email, pass) {
-            if (!auth) { window.showModalMessage("Database connection not established."); return false; }
+            if (!auth) { window.showSysMessage("Database connection not established."); return false; }
             try { await createUserWithEmailAndPassword(auth, email, pass); return true; } 
-            catch(e) { window.showModalMessage(e.message.replace('Firebase: ', '')); return false; }
+            catch(e) { window.showAuthError(e.message.replace('Firebase: ', '')); return false; }
         }
 
         window.doLogin = async function(email, pass) {
-            if (!auth) { window.showModalMessage("Database connection not established."); return false; }
+            if (!auth) { window.showSysMessage("Database connection not established."); return false; }
             try { await signInWithEmailAndPassword(auth, email, pass); return true; } 
-            catch(e) { window.showModalMessage(e.message.replace('Firebase: ', '')); return false; }
+            catch(e) { window.showAuthError(e.message.replace('Firebase: ', '')); return false; }
         }
         
         window.doResetPassword = async function(email) {
-            if (!auth) { window.showModalMessage("Database connection not established."); return false; }
+            if (!auth) { window.showSysMessage("Database connection not established."); return false; }
             try { 
                 await sendPasswordResetEmail(auth, email); 
                 return true; 
             } catch(e) { 
-                window.showModalMessage(e.message.replace('Firebase: ', '')); 
+                window.showAuthError(e.message.replace('Firebase: ', '')); 
                 return false; 
             }
         }
