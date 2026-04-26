@@ -83,7 +83,7 @@ def robust_nws_fetch_backend(url):
     # Retry logic up to 3 times for flaky NWS API endpoints
     for _ in range(3):
         try:
-            res = requests.get(url, headers=headers, timeout=12)
+            res = requests.get(url, headers=headers, timeout=15)
             if res.status_code == 200:
                 data = res.json()
                 if isinstance(data, dict) and data.get('status') not in [404, 500]: 
@@ -104,8 +104,42 @@ def robust_nws_fetch_backend(url):
     
     return None
 
+def fetch_spc_outlooks():
+    print("\n[1/5] Fetching Storm Prediction Center Outlooks...")
+    types = ['cat', 'torn', 'wind', 'hail']
+    now = datetime.datetime.utcnow()
+    dates_to_check = [now, now - datetime.timedelta(days=1)]
+    times_day1 = ['2000', '1630', '1300', '1200', '0100']
+    times_day2 = ['1730', '0600']
+
+    for day in [1, 2]:
+        combined = {}
+        for t in types:
+            url = f"https://www.spc.noaa.gov/products/outlook/day{day}otlk_{t}.lyr.geojson"
+            data = robust_nws_fetch_backend(url)
+            
+            if not data:
+                # Fallback to archive search if active endpoint is transitioning
+                times = times_day1 if day == 1 else times_day2
+                for d in dates_to_check:
+                    date_str = d.strftime('%Y%m%d')
+                    year = d.strftime('%Y')
+                    for tm in times:
+                        archive_url = f"https://www.spc.noaa.gov/products/outlook/archive/{year}/day{day}otlk_{date_str}_{tm}_{t}.lyr.geojson"
+                        data = robust_nws_fetch_backend(archive_url)
+                        if data: break
+                    if data: break
+            
+            combined[t] = data
+            
+        os.makedirs('static', exist_ok=True)
+        with open(f"static/spc_day{day}.json", "w") as f:
+            json.dump(combined, f)
+    print("  ✓ Storm Prediction Center Outlooks Cached.")
+
+
 def update_nws_alerts():
-    print("\n[1/4] Fetching active NWS Severe Weather Alerts...")
+    print("\n[2/5] Fetching active National Weather Service Alerts...")
     try:
         res = robust_nws_fetch_backend("https://api.weather.gov/alerts/active?status=actual")
         if res:
@@ -116,8 +150,9 @@ def update_nws_alerts():
     except Exception as e:
         print(f"  [X] Error fetching alerts: {e}")
 
+
 def fetch_asos_current_conditions():
-    print("\n[2/4] Fetching live ASOS/METAR observations (with Gusts)...")
+    print("\n[3/5] Fetching live Surface Observations...")
     icaos = ",".join([c['icao'] for c in CITIES if 'icao' in c])
     awc_url = f"https://aviationweather.gov/api/data/metar?ids={icaos}&format=json"
     
@@ -130,26 +165,24 @@ def fetch_asos_current_conditions():
                 icao = obs.get('icaoId')
                 temp_c = obs.get('temp')
                 wind_spd = obs.get('wspd') 
-                wind_gust = obs.get('wgst') # Extracting Gusts
                 wx_string = obs.get('wxString', '')
                 
                 temp_f = round((temp_c * 9/5) + 32) if temp_c is not None else None
                 wind_mph = round(wind_spd * 1.15078) if wind_spd is not None else None
-                gust_mph = round(wind_gust * 1.15078) if wind_gust is not None else None
                 
                 city_name = next((c['name'] for c in CITIES if c.get('icao') == icao), None)
                 if city_name:
-                    conditions[city_name] = {"temp": temp_f, "wind": wind_mph, "gust": gust_mph, "wx": wx_string}
+                    conditions[city_name] = {"temp": temp_f, "wind": wind_mph, "wx": wx_string}
             
             os.makedirs('static', exist_ok=True)
             with open("static/asos_conditions.json", "w") as f:
                 json.dump(conditions, f)
             print("  ✓ Successfully cached current conditions!")
     except Exception as e:
-        print(f"  [X] Failed to fetch METARs: {e}")
+        print(f"  [X] Failed to fetch Surface Observations: {e}")
 
 def cache_nws_point_forecasts():
-    print("\n[3/4] Syncing human-made NWS point forecasts and NBM Consensus...")
+    print("\n[4/5] Syncing Forecasts and Models Consensus...")
     os.makedirs('static/nws', exist_ok=True)
     
     now = datetime.datetime.utcnow()
@@ -172,7 +205,7 @@ def cache_nws_point_forecasts():
                 with open(f"static/nws/{safe_name}.json", "w") as f:
                     json.dump(payload, f)
                 
-                # FIXED: Expanded array to 150 to support the frontend 6-day lookahead!
+                # Expanded array to 150 to support the frontend 6-day lookahead!
                 nbm_temps = [None] * MAX_FORECAST_HOURS
                 nbm_qpf = [0.0] * MAX_FORECAST_HOURS
                 nbm_snow = [0.0] * MAX_FORECAST_HOURS
@@ -195,7 +228,7 @@ def cache_nws_point_forecasts():
                     "lat": city['lat'], "lon": city['lon'], "fxx": list(range(MAX_FORECAST_HOURS)),
                     "temp": nbm_temps, "qpf": nbm_qpf, "snow": nbm_snow, "wind": [None]*MAX_FORECAST_HOURS
                 }
-            time.sleep(0.3) # Be nice to NOAA API
+            time.sleep(0.3) # Be nice to NWS API
         except Exception as e:
             pass
             
@@ -204,14 +237,14 @@ def cache_nws_point_forecasts():
             with open(f"static/nbm_timeseries_{c1_str}.json", "w") as f: json.dump(nbm_data, f)
             # Write a generic 'latest' file for easy frontend access
             with open("static/nbm_timeseries_latest.json", "w") as f: json.dump(nbm_data, f)
-            print("  ✓ NBM Base Generation Complete.")
+            print("  ✓ Models Base Generation Complete.")
         except: pass
 
     # Pass nbm_data forward to cache_mos_forecasts for the fallback engine
     return nbm_data
 
 def cache_mos_forecasts(nbm_data):
-    print("\n[4/4] Fetching Statistical MOS Model Bulletins (Uncertainty Range)...")
+    print("\n[5/5] Fetching Model Output Statistics (Uncertainty Range)...")
     now = datetime.datetime.utcnow()
     c1_hour = (now.hour // 6) * 6
     c1_str = f"{now.strftime('%Y-%m-%d')}_{c1_hour:02d}"
@@ -229,7 +262,7 @@ def cache_mos_forecasts(nbm_data):
         temps = re.findall(r'-?\d+', tmp_line[3:])
         if len(temps) < 2: return None
         
-        # FIXED: Expanded to 150 hours to prevent frontend crash
+        # Expanded to 150 hours to prevent frontend crash
         f_temps = [None] * MAX_FORECAST_HOURS
         try:
             for idx, val in enumerate(temps):
@@ -312,13 +345,14 @@ def cache_mos_forecasts(nbm_data):
         with open(f"static/nammos_timeseries_{c1_str}.json", "w") as f: json.dump(nam_mos, f)
         with open("static/nammos_timeseries_latest.json", "w") as f: json.dump(nam_mos, f)
         
-    print("  ✓ MOS Statistical Fetch Complete.")
+    print("  ✓ Model Output Statistics Fetch Complete.")
 
 if __name__ == '__main__':
     print("==================================================")
     print("   TJFWeather Github Actions Pipeline Started     ")
     print("==================================================")
     
+    fetch_spc_outlooks()
     update_nws_alerts()
     fetch_asos_current_conditions()
     
