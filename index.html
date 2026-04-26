@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TJFWeather | Dashboard</title>
+    <title>National Weather Service Dashboard | TJFWeather</title>
     
     <!-- PWA Meta Tags for iOS & Android -->
     <meta name="theme-color" content="#0b0e11">
@@ -14,6 +14,9 @@
     <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://d3js.org/topojson.v3.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -38,7 +41,7 @@
 
         html, body {
             margin: 0; padding: 0; height: 100vh; width: 100vw;
-            font-family: 'Inter', sans-serif; background-color: var(--bg);
+            font-family: 'Roboto Condensed', sans-serif; background-color: var(--bg);
             background-image: url('https://images.pexels.com/photos/1162251/pexels-photo-1162251.jpeg?auto=compress&cs=tinysrgb&w=2560');
             background-size: cover; background-position: center;
             background-repeat: no-repeat; background-attachment: fixed;
@@ -70,6 +73,7 @@
             padding: 10px 20px; border-radius: 12px; font-weight: 900; font-size: 14px;
             cursor: pointer; min-width: 100px; transition: all 0.3s ease;
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            font-family: 'Roboto Condensed', sans-serif;
         }
 
         .glass-btn:hover {
@@ -127,7 +131,7 @@
 
         .map-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background-color: #0b0e11 !important; }
 
-        .city-label { font-size: 13px; font-weight: 900; color: #ffffff; text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000; text-align: center; line-height: 1.1; }
+        .city-label { font-size: 13px; font-weight: 900; color: #ffffff; text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000; text-align: center; line-height: 1.1; font-family: 'Roboto Condensed', sans-serif; }
         .city-name { font-size: 11px; }
 
         .lf-container { display: flex; height: 100%; overflow: hidden; }
@@ -135,8 +139,8 @@
         .lf-main { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
         
         .lf-search-wrap { display: flex; gap: 8px; }
-        .lf-search-wrap input { flex: 1; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text); padding: 10px 14px; border-radius: 12px; outline: none; font-weight: 500; }
-        .lf-search-wrap button { background: var(--accent); border: none; color: #000; font-weight: 900; padding: 10px 16px; border-radius: 12px; cursor: pointer; }
+        .lf-search-wrap input { flex: 1; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text); padding: 10px 14px; border-radius: 12px; outline: none; font-weight: 500; font-family: 'Roboto Condensed', sans-serif; }
+        .lf-search-wrap button { background: var(--accent); border: none; color: #000; font-weight: 900; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-family: 'Roboto Condensed', sans-serif; }
         
         .lf-city-list { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
         .lf-city-item { padding: 10px 14px; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 600; border: 1px solid transparent; display: flex; align-items: center; }
@@ -145,7 +149,7 @@
         .lf-hourly-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: thin; }
         .lf-hour-col { min-width: 140px; text-align: center; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;}
         .lf-hour-col .hr-label { opacity: 0.7; margin-bottom: 8px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
-        .lf-hour-col .hr-temp { font-size: 20px; font-weight: 900; color: var(--accent); margin-top: 8px; }
+        .lf-hour-col .hr-temp { font-size: 20px; font-weight: 900; color: #fff; margin-top: 8px; }
 
         .lf-daily-col { min-width: 190px; text-align: center; background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(20, 30, 40, 0.6) 100%); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.2s; }
         .lf-daily-col:hover { background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(30, 45, 60, 0.8) 100%); border-color: var(--accent); transform: translateY(-2px); }
@@ -220,7 +224,7 @@
             <div class="nav-item active" onclick="window.showTab('home', this); window.toggleNavMenu(true);">HOME</div>
             <div class="nav-item" onclick="window.showTab('localforecast', this); window.toggleNavMenu(true);">LOCAL FORECAST</div>
             <div id="navRadarBtn" class="nav-item" onclick="window.showTab('radar', this); window.toggleNavMenu(true);">LIVE RADAR</div>
-            <div class="nav-item" onclick="window.showTab('datasources', this); window.toggleNavMenu(true);">DATA SOURCES</div>
+            <div class="nav-item" onclick="window.showTab('datasources', this); window.toggleNavMenu(true);">WHAT DOES THIS MEAN?</div>
             <div class="nav-item" onclick="window.showTab('about', this); window.toggleNavMenu(true);">ABOUT</div>
             <div class="nav-item" onclick="window.showTab('feedback', this); window.toggleNavMenu(true);">FEEDBACK</div>
             <a href="https://www.buymeacoffee.com/tyreek" target="_blank" rel="noopener noreferrer" class="nav-item donate-btn"><i class="ph ph-coffee"></i> DONATE</a>
@@ -245,16 +249,16 @@
                 </div>
 
                 <div class="glass" style="padding: 30px; flex: 2; min-width: 300px;">
-                    <div style="font-size: 12px; opacity: 0.5; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">TJFWeather Alpha</div>
+                    <div style="font-size: 12px; opacity: 0.5; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">National Weather Service Dashboard</div>
                     <h1 style="font-size: 30px; margin: 0 0 10px;">Dashboard</h1>
-                    <p style="font-size: 14px; line-height: 1.7; opacity: 0.75; margin: 0 0 18px;">Expert NWS forecasts, Statistical Uncertainty (MOS), and Real-Time ASOS Observations.</p>
+                    <p style="font-size: 14px; line-height: 1.7; opacity: 0.75; margin: 0 0 18px;">Expert National Weather Service forecasts, Model Output Statistics Uncertainty, and Real-Time Automated Surface Observing System Observations.</p>
 
                     <div id="homeLocalWeather" class="glass"
                         style="background: rgba(0,210,255,0.05); border: 1px solid var(--accent); padding: 20px; cursor:pointer; transition: transform 0.2s;"
                         onclick="window.showTab('localforecast', document.querySelector('.nav-item:nth-child(2)')); if(window.lfSelectedCity) window.selectLFCity(window.lfSelectedCity, true);"
                         onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
                         <div id="homeLocationName" style="opacity:0.6; font-size:11px; font-weight: 800; letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; color: var(--accent); word-break: break-word; line-height: 1.4;">
-                            Official NWS Forecast &mdash; Locating...
+                            Official National Weather Service Forecast &mdash; Locating...
                         </div>
                         <div id="homeWeatherContent" class="home-weather-content">
                             <div class="home-temp-val" id="homeTempVal">&mdash;</div>
@@ -263,7 +267,8 @@
                                     <i class="ph-fill ph-spinner ph-spin" style="font-size: 36px; color: #fff;"></i>
                                 </div>
                                 <div id="homeWindVal" style="font-size:14px; opacity:0.8; font-weight:600; margin-top: 6px;">Wind: &mdash;</div>
-                                <div id="homeFeelsLikeVal" style="font-size:13px; font-weight:bold; color:var(--info); margin-top: 4px;"></div>
+                                <div id="homeDewVal" style="font-size:13px; opacity:0.8; margin-top: 4px;">Dew Point: &mdash;</div>
+                                <div id="homeFeelsLikeVal" style="font-size:13px; font-weight:bold; color:#fff; opacity:0.9; margin-top: 4px;"></div>
                                 <div id="homeQpfVal" style="font-size:13px; opacity:0.6; margin-top:6px;">Forecast: &mdash;</div>
                             </div>
                         </div>
@@ -285,15 +290,15 @@
                 <div class="glass" style="padding: 25px; flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 15px; order: 3;">
                     <div>
                         <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; opacity:0.5; margin-bottom:10px; display: flex; align-items: center; gap: 6px;">
-                            <i class="ph-fill ph-calendar-blank"></i> Today's SPC Outlook
+                            <i class="ph-fill ph-calendar-blank"></i> Today's Storm Prediction Center Outlook
                         </div>
-                        <div id="spcTodayHome"><div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div></div>
+                        <div id="spcTodayHome"><div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div></div>
                     </div>
                     <div style="border-top: 1px solid var(--border); padding-top: 15px;">
                         <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; opacity:0.5; margin-bottom:10px; display: flex; align-items: center; gap: 6px;">
-                            <i class="ph-fill ph-calendar-plus"></i> Tomorrow's SPC Outlook
+                            <i class="ph-fill ph-calendar-plus"></i> Tomorrow's Storm Prediction Center Outlook
                         </div>
-                        <div id="spcTomHome"><div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div></div>
+                        <div id="spcTomHome"><div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div></div>
                     </div>
                 </div>
 
@@ -302,7 +307,7 @@
                         <h3 style="margin:0; color:var(--accent); font-size:12px; letter-spacing:1px; text-transform:uppercase; display: flex; align-items: center; gap: 6px;">
                             <i class="ph-fill ph-radar" style="font-size: 16px;"></i> Local Composite Radar
                         </h3>
-                        <span id="miniRadarTime" style="font-size:11px; opacity:0.6; font-family:monospace;"></span>
+                        <span id="miniRadarTime" style="font-size:11px; opacity:0.6; font-family: 'Roboto Condensed', sans-serif;"></span>
                     </div>
                     <div style="width:100%; height:220px; border-radius:12px; position:relative; overflow:hidden; border:1px solid var(--border);">
                         <div id="miniRadarMap" style="width:100%; height:100%; z-index:1;"></div>
@@ -358,74 +363,72 @@
             </div>
             <div style="text-align:right; margin-top:12px; border-top:1px solid var(--border); padding-top:8px;">
                 <a href="https://mobile.weather.gov" target="_blank" rel="noopener noreferrer" style="color:var(--accent); text-decoration:none; font-size:10px; font-weight:bold; display: flex; align-items: center; justify-content: flex-end; gap: 4px;">
-                    Source: weather.gov <i class="ph ph-arrow-up-right"></i>
+                    Source: National Weather Service <i class="ph ph-arrow-up-right"></i>
                 </a>
             </div>
         </div>
         <div class="radar-controls glass">
             <button id="radarPlayBtn" onclick="window.toggleRadarPlay()" class="glass-btn"><i class="ph-fill ph-pause"></i> PAUSE</button>
             <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 0; color: var(--text); font-size: 13px; font-weight: bold; border-left: 2px solid var(--border); padding-left: 15px;">
-                <input type="checkbox" id="nwsRadarToggle" checked onchange="window.toggleNWSLayer()" style="transform: scale(1.2); accent-color: var(--accent);"> Show Warnings
+                <input type="checkbox" id="nwsRadarToggle" checked onchange="window.toggleNWSLayer()" style="transform: scale(1.2); accent-color: var(--accent);"> Show National Weather Service Warnings
             </label>
             <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 0; color: var(--text); font-size: 13px; font-weight: bold; border-left: 2px solid var(--border); padding-left: 15px;">
                 <input type="checkbox" id="urgentRadarToggle" onchange="window.renderAlertPolygons()" style="transform: scale(1.2); accent-color: var(--accent);"> Urgent Only
             </label>
             <div style="display: flex; align-items: center; gap: 15px; border-left: 2px solid var(--border); padding-left: 15px;">
                 <span style="font-weight:800; font-size:12px; opacity:0.8; letter-spacing:1px;">LATEST LOOP</span>
-                <span id="radarTimeDisplay" style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:900; color:var(--accent); min-width:85px; text-align: center;">--:--</span>
+                <span id="radarTimeDisplay" style="font-family:'Roboto Condensed', sans-serif; font-size:18px; font-weight:900; color:var(--accent); min-width:85px; text-align: center;">--:--</span>
             </div>
         </div>
     </div>
 
-    <!-- DATA SOURCES TAB -->
+    <!-- WHAT DOES THIS MEAN TAB -->
     <div id="datasources" class="tab-content">
         <div style="padding: 60px 20px; max-width: 900px; margin: auto; position: relative; z-index: 2; overflow-y: auto;">
-            <div class="glass" style="padding: 40px;">
-                <h1 style="font-size: 32px; margin-top: 0; margin-bottom: 35px; color: var(--accent); display: flex; align-items: center; gap: 12px;">
-                    <i class="ph-fill ph-database"></i> Data Sources & Glossary
-                </h1>
+            <h1 style="font-size: 32px; margin-top: 0; margin-bottom: 35px; color: #fff; display: flex; align-items: center; gap: 12px; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+                <i class="ph-fill ph-question"></i> What does this mean?
+            </h1>
 
-                <div style="margin-bottom: 35px;">
-                    <h3 style="margin: 0 0 12px; color: var(--warning); font-size: 18px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
-                        <i class="ph-fill ph-cloud-lightning"></i> What is the SPC Outlook?
-                    </h3>
-                    <p style="font-size: 15px; line-height: 1.6; opacity: 0.85; margin: 0;">
-                        The <strong>Storm Prediction Center (SPC)</strong> issues daily severe weather outlooks indicating the risk of organized severe thunderstorms (tornadoes, damaging winds, and large hail) over the contiguous United States.
-                        Risks are categorized from 1 to 5: <strong>Marginal, Slight, Enhanced, Moderate, and High</strong>.
-                    </p>
-                </div>
+            <div class="glass" style="padding: 30px; margin-bottom: 25px;">
+                <h3 style="margin: 0 0 12px; color: #ffffff; font-size: 18px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                    <i class="ph-fill ph-cloud-lightning"></i> Storm Prediction Center Outlook
+                </h3>
+                <p style="font-size: 15px; line-height: 1.6; opacity: 0.85; margin: 0;">
+                    The <strong>Storm Prediction Center</strong> issues daily severe weather outlooks indicating the risk of organized severe thunderstorms (tornadoes, damaging winds, and large hail) over the contiguous United States.
+                    Risks are categorized from 1 to 5: <strong>Marginal, Slight, Enhanced, Moderate, and High</strong>.
+                </p>
+            </div>
 
-                <div style="margin-bottom: 35px;">
-                    <h3 style="margin: 0 0 12px; color: var(--accent); font-size: 18px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
-                        <i class="ph-fill ph-chart-bar"></i> Numerical Weather Prediction
-                    </h3>
-                    <ul style="font-size: 15px; line-height: 1.8; opacity: 0.85; margin: 0; padding-left: 20px;">
-                        <li style="margin-bottom: 8px;"><strong>NBM:</strong> The gold-standard official NOAA ensemble, blending dozens of models for the most accurate consensus.</li>
-                        <li style="margin-bottom: 8px;"><strong>MOS:</strong> Statistical post-processing that corrects known numerical model biases for specific point locations based on historical data.</li>
-                        <li><strong>GFS:</strong> The flagship US medium-range model (0-384h+), useful for forecasting broad weather patterns days in advance.</li>
-                    </ul>
-                </div>
+            <div class="glass" style="padding: 30px; margin-bottom: 25px;">
+                <h3 style="margin: 0 0 12px; color: #ffffff; font-size: 18px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                    <i class="ph-fill ph-chart-bar"></i> Numerical Weather Prediction
+                </h3>
+                <ul style="font-size: 15px; line-height: 1.8; opacity: 0.85; margin: 0; padding-left: 20px;">
+                    <li style="margin-bottom: 8px;"><strong>National Blend of Models:</strong> The gold-standard official National Oceanic and Atmospheric Administration ensemble, blending dozens of models for the most accurate consensus.</li>
+                    <li style="margin-bottom: 8px;"><strong>Model Output Statistics:</strong> Statistical post-processing that corrects known numerical model biases for specific point locations based on historical data.</li>
+                    <li><strong>Global Forecast System:</strong> The flagship United States medium-range model (0-384 hours out), useful for forecasting broad weather patterns days in advance.</li>
+                </ul>
+            </div>
 
-                <div>
-                    <h3 style="margin: 0 0 12px; color: var(--success); font-size: 18px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
-                        <i class="ph-fill ph-thermometer"></i> Live ASOS Observations
-                    </h3>
-                    <p style="font-size: 15px; line-height: 1.6; opacity: 0.85; margin: 0;">
-                        The <strong>Automated Surface Observing System (ASOS)</strong> is a massive network of climate sensors heavily concentrated at US airports. They provide highly accurate, minute-by-minute updates of the current temperature, wind speed, and visibility (METARs). When viewing the Local Forecast tab, TJFWeather queries the nearest aviation sensor to give you absolute ground truth.
-                    </p>
-                </div>
+            <div class="glass" style="padding: 30px; margin-bottom: 25px;">
+                <h3 style="margin: 0 0 12px; color: #ffffff; font-size: 18px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                    <i class="ph-fill ph-thermometer"></i> Live Surface Observations
+                </h3>
+                <p style="font-size: 15px; line-height: 1.6; opacity: 0.85; margin: 0;">
+                    The <strong>Automated Surface Observing System</strong> is a massive network of climate sensors heavily concentrated at United States airports. They provide highly accurate, minute-by-minute updates of the current temperature, wind speed, and visibility. When viewing the Local Forecast tab, TJFWeather queries the nearest aviation sensor to give you absolute ground truth.
+                </p>
+            </div>
 
-                <div style="margin-top: 35px;">
-                    <h3 style="margin: 0 0 12px; color: #a29bfe; font-size: 18px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
-                        <i class="ph-fill ph-thermometer-cold"></i> Wind Chill & Min Chill
-                    </h3>
-                    <p style="font-size: 15px; line-height: 1.6; opacity: 0.85; margin: 0 0 10px 0;">
-                        <strong>Feels Like / Wind Chill:</strong> Calculates the perceived decrease in air temperature felt by the body on exposed skin. It is calculated using the official NWS formula (valid for temps &le; 50°F and wind &gt; 3 mph). Between 50°F and 80°F, we use the Steadman Apparent Temperature formula to account for ambient humidity.
-                    </p>
-                    <p style="font-size: 15px; line-height: 1.6; opacity: 0.85; margin: 0;">
-                        <strong>Min Chill (Gusts):</strong> A specialized calculation unique to TJFWeather. Instead of using the <em>sustained</em> wind speed, we use the highest forecasted or recently recorded <strong>wind gust</strong>. This tells you exactly how cold the air will feel the moment a strong gust hits you.
-                    </p>
-                </div>
+            <div class="glass" style="padding: 30px; margin-bottom: 25px;">
+                <h3 style="margin: 0 0 12px; color: #ffffff; font-size: 18px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                    <i class="ph-fill ph-thermometer-cold"></i> Wind Chill & Min Chill
+                </h3>
+                <p style="font-size: 15px; line-height: 1.6; opacity: 0.85; margin: 0 0 10px 0;">
+                    <strong>Feels Like / Wind Chill:</strong> Calculates the perceived decrease in air temperature felt by the body on exposed skin. It is calculated using the official National Weather Service formula (valid for temps &le; 50°F and wind &gt; 3 mph). Between 50°F and 80°F, it defaults to ambient temperature, and above 80°F it switches to the official Heat Index.
+                </p>
+                <p style="font-size: 15px; line-height: 1.6; opacity: 0.85; margin: 0;">
+                    <strong>Min Chill (Gusts):</strong> A specialized calculation unique to TJFWeather. Instead of using the <em>sustained</em> wind speed, we use the highest forecasted or recently recorded <strong>wind gust</strong>. This tells you exactly how cold the air will feel the moment a strong gust hits you.
+                </p>
             </div>
         </div>
     </div>
@@ -455,7 +458,7 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v16.3 (MOS Hotfix) | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v17.0 (Unified & Styled) | AMES, IA</p>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <h3 style="font-size: 16px; color: var(--info); margin-top: 0;">App Features & Notifications</h3>
@@ -761,7 +764,7 @@
                 let ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${window.currentHomeLat},${window.currentHomeLon}`);
                 let fData = await window.robustNWSFetch(ptData.properties.forecast);
                 let today = fData.properties.periods[0];
-                let cityName = document.getElementById('homeLocationName').innerText.replace('Official NWS Forecast — ', '');
+                let cityName = document.getElementById('homeLocationName').innerText.replace('Official National Weather Service Forecast — ', '');
                 window.fireNotification(`Morning Forecast: ${cityName}`, `${today.name}: ${today.shortForecast}, High ${today.temperature}°F.`);
             } catch(e) { console.error("Brief fetch failed", e); }
         };
@@ -774,7 +777,7 @@
                 let periods = fData.properties.periods;
                 let tonight = periods[0].isDaytime ? periods[1] : periods[0];
                 let tomorrow = periods[0].isDaytime ? periods[2] : periods[1];
-                let cityName = document.getElementById('homeLocationName').innerText.replace('Official NWS Forecast — ', '');
+                let cityName = document.getElementById('homeLocationName').innerText.replace('Official National Weather Service Forecast — ', '');
                 window.fireNotification(`Evening Forecast: ${cityName}`, `${tonight.name}: ${tonight.shortForecast}, Low ${tonight.temperature}°F. ${tomorrow.name}: High ${tomorrow.temperature}°F.`);
             } catch(e) { console.error("Brief fetch failed", e); }
         };
@@ -875,7 +878,7 @@
                 let pRes = await fetchWithTimeout(proxied, { timeout: 6000 });
                 if (pRes.ok) { let data = await pRes.json(); if (!data.status || data.status === 200) return data; }
             } catch (e) { }
-            throw new Error("NWS Fetch Failed");
+            throw new Error("National Weather Service Fetch Failed");
         }
 
         async function fetchWithTimeout(resource, options = {}) {
@@ -888,30 +891,22 @@
         }
 
         function getFeelsLike(tempF, windMph, rh = null) {
-            let calcRh = rh !== null ? rh : 50; 
-            let tempC = (tempF - 32) * 5 / 9;
-            let windMs = windMph * 0.44704;
-            let e = (calcRh / 100) * 6.105 * Math.exp((17.27 * tempC) / (237.7 + tempC));
-            let atC = tempC + 0.33 * e - 0.70 * windMs - 4.00;
-            let apparentTempF = (atC * 9 / 5) + 32;
-
             if (tempF <= 50 && windMph > 3) {
-                let wc = 35.74 + (0.6215 * tempF) - (35.75 * Math.pow(windMph, 0.16)) + (0.4275 * tempF * Math.pow(windMph, 0.16));
-                return Math.round(Math.min(apparentTempF, wc));
+                return Math.round(35.74 + (0.6215 * tempF) - (35.75 * Math.pow(windMph, 0.16)) + (0.4275 * tempF * Math.pow(windMph, 0.16)));
             }
-            if (tempF >= 80 && calcRh >= 40) {
-                let hi = 0.5 * (tempF + 61.0 + ((tempF - 68.0) * 1.2) + (calcRh * 0.094));
+            if (tempF >= 80 && rh !== null) {
+                let hi = 0.5 * (tempF + 61.0 + ((tempF - 68.0) * 1.2) + (rh * 0.094));
                 if (hi >= 80) {
-                    hi = -42.379 + 2.04901523*tempF + 10.14333127*calcRh - 0.22475541*tempF*calcRh - 0.00683783*tempF*tempF - 0.05481717*calcRh*calcRh + 0.00122874*tempF*tempF*calcRh + 0.00085282*tempF*calcRh*calcRh - 0.00000199*tempF*tempF*calcRh*calcRh;
-                    if (calcRh < 13 && tempF >= 80 && tempF <= 112) {
-                        hi -= ((13 - calcRh) / 4) * Math.sqrt((17 - Math.abs(tempF - 95.)) / 17);
-                    } else if (calcRh > 85 && tempF >= 80 && tempF <= 87) {
-                        hi += ((calcRh - 85) / 10) * ((87 - tempF) / 5);
+                    hi = -42.379 + 2.04901523*tempF + 10.14333127*rh - 0.22475541*tempF*rh - 0.00683783*tempF*tempF - 0.05481717*rh*rh + 0.00122874*tempF*tempF*rh + 0.00085282*tempF*rh*rh - 0.00000199*tempF*tempF*rh*rh;
+                    if (rh < 13 && tempF >= 80 && tempF <= 112) {
+                        hi -= ((13 - rh) / 4) * Math.sqrt((17 - Math.abs(tempF - 95.)) / 17);
+                    } else if (rh > 85 && tempF >= 80 && tempF <= 87) {
+                        hi += ((rh - 85) / 10) * ((87 - tempF) / 5);
                     }
                 }
-                return Math.round(Math.max(apparentTempF, hi));
+                return Math.round(hi);
             }
-            return Math.round(apparentTempF); 
+            return Math.round(tempF); 
         }
 
         function parseWinds(windStr, gustStr) {
@@ -1067,12 +1062,27 @@
                 if (todayEl) todayEl.innerHTML = d1;
                 if (tomEl) tomEl.innerHTML = d2;
             } else {
-                if (todayEl) todayEl.innerHTML = '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div>';
-                if (tomEl) tomEl.innerHTML = '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div>';
+                if (todayEl) todayEl.innerHTML = '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>';
+                if (tomEl) tomEl.innerHTML = '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>';
             }
         }
 
         window.loadSPCOutlooks = async function() {
+            // Attempt to hit static cached files first to dramatically improve load speed
+            try {
+                const [d1Res, d2Res] = await Promise.all([
+                    fetchWithTimeout(`static/spc_day1.json?t=${Date.now()}`, { timeout: 3000 }),
+                    fetchWithTimeout(`static/spc_day2.json?t=${Date.now()}`, { timeout: 3000 })
+                ]);
+                const d1 = await d1Res.json();
+                const d2 = await d2Res.json();
+                spcData.day1 = { cat: d1.cat, tor: d1.torn, wind: d1.wind, hail: d1.hail };
+                spcData.day2 = { cat: d2.cat, tor: d2.torn, wind: d2.wind, hail: d2.hail };
+                window.updateHomeSPC(); window.updateLocalSPC();
+                return;
+            } catch(e) { }
+
+            // If static files are unavailable, fetch them directly
             const [d1c, d1t, d1w, d1h, d2c, d2t, d2w, d2h] = await Promise.all([
                 fetchSPCDynamic(1, 'cat'), fetchSPCDynamic(1, 'torn'), fetchSPCDynamic(1, 'wind'), fetchSPCDynamic(1, 'hail'),
                 fetchSPCDynamic(2, 'cat'), fetchSPCDynamic(2, 'torn'), fetchSPCDynamic(2, 'wind'), fetchSPCDynamic(2, 'hail')
@@ -1180,18 +1190,21 @@
         function renderSPCHTML(spc) {
             if (spc.rawLvl === 0) return `
                 <div style="padding: 10px 14px; background: rgba(255,255,255,0.05); border-radius: 8px; font-size: 15px; opacity: 0.7; font-weight: 500; margin-bottom: 12px;">No Severe Weather Expected</div>
-                <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official SPC Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
+                <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official Storm Prediction Center Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
+            
+            let riskBadge = spc.rawLvl === 1 ? "Thunderstorm" : `<span style="font-size: 2.2em; line-height: 0.7;">${spc.level}</span><span style="font-size: 1.1em; opacity: 0.85; margin-left: 2px;">/5</span>`;
+            
             return `
                 <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="background: ${spc.bgColor}; color: ${spc.textColor}; padding: 6px 12px; border-radius: 6px; font-weight: 900; font-size: 15px;">${spc.rawLvl === 1 ? "TSTM" : spc.level + "/5"}</div>
+                        <div style="background: ${spc.bgColor}; color: ${spc.textColor}; padding: 8px 14px; border-radius: 8px; font-weight: 900; font-size: 15px; display: flex; align-items: baseline; gap: 2px;">${riskBadge}</div>
                         <div style="font-weight: 900; font-size: 16px; color: ${spc.bgColor};">${spc.name}</div>
                     </div>
                     <div style="display: flex; gap: 18px; font-size: 14px; font-weight: 800; opacity: 0.85; margin-top: 4px;">
-                        <div>Tornado: <span style="color:#ff4757">${spc.tor}</span></div><div>Wind: <span style="color:#00d2ff">${spc.wind}</span></div><div>Hail: <span style="color:#2ecc71">${spc.hail}</span></div>
+                        <div>Tornado: <span style="color:#fff">${spc.tor}</span></div><div>Wind: <span style="color:#fff">${spc.wind}</span></div><div>Hail: <span style="color:#fff">${spc.hail}</span></div>
                     </div>
                 </div>
-                <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official SPC Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
+                <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official Storm Prediction Center Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
         }
 
         window.updateHomeSPC = function() {
@@ -1200,8 +1213,8 @@
             let cacheKey = `home_${lat},${lon}`;
 
             if (spcData.day1.cat === null) {
-                document.getElementById('spcTodayHome').innerHTML = '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div>';
-                document.getElementById('spcTomHome').innerHTML = '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div>';
+                document.getElementById('spcTodayHome').innerHTML = '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>';
+                document.getElementById('spcTomHome').innerHTML = '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>';
                 return;
             }
             
@@ -1281,15 +1294,15 @@
                 const mapSev = { 'Extreme': 4, 'Severe': 3, 'Moderate': 2, 'Minor': 1 };
                 return (mapSev[b.properties.severity] || 0) - (mapSev[a.properties.severity] || 0);
             });
-            const srcLink = `<div style="text-align:right;"><a href="https://mobile.weather.gov" target="_blank" rel="noopener noreferrer" class="source-link">View Weather.gov <i class="ph ph-arrow-up-right"></i></a></div>`;
+            const srcLink = `<div style="text-align:right;"><a href="https://mobile.weather.gov" target="_blank" rel="noopener noreferrer" class="source-link" style="color: #fff;">View National Weather Service <i class="ph ph-arrow-up-right"></i></a></div>`;
             const html = sortedAlerts.length ? sortedAlerts.slice(0, 30).map(alertBadgeHTML).join('') + srcLink : '<div style="opacity:0.4; font-size:13px; font-style: italic;">No active alerts nationwide.</div>';
             const radEl = document.getElementById('radarAlertsList');
             if (radEl) radEl.innerHTML = html;
         }
 
         window.renderAlertPolygons = function() {
-            if (window.alertPolygonLayer && window._mapFull) window._mapFull.removeLayer(window.alertPolygonLayer);
-            if (window.alertPolygonLayerMini && window._mapMini) window._mapMini.removeLayer(window.alertPolygonLayerMini);
+            if (window.alertPolygonLayer && window._mapFull && typeof window._mapFull.removeLayer === 'function') window._mapFull.removeLayer(window.alertPolygonLayer);
+            if (window.alertPolygonLayerMini && window._mapMini && typeof window._mapMini.removeLayer === 'function') window._mapMini.removeLayer(window.alertPolygonLayerMini);
 
             const colorMap = { 'alert-tornado': '#ff4444', 'alert-thunderstorm': '#ff9800', 'alert-flash-flood': '#00c853', 'alert-flood': '#00bcd4', 'alert-winter': '#9b9bff', 'alert-wind': '#f4e03b', 'alert-other': '#aaaaaa' };
             let geojsonFeatures = (window.nwsAlerts || []).filter(f => f.geometry);
@@ -1333,15 +1346,15 @@
         }
 
         window.toggleNWSLayer = function() {
-            if (!window.alertPolygonLayer || !window._mapFull) return;
+            if (!window.alertPolygonLayer || !window._mapFull || typeof window._mapFull.removeLayer !== 'function') return;
             if (document.getElementById('nwsRadarToggle').checked) window.alertPolygonLayer.addTo(window._mapFull);
             else window._mapFull.removeLayer(window.alertPolygonLayer);
         }
 
         window.initLiveRadar = async function() {
             try {
-                if (window._mapFull) mainRadarLayers.forEach(l => window._mapFull.removeLayer(l)); 
-                if (window._mapMini) miniRadarLayers.forEach(l => window._mapMini.removeLayer(l));
+                if (window._mapFull && typeof window._mapFull.removeLayer === 'function') mainRadarLayers.forEach(l => window._mapFull.removeLayer(l)); 
+                if (window._mapMini && typeof window._mapMini.removeLayer === 'function') miniRadarLayers.forEach(l => window._mapMini.removeLayer(l));
                 mainRadarLayers = []; miniRadarLayers = [];
                 if (radarInterval) clearInterval(radarInterval);
 
@@ -1379,23 +1392,32 @@
         }
 
         function buildMeteorologistCreditHTML(wfo, lat, lon) {
-            let afdLink = (wfo && wfo !== "NWS") ? `<a href="https://mesonet.agron.iastate.edu/wx/afos/p.php?pil=AFD${wfo}" target="_blank" rel="noopener noreferrer" class="glass-btn" style="text-decoration: none; padding: 10px 16px; font-size: 14px; min-width: auto; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important;">Read Forecast Discussion <i class="ph ph-arrow-up-right"></i></a>` : '';
+            let afdLink = (wfo && wfo !== "NWS") ? `<a href="https://mesonet.agron.iastate.edu/wx/afos/p.php?pil=AFD${wfo}" target="_blank" rel="noopener noreferrer" class="glass-btn" style="text-decoration: none; padding: 10px 16px; font-size: 14px; min-width: auto; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important;">Read National Weather Service Discussion <i class="ph ph-arrow-up-right"></i></a>` : '';
             return `
             <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; line-height: 1.6;">
-                <div style="font-weight: bold; color: var(--accent); margin-bottom: 5px; display: flex; align-items: center; gap: 6px;"><i class="ph-fill ph-user-focus" style="font-size: 18px;"></i> EXPERT METEOROLOGIST FORECAST</div>
-                <div style="opacity: 0.85; margin-bottom: 15px;">These localized forecasts are actively monitored and adjusted by expert meteorologists at the National Weather Service (NWS) ${(wfo && wfo !== "NWS") ? `office in <strong>${wfo}</strong>` : `offices`}.</div>
+                <div style="font-weight: bold; color: #fff; margin-bottom: 5px; display: flex; align-items: center; gap: 6px;"><i class="ph-fill ph-user-focus" style="font-size: 18px;"></i> NATIONAL WEATHER SERVICE FORECAST</div>
+                <div style="opacity: 0.85; margin-bottom: 15px;">These localized forecasts are actively monitored and adjusted by expert meteorologists at the National Weather Service ${(wfo && wfo !== "NWS") ? `office in <strong>${wfo}</strong>` : `offices`}.</div>
                 ${(wfo && wfo !== "NWS") ? `<div style="font-weight: bold; color: #f1c40f; margin-bottom: 10px;">Want to learn how these forecasts were made? Read the expert forecast discussion here:</div>` : ``}
                 <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                    <a href="https://mobile.weather.gov/index.php?lat=${lat}&lon=${lon}" target="_blank" rel="noopener noreferrer" class="glass-btn" style="text-decoration: none; padding: 10px 16px; font-size: 14px; min-width: auto; background: rgba(0, 210, 255, 0.15)!important;">View Detailed NWS Data <i class="ph ph-arrow-up-right"></i></a>
+                    <a href="https://mobile.weather.gov/index.php?lat=${lat}&lon=${lon}" target="_blank" rel="noopener noreferrer" class="glass-btn" style="text-decoration: none; padding: 10px 16px; font-size: 14px; min-width: auto; background: rgba(0, 210, 255, 0.15)!important;">View Detailed National Weather Service Data <i class="ph ph-arrow-up-right"></i></a>
                     ${afdLink}
                 </div>
             </div>`;
         }
 
         async function fetchLiveASOS(lat, lon, fallbackData) {
-            let result = { temp: '--', wind: null, gust: null, wx: 'Loading...', icon: 'ph-cloud', rh: 50, interpolated: false };
+            let result = { temp: '--', wind: null, gust: null, dewp: null, wx: 'Loading...', icon: 'ph-cloud', rh: 50, interpolated: false };
             try {
-                let ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
+                // Instantly grab cached NWS Point grid data
+                let cacheKey = `nws_pt_${lat.toFixed(2)}_${lon.toFixed(2)}`;
+                let ptData = null;
+                try { ptData = JSON.parse(localStorage.getItem(cacheKey)); } catch(e){}
+                
+                if (!ptData) {
+                    ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
+                    if (ptData) localStorage.setItem(cacheKey, JSON.stringify(ptData));
+                }
+                
                 let stationsRes = await window.robustNWSFetch(ptData.properties.observationStations);
                 let stationId = stationsRes.features[0].properties.stationIdentifier;
                 
@@ -1428,6 +1450,9 @@
                     if (tempC !== null && tempC !== undefined) {
                         result.temp = Math.round((tempC * 9/5) + 32);
                         result.interpolated = isInterpolated;
+                    }
+                    if (latest.dewp !== null && latest.dewp !== undefined) {
+                        result.dewp = Math.round((latest.dewp * 9/5) + 32);
                     }
                     if (latest.wspd !== null) result.wind = Math.round(latest.wspd * 1.15078);
                     if (latest.wgst !== null) result.gust = Math.round(latest.wgst * 1.15078);
@@ -1476,11 +1501,11 @@
                 validCards++;
                 
                 let cAlerts = window.getCityAlerts(pc.lat, pc.lon);
-                let alertIconHtml = cAlerts.length > 0 ? `<i class="ph-fill ph-warning" style="color:var(--danger); font-size:16px;" title="${cAlerts.length} Active Alert(s)"></i>` : '';
+                let alertIconHtml = cAlerts.length > 0 ? `<i class="ph-fill ph-warning" style="color:#fff; font-size:16px;" title="${cAlerts.length} Active Alert(s)"></i>` : '';
 
                 html += `<div id="pinned-card-${pc.id}" class="glass" style="min-width: 240px; padding: 20px; cursor: pointer; display: flex; flex-direction: column; gap: 10px; transition:0.2s;" onclick="window.showTab('localforecast'); window.selectLFCity('${pc.id}', false);" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div style="font-size:13px; font-weight:800; color:var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform:uppercase;">${pc.display}</div>
+                        <div style="font-size:13px; font-weight:800; color:#fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform:uppercase;">${pc.display}</div>
                         ${alertIconHtml}
                     </div>
                     <div style="display:flex; align-items:center; gap:12px; margin-top:5px;">
@@ -1506,17 +1531,17 @@
                 const card = document.getElementById(`pinned-card-${pc.id}`);
                 if(card) {
                     let cAlerts = window.getCityAlerts(pc.lat, pc.lon);
-                    let alertIconHtml = cAlerts.length > 0 ? `<i class="ph-fill ph-warning" style="color:var(--danger); font-size:16px;" title="${cAlerts.length} Active Alert(s)"></i>` : '';
+                    let alertIconHtml = cAlerts.length > 0 ? `<i class="ph-fill ph-warning" style="color:#fff; font-size:16px;" title="${cAlerts.length} Active Alert(s)"></i>` : '';
                     
                     card.innerHTML = `
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div style="font-size:13px; font-weight:800; color:var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform:uppercase;">${pc.display}</div>
+                            <div style="font-size:13px; font-weight:800; color:#fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform:uppercase;">${pc.display}</div>
                             ${alertIconHtml}
                         </div>
                         <div style="display:flex; align-items:center; gap:15px; margin-top:5px;">
                             <i class="ph-fill ${liveASOS.icon}" style="font-size:36px; color:#fff;"></i>
                             <div>
-                                <div style="font-size:26px; font-weight:900; line-height:1; color:var(--danger);">${liveASOS.temp !== '--' ? liveASOS.temp+'°F' : '--'}</div>
+                                <div style="font-size:26px; font-weight:900; line-height:1; color:#fff;">${liveASOS.temp !== '--' ? liveASOS.temp+'°F' : '--'}</div>
                                 <div style="font-size:12px; opacity:0.8; margin-top:4px; font-weight:600;">${liveASOS.wx}</div>
                             </div>
                         </div>
@@ -1528,7 +1553,7 @@
         window.setupHomeLocation = async function() {
             window.currentHomeLat = 42.03; window.currentHomeLon = -93.62;
             window.currentHomeCityId = "Ames_IA";
-            document.getElementById('homeLocationName').innerText = `Official NWS Forecast — Ames, IA`;
+            document.getElementById('homeLocationName').innerText = `Official National Weather Service Forecast — Ames, IA`;
             window.loadHomeNWS(42.03, -93.62, false); window.updateHomeAlerts(42.03, -93.62); window.updateHomeSPC();
             if(window.renderPinnedCities) window.renderPinnedCities();
 
@@ -1536,13 +1561,21 @@
                 navigator.geolocation.getCurrentPosition(
                     async pos => {
                         window.currentHomeLat = pos.coords.latitude; window.currentHomeLon = pos.coords.longitude;
-                        document.getElementById('homeLocationName').innerText = `Official NWS Forecast — Locating...`;
+                        document.getElementById('homeLocationName').innerText = `Official National Weather Service Forecast — Locating...`;
                         
                         try {
-                            let res = await window.robustNWSFetch(`https://api.weather.gov/points/${pos.coords.latitude},${pos.coords.longitude}`);
-                            if(res && res.properties) {
-                                let c = res.properties.relativeLocation.properties.city;
-                                let s = res.properties.relativeLocation.properties.state;
+                            let cacheKey = `nws_pt_${pos.coords.latitude.toFixed(2)}_${pos.coords.longitude.toFixed(2)}`;
+                            let ptData = null;
+                            try { ptData = JSON.parse(localStorage.getItem(cacheKey)); } catch(e){}
+                            
+                            if (!ptData) {
+                                ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${pos.coords.latitude},${pos.coords.longitude}`);
+                                if (ptData) localStorage.setItem(cacheKey, JSON.stringify(ptData));
+                            }
+                            
+                            if(ptData && ptData.properties) {
+                                let c = ptData.properties.relativeLocation.properties.city;
+                                let s = ptData.properties.relativeLocation.properties.state;
                                 let mCity = LF_CITIES.find(city => city.display.includes(c) && city.display.includes(s));
                                 window.currentHomeCityId = mCity ? mCity.id : `${c}_${s}`;
                             }
@@ -1559,7 +1592,7 @@
         }
 
         window.loadHomeNWS = async function(lat, lon, isGeo = false) {
-            let tempStr = "—"; let windStr = "Wind: —"; let flStr = ""; let wxStr = "Observation Unavailable"; let wxIcon = "ph-cloud-slash";
+            let tempStr = "—"; let windStr = "Wind: —"; let dewpStr = "Dew Point: —"; let flStr = ""; let wxStr = "Observation Unavailable"; let wxIcon = "ph-cloud-slash";
             let fallbackAd = null;
             let staticFile = (!isGeo && lat === 42.03 && lon === -93.62) ? 'Ames' : null;
 
@@ -1578,25 +1611,32 @@
                 windStr = `Wind: ${liveASOS.wind} mph`;
                 if(liveASOS.gust) windStr += ` (Gusts: ${liveASOS.gust} mph)`;
             }
+            if (liveASOS.dewp !== null && liveASOS.dewp !== undefined) {
+                dewpStr = `Dew Point: ${liveASOS.dewp}°F`;
+            }
             
             if (liveASOS.temp !== '--' && liveASOS.wind !== null) {
                 let fl = getFeelsLike(liveASOS.temp, liveASOS.wind, liveASOS.rh);
                 flStr = `Feels Like: ${fl}°F`;
-                if (liveASOS.gust && liveASOS.gust > liveASOS.wind) {
+                if (liveASOS.gust && liveASOS.gust > liveASOS.wind && liveASOS.temp <= 50) {
                     let mc = getFeelsLike(liveASOS.temp, liveASOS.gust, liveASOS.rh);
-                    if (mc < fl) flStr += ` | <span style="color:#a29bfe;">Min Chill (Gusts): ${mc}°F</span> <a href="#datasources" onclick="window.showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a>`;
+                    if (mc < fl) flStr += ` | <span style="color:#fff; opacity:0.8;">Min Chill (Gusts): ${mc}°F</span> <a href="#datasources" onclick="window.showTab('datasources')" style="color:#fff; text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a>`;
                     else flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">Gusts don't lower temp</span>`;
+                } else if (liveASOS.gust && liveASOS.gust > liveASOS.wind) {
+                    flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">Gusts don't lower temp</span>`;
                 } else flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">No gusts past hour</span>`;
             }
 
             document.getElementById('homeTempVal').innerText = tempStr;
             document.getElementById('homeWindVal').innerText = windStr;
+            if(document.getElementById('homeDewVal')) document.getElementById('homeDewVal').innerText = dewpStr;
             document.getElementById('homeFeelsLikeVal').innerHTML = flStr;
             
-            let interpTag = liveASOS.interpolated && tempStr !== '--' ? `<span style="font-size:10px; color:var(--warning); vertical-align:super;" title="Interpolated from recent trend">*</span>` : '';
+            let interpTag = liveASOS.interpolated && tempStr !== '--' ? `<span style="font-size:10px; color:#fff; vertical-align:super;" title="Interpolated from recent trend">*</span>` : '';
             document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIcon}" style="font-size: 36px; color: #fff;"></i> ${interpTag}`;
 
             try {
+                let cacheKey = `nws_pt_${lat.toFixed(2)}_${lon.toFixed(2)}`;
                 let ptData = null; let gridId = "NWS"; let nwsData = null; let cacheValid = false;
                 
                 if (staticFile) {
@@ -1613,12 +1653,17 @@
                 }
 
                 if (!cacheValid) {
-                    ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
-                    if (!ptData || !ptData.properties) throw new Error("Invalid NWS Point Data");
+                    try { ptData = JSON.parse(localStorage.getItem(cacheKey)); } catch(e){}
+                    if (!ptData) {
+                        ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
+                        if (ptData) localStorage.setItem(cacheKey, JSON.stringify(ptData));
+                    }
+                    
+                    if (!ptData || !ptData.properties) throw new Error("Invalid National Weather Service Point Data");
                     if(isGeo) {
                         const city = ptData.properties.relativeLocation?.properties?.city || "Unknown";
                         const state = ptData.properties.relativeLocation?.properties?.state || "";
-                        document.getElementById('homeLocationName').innerText = `Official NWS Forecast — ${city}, ${state}`;
+                        document.getElementById('homeLocationName').innerText = `Official National Weather Service Forecast — ${city}, ${state}`;
                     }
                     gridId = ptData.properties.gridId;
                     let fData = await window.robustNWSFetch(ptData.properties.forecast);
@@ -1644,28 +1689,32 @@
                             let hWinds = parseWinds(p.windSpeed, p.windGust);
                             let hRh = p.relativeHumidity?.value || null;
                             let hFl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
-                            let flHtml = `<div style="font-size:12px; font-weight:bold; color:var(--info); margin-top:6px;">Feels Like: ${hFl}&deg;</div>`;
+                            let flHtml = `<div style="font-size:12px; font-weight:bold; color:#fff; opacity:0.9; margin-top:6px;">Feels Like: ${hFl}&deg;</div>`;
 
-                            if (hWinds.gust > hWinds.sustained) {
+                            if (hWinds.gust > hWinds.sustained && p.temperature <= 50) {
                                 let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
-                                if (mc < hFl) flHtml += `<div style="font-size:12px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
+                                if (mc < hFl) flHtml += `<div style="font-size:12px; font-weight:bold; color:#fff; opacity:0.8; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
                                 else flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
-                            } else flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">No gusts<br>expected</div>`;
+                            } else if (hWinds.gust > hWinds.sustained) {
+                                flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
+                            } else {
+                                flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">No gusts<br>expected</div>`;
+                            }
 
                             let qpfVal = p.quantitativePrecipitation?.value;
                             let qpfStr = '';
                             if (qpfVal > 0) {
                                 let inches = (qpfVal / 25.4).toFixed(2);
-                                qpfStr = `<div style="color:var(--success); font-size:11px; font-weight:900; margin-top:8px;">${inches}"</div>`;
+                                qpfStr = `<div style="color:#fff; font-size:11px; font-weight:900; margin-top:8px;">${inches}"</div>`;
                             } else {
                                 let pop = p.probabilityOfPrecipitation?.value || 0;
-                                if (pop > 0) qpfStr = `<div style="color:var(--info); font-size:11px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
+                                if (pop > 0) qpfStr = `<div style="color:#fff; opacity:0.9; font-size:11px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
                                 else qpfStr = `<div style="color:transparent; font-size:11px; margin-top:8px;">0%</div>`;
                             }
                             tempsHtml += `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
                                 <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
-                                <i class="ph-fill ${pIcon}" style="font-size: 26px; margin: 4px 0;"></i>
-                                <div class="hr-temp" style="font-size:15px; font-weight:900; color:var(--accent);">${p.temperature}&deg;</div>
+                                <i class="ph-fill ${pIcon}" style="font-size: 26px; margin: 4px 0; color:#fff;"></i>
+                                <div class="hr-temp" style="color:#fff;">${p.temperature}&deg;</div>
                                 ${flHtml} ${qpfStr}
                             </div>`;
                         }
@@ -1694,7 +1743,7 @@
             }
 
             const main = document.getElementById('lfMain');
-            main.innerHTML = '<div style="padding:60px 20px; text-align:center; opacity:0.5;"><i class="ph ph-spinner ph-spin" style="font-size: 32px; margin-bottom: 15px;"></i><br>Compiling advanced forecasts...<br><span style="font-size: 13px; color: var(--accent); margin-top: 12px; display: inline-block; font-weight: bold;">Loading MOS Stats (< 3s)...</span></div>';
+            main.innerHTML = '<div style="padding:60px 20px; text-align:center; opacity:0.5;"><i class="ph ph-spinner ph-spin" style="font-size: 32px; margin-bottom: 15px;"></i><br>Compiling advanced forecasts...<br><span style="font-size: 13px; color: var(--text); opacity: 0.8; margin-top: 12px; display: inline-block; font-weight: bold;">Loading Model Output Statistics (< 3s)...</span></div>';
             
             let cityObj = LF_CITIES.find(c => c.id === cityId);
             if (!cityObj) return;
@@ -1703,8 +1752,8 @@
             let alertsHtml = "";
             if (cityAlerts.length > 0) {
                 alertsHtml = `
-                <div class="glass" style="padding: 25px; margin-bottom: 20px; border: 2px solid var(--danger); background: rgba(255, 71, 87, 0.1); height: auto; min-height: fit-content; overflow: visible;">
-                    <h3 style="margin: 0 0 16px; font-size: 14px; text-transform: uppercase; color: var(--danger); font-weight: 900; display: flex; align-items: center; gap: 8px;">
+                <div class="glass" style="padding: 25px; margin-bottom: 20px; border: 2px solid #fff; background: rgba(255, 255, 255, 0.1); height: auto; min-height: fit-content; overflow: visible;">
+                    <h3 style="margin: 0 0 16px; font-size: 14px; text-transform: uppercase; color: #fff; font-weight: 900; display: flex; align-items: center; gap: 8px;">
                         <i class="ph-fill ph-warning-circle" style="font-size: 20px;"></i> ACTIVE WEATHER ALERTS
                     </h3>
                     ${cityAlerts.map(alertBadgeHTML).join('')}
@@ -1723,32 +1772,37 @@
             if (liveASOS.temp !== '--') {
                 let fl = getFeelsLike(liveASOS.temp, liveASOS.wind || 0, liveASOS.rh);
                 let minChillHtml = "";
-                if (liveASOS.gust && liveASOS.gust > liveASOS.wind) {
+                if (liveASOS.gust && liveASOS.gust > liveASOS.wind && liveASOS.temp <= 50) {
                     let mc = getFeelsLike(liveASOS.temp, liveASOS.gust, liveASOS.rh);
                     if (mc < fl) {
-                        minChillHtml = `<div style="color:#a29bfe; font-size:14px; margin-top:2px; font-weight:bold;"><i class="ph-fill ph-wind"></i> Min Chill (Gusts): ${mc}°F <a href="#datasources" onclick="window.showTab('datasources')" style="color:var(--accent); text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a></div>`;
+                        minChillHtml = `<div style="color:#fff; opacity:0.8; font-size:14px; margin-top:2px; font-weight:bold;"><i class="ph-fill ph-wind"></i> Min Chill (Gusts): ${mc}°F <a href="#datasources" onclick="window.showTab('datasources')" style="color:#fff; text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a></div>`;
                     } else {
                         minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:2px; font-style:italic;"><i class="ph ph-wind"></i> Gusts don't lower perceived temp</div>`;
                     }
+                } else if (liveASOS.gust && liveASOS.gust > liveASOS.wind) {
+                    minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:2px; font-style:italic;"><i class="ph ph-wind"></i> Gusts don't lower perceived temp</div>`;
                 } else {
                     minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:2px; font-style:italic;"><i class="ph ph-wind"></i> No gusts past hour</div>`;
                 }
 
                 let titleHtml = liveASOS.interpolated 
-                    ? `<i class="ph-fill ph-thermometer"></i> LIVE ASOS (INTERPOLATED) <span style="color:var(--warning); cursor:help;" title="Temperature calculated from recent hourly trend">*</span>`
-                    : `<i class="ph-fill ph-thermometer"></i> LIVE ASOS OBSERVATION`;
+                    ? `<i class="ph-fill ph-thermometer"></i> LIVE AUTOMATED SURFACE OBSERVING SYSTEM (INTERPOLATED) <span style="color:#fff; opacity:0.8; cursor:help;" title="Temperature calculated from recent hourly trend">*</span>`
+                    : `<i class="ph-fill ph-thermometer"></i> LIVE AUTOMATED SURFACE OBSERVING SYSTEM OBSERVATION`;
+
+                let dewpStr = liveASOS.dewp !== undefined && liveASOS.dewp !== null ? `${liveASOS.dewp}°F` : '--';
 
                 asosHtml = `
-                <div class="glass asos-panel" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(20, 30, 40, 0.6) 100%); border-color: var(--accent); padding: 25px;">
-                    <div style="font-size:12px; font-weight: 900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase;">
+                <div class="glass asos-panel" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(20, 30, 40, 0.6) 100%); border-color: rgba(255,255,255,0.3); padding: 25px;">
+                    <div style="font-size:12px; font-weight: 900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase; color:#fff;">
                         ${titleHtml}
                     </div>
                     <i class="ph-fill ${liveASOS.icon}" style="font-size: 56px; margin-bottom: 12px; color: #fff;"></i>
-                    <div style="font-size:42px; font-weight:900; color:var(--danger); line-height:1; margin-bottom:15px;">${liveASOS.temp}°F</div>
+                    <div style="font-size:42px; font-weight:900; color:#fff; line-height:1; margin-bottom:15px;">${liveASOS.temp}°F</div>
                     
-                    <div style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;">
+                    <div style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; color:#fff;">
                         <div style="font-size: 14px; font-weight: 600; opacity: 0.85;">Wind: ${liveASOS.wind !== null ? liveASOS.wind + ' mph' : '--'}${liveASOS.gust ? ` (Gusts: ${liveASOS.gust} mph)` : ''}</div>
-                        <div style="font-size: 14px; font-weight: bold; color: var(--info);">Feels Like: ${fl}°F</div>
+                        <div style="font-size: 14px; font-weight: 600; opacity: 0.85;">Dew Point: ${dewpStr}</div>
+                        <div style="font-size: 14px; font-weight: bold; color: #fff; opacity: 0.9;">Feels Like: ${fl}°F</div>
                         ${minChillHtml}
                     </div>
                 </div>`;
@@ -1773,7 +1827,13 @@
                 } catch(e) {}
                 
                 if (!cacheValid) {
-                    let ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${cityObj.lat},${cityObj.lon}`);
+                    let cacheKey = `nws_pt_${cityObj.lat.toFixed(2)}_${cityObj.lon.toFixed(2)}`;
+                    let ptData = null;
+                    try { ptData = JSON.parse(localStorage.getItem(cacheKey)); } catch(e){}
+                    if (!ptData) {
+                        ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${cityObj.lat},${cityObj.lon}`);
+                        if (ptData) localStorage.setItem(cacheKey, JSON.stringify(ptData));
+                    }
                     if(ptData && ptData.properties) {
                         gridId = ptData.properties.gridId;
                         let fData = await window.robustNWSFetch(ptData.properties.forecast);
@@ -1798,15 +1858,17 @@
                             let hWinds = parseWinds(p.windSpeed, p.windGust);
                             let hRh = p.relativeHumidity?.value || null;
                             let fl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
-                            let flHtml = `<div style="font-size:12px; font-weight:bold; color:var(--info); margin-top:6px;">Feels Like: ${fl}&deg;</div>`;
+                            let flHtml = `<div style="font-size:12px; font-weight:bold; color:#fff; opacity:0.9; margin-top:6px;">Feels Like: ${fl}&deg;</div>`;
 
-                            if (hWinds.gust > hWinds.sustained) {
+                            if (hWinds.gust > hWinds.sustained && p.temperature <= 50) {
                                 let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
                                 if (mc < fl) {
-                                    flHtml += `<div style="font-size:12px; font-weight:bold; color:#a29bfe; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
+                                    flHtml += `<div style="font-size:12px; font-weight:bold; color:#fff; opacity:0.8; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
                                 } else {
                                     flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
                                 }
+                            } else if (hWinds.gust > hWinds.sustained) {
+                                flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
                             } else {
                                 flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">No gusts<br>expected</div>`;
                             }
@@ -1815,19 +1877,19 @@
                             let qpfStr = '';
                             if (qpfVal > 0) {
                                 let inches = (qpfVal / 25.4).toFixed(2);
-                                qpfStr = `<div style="color:var(--success); font-size:11px; font-weight:900; margin-top:8px;">${inches}"</div>`;
+                                qpfStr = `<div style="color:#fff; opacity:0.9; font-size:11px; font-weight:900; margin-top:8px;">${inches}"</div>`;
                             } else {
                                 let pop = p.probabilityOfPrecipitation?.value || 0;
                                 if (pop > 0) {
-                                    qpfStr = `<div style="color:var(--info); font-size:12px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
+                                    qpfStr = `<div style="color:#fff; opacity:0.8; font-size:12px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
                                 } else {
                                     qpfStr = `<div style="color:transparent; font-size:12px; margin-top:8px;">0%</div>`;
                                 }
                             }
                             return `<div class="lf-hour-col">
                                 <div class="hr-label">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
-                                <i class="ph-fill ${hIcon}" style="font-size: 26px; margin: 4px 0; color: #fff;"></i>
-                                <div class="hr-temp">${p.temperature}&deg;</div>
+                                <i class="ph-fill ${hIcon}" style="font-size: 26px; margin: 4px 0; color:#fff;"></i>
+                                <div class="hr-temp" style="color:#fff;">${p.temperature}&deg;</div>
                                 ${flHtml}
                                 ${qpfStr}
                             </div>`;
@@ -1835,7 +1897,7 @@
                         
                         hourlyHtml = `
                         <div class="glass" style="padding: 25px; margin-bottom: 20px;">
-                            <div style="font-size:12px; font-weight:900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px;">
+                            <div style="font-size:12px; font-weight:900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px; color:#fff;">
                                 <i class="ph-fill ph-clock"></i> 24-HOUR FORECAST
                             </div>
                             <div class="lf-hourly-scroll">${hCols}</div>
@@ -1859,21 +1921,23 @@
                                 let dWinds = parseWinds(p1.windSpeed, p1.windGust);
                                 let dRh = p1.relativeHumidity?.value || null;
                                 let dFl = getFeelsLike(hi, dWinds.sustained, dRh);
-                                if (hi !== '--' && dFl !== hi && !isNaN(dFl)) dayFlHtml = `<div style="font-size:12px; color:var(--warning); margin-top:6px; font-weight:bold;">Day Feels Like: ${dFl}°</div>`;
+                                if (hi !== '--' && dFl !== hi && !isNaN(dFl)) dayFlHtml = `<div style="font-size:12px; color:#fff; opacity:0.9; margin-top:6px; font-weight:bold;">Day Feels Like: ${dFl}°</div>`;
 
                                 if (p2 && !p2.isDaytime && lo !== '--') {
                                     let nWinds = parseWinds(p2.windSpeed, p2.windGust);
                                     let nRh = p2.relativeHumidity?.value || null;
                                     let nFl = getFeelsLike(lo, nWinds.sustained, nRh);
-                                    if (nFl !== lo && !isNaN(nFl)) eveFlHtml = `<div style="font-size:12px; color:var(--info); margin-top:6px; font-weight:bold;">Eve Feels Like: ${nFl}°</div>`;
+                                    if (nFl !== lo && !isNaN(nFl)) eveFlHtml = `<div style="font-size:12px; color:#fff; opacity:0.9; margin-top:6px; font-weight:bold;">Eve Feels Like: ${nFl}°</div>`;
 
-                                    if (nWinds.gust > nWinds.sustained) {
+                                    if (nWinds.gust > nWinds.sustained && lo <= 50) {
                                         let nMc = getFeelsLike(lo, nWinds.gust, nRh);
                                         if (nMc < nFl && !isNaN(nMc)) {
-                                            nightMcHtml = `<div style="font-size:12px; color:#a29bfe; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
+                                            nightMcHtml = `<div style="font-size:12px; color:#fff; opacity:0.8; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
                                         } else {
                                             nightMcHtml = `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px;">Gusts don't lower temp</div>`;
                                         }
+                                    } else if (nWinds.gust > nWinds.sustained) {
+                                        nightMcHtml = `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px;">Gusts don't lower temp</div>`;
                                     } else {
                                         nightMcHtml = `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px;">No gusts expected</div>`;
                                     }
@@ -1888,15 +1952,17 @@
                                 let nWinds = parseWinds(p1.windSpeed, p1.windGust);
                                 let nRh = p1.relativeHumidity?.value || null;
                                 let nFl = getFeelsLike(lo, nWinds.sustained, nRh);
-                                if (lo !== '--' && nFl !== lo && !isNaN(nFl)) eveFlHtml = `<div style="font-size:12px; color:var(--info); margin-top:6px; font-weight:bold;">Eve Feels Like: ${nFl}°</div>`;
+                                if (lo !== '--' && nFl !== lo && !isNaN(nFl)) eveFlHtml = `<div style="font-size:12px; color:#fff; opacity:0.9; margin-top:6px; font-weight:bold;">Eve Feels Like: ${nFl}°</div>`;
                                 
-                                if (nWinds.gust > nWinds.sustained) {
+                                if (nWinds.gust > nWinds.sustained && lo <= 50) {
                                     let nMc = getFeelsLike(lo, nWinds.gust, nRh);
                                     if (nMc < nFl && !isNaN(nMc)) {
-                                        nightMcHtml = `<div style="font-size:12px; color:#a29bfe; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
+                                        nightMcHtml = `<div style="font-size:12px; color:#fff; opacity:0.8; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
                                     } else {
                                         nightMcHtml = `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px;">Gusts don't lower temp</div>`;
                                     }
+                                } else if (nWinds.gust > nWinds.sustained) {
+                                    nightMcHtml = `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px;">Gusts don't lower temp</div>`;
                                 } else {
                                     nightMcHtml = `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px;">No gusts expected</div>`;
                                 }
@@ -1905,16 +1971,16 @@
                             
                             dCols += `
                             <div class="lf-daily-col">
-                                <div style="font-weight: 800; font-size: 14px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">${dayName}</div>
+                                <div style="font-weight: 800; font-size: 14px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; color:#fff;">${dayName}</div>
                                 <i class="ph-fill ${dIcon}" style="font-size: 36px; margin-bottom: 12px; color: #fff;"></i>
                                 
                                 <div style="margin-bottom: 10px; min-height: 45px;">
-                                    <div style="font-size: 24px; font-weight: 900; color: var(--danger); line-height: 1;">${hi !== '--' ? hi+'°' : '--'}</div>
+                                    <div style="font-size: 24px; font-weight: 900; color: #fff; line-height: 1;">${hi !== '--' ? hi+'°' : '--'}</div>
                                     ${dayFlHtml}
                                 </div>
                                 
                                 <div style="margin-top: 4px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; min-height: 65px;">
-                                    <div style="font-size: 18px; font-weight: 900; color: var(--info); line-height: 1;">${lo !== '--' ? lo+'°' : '--'}</div>
+                                    <div style="font-size: 18px; font-weight: 900; color: #fff; opacity: 0.8; line-height: 1;">${lo !== '--' ? lo+'°' : '--'}</div>
                                     ${eveFlHtml}
                                     ${nightMcHtml}
                                 </div>
@@ -1923,7 +1989,7 @@
                         
                         dailyHtml = `
                         <div class="glass" style="padding: 25px; margin-bottom: 20px;">
-                            <div style="font-size:12px; font-weight:900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px;">
+                            <div style="font-size:12px; font-weight:900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px; color:#fff;">
                                 <i class="ph-fill ph-calendar-blank"></i> 7-DAY FORECAST
                             </div>
                             <div class="lf-hourly-scroll">
@@ -1935,29 +2001,29 @@
                     let period = dailyPeriods[0];
                     nwsHtml = `
                     <div class="glass nws-panel" style="background: rgba(0, 210, 255, 0.05); padding: 25px;">
-                        <div style="font-size:22px; font-weight:900; margin-bottom: 15px;">${period.name}: ${period.temperature}°F</div>
-                        <div style="font-size:15px; opacity:0.9; line-height: 1.6;">${period.detailedForecast}</div>
+                        <div style="font-size:22px; font-weight:900; margin-bottom: 15px; color:#fff;">${period.name}: ${period.temperature}°F</div>
+                        <div style="font-size:15px; opacity:0.9; line-height: 1.6; color:#fff;">${period.detailedForecast}</div>
                         ${buildMeteorologistCreditHTML(gridId, cityObj.lat, cityObj.lon)}
                     </div>`;
                 }
-            } catch(e) { nwsHtml = "<div class='glass' style='padding:25px; color:var(--danger);'><i class=\"ph-fill ph-warning\"></i> NWS Forecast temporarily unavailable.</div>" }
+            } catch(e) { nwsHtml = "<div class='glass' style='padding:25px; color:#fff;'><i class=\"ph-fill ph-warning\"></i> National Weather Service Forecast temporarily unavailable.</div>" }
 
             let spcHtml = `
                 <div style="display:flex; gap:20px; margin-bottom: 20px; flex-wrap:wrap;">
                     <div class="glass" style="flex:1; min-width:280px; padding: 25px;">
-                        <div style="font-size:11px; opacity:0.8; font-weight: 800; letter-spacing:1px; margin-bottom:12px; display: flex; align-items: center; gap: 6px;">
-                            <i class="ph-fill ph-calendar-blank"></i> TODAY'S SPC OUTLOOK
+                        <div style="font-size:11px; opacity:0.8; font-weight: 800; letter-spacing:1px; margin-bottom:12px; display: flex; align-items: center; gap: 6px; color:#fff;">
+                            <i class="ph-fill ph-calendar-blank"></i> TODAY'S STORM PREDICTION CENTER OUTLOOK
                         </div>
                         <div id="lfSpcToday">
-                            ${spcData.day1 && spcData.day1.cat ? renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 0)) : '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div>'}
+                            ${spcData.day1 && spcData.day1.cat ? renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 0)) : '<div style="opacity:0.5; font-size:13px; color:#fff;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>'}
                         </div>
                     </div>
                     <div class="glass" style="flex:1; min-width:280px; padding: 25px;">
-                        <div style="font-size:11px; opacity:0.8; font-weight: 800; letter-spacing:1px; margin-bottom:12px; display: flex; align-items: center; gap: 6px;">
-                            <i class="ph-fill ph-calendar-plus"></i> TOMORROW'S SPC OUTLOOK
+                        <div style="font-size:11px; opacity:0.8; font-weight: 800; letter-spacing:1px; margin-bottom:12px; display: flex; align-items: center; gap: 6px; color:#fff;">
+                            <i class="ph-fill ph-calendar-plus"></i> TOMORROW'S STORM PREDICTION CENTER OUTLOOK
                         </div>
                         <div id="lfSpcTom">
-                            ${spcData.day2 && spcData.day2.cat ? renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 1)) : '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading SPC Data...</div>'}
+                            ${spcData.day2 && spcData.day2.cat ? renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 1)) : '<div style="opacity:0.5; font-size:13px; color:#fff;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>'}
                         </div>
                     </div>
                 </div>
@@ -1997,12 +2063,12 @@
 
                 mosHtml = `
                 <div class="glass" style="padding: 25px; margin-bottom: 20px;">
-                    <div style="display:flex; align-items:center; gap:8px; font-size:15px; font-weight:900; margin-bottom: 10px; color: var(--accent);">
-                        <i class="ph-fill ph-chart-line-up" style="font-size: 24px;"></i> 7-DAY STATISTICAL UNCERTAINTY (MOS)
+                    <div style="display:flex; align-items:center; gap:8px; font-size:15px; font-weight:900; margin-bottom: 10px; color: #fff;">
+                        <i class="ph-fill ph-chart-line-up" style="font-size: 24px;"></i> 7-DAY STATISTICAL UNCERTAINTY (MODEL OUTPUT STATISTICS)
                     </div>
-                    <div style="font-size:13px; opacity:0.8; margin-bottom: 20px; line-height: 1.6;">
-                        Plotting the daily High and Low temperature spread between the official NBM consensus, GFS MOS, and NAM MOS models.
-                        <span style="color:var(--danger); font-weight:bold;">Wider gaps = lower confidence in the forecast.</span>
+                    <div style="font-size:13px; opacity:0.8; margin-bottom: 20px; line-height: 1.6; color:#fff;">
+                        Plotting the daily High and Low temperature spread between the official National Blend of Models consensus, Global Forecast System Model Output Statistics, and North American Mesoscale Model Output Statistics models.
+                        <span style="color:#fff; opacity:0.9; font-weight:bold;">Wider gaps = lower confidence in the forecast.</span>
                     </div>
                     <div style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 10px;">
                         <div style="min-width: 900px; height: 350px; position: relative;">
@@ -2020,15 +2086,15 @@
                             data: {
                                 labels: labels,
                                 datasets: [
-                                    { label: 'NBM', data: nbmLine, borderColor: '#00d2ff', backgroundColor: '#00d2ff', borderWidth: 3, pointRadius: 4, fill: false, tension: 0.2 },
-                                    { label: 'GFS MOS', data: gfsLine, borderColor: '#ff4757', backgroundColor: '#ff4757', borderWidth: 2, pointRadius: 3, fill: false, tension: 0.2 },
-                                    { label: 'NAM MOS', data: namLine, borderColor: '#2ecc71', backgroundColor: '#2ecc71', borderWidth: 2, pointRadius: 3, fill: false, tension: 0.2 }
+                                    { label: 'National Blend of Models', data: nbmLine, borderColor: '#00d2ff', backgroundColor: '#00d2ff', borderWidth: 3, pointRadius: 4, fill: false, tension: 0.2 },
+                                    { label: 'Global Forecast System', data: gfsLine, borderColor: '#ff4757', backgroundColor: '#ff4757', borderWidth: 2, pointRadius: 3, fill: false, tension: 0.2 },
+                                    { label: 'North American Mesoscale', data: namLine, borderColor: '#2ecc71', backgroundColor: '#2ecc71', borderWidth: 2, pointRadius: 3, fill: false, tension: 0.2 }
                                 ]
                             },
                             options: {
                                 responsive: true, maintainAspectRatio: false,
                                 plugins: {
-                                    legend: { labels: { color: '#fff', font: { family: 'Inter', size: 11 } } },
+                                    legend: { labels: { color: '#fff', font: { family: 'Roboto Condensed', size: 11 } } },
                                     tooltip: { mode: 'index', intersect: false },
                                     datalabels: {
                                         color: function(context) { return context.dataset.borderColor; },
@@ -2039,8 +2105,8 @@
                                     }
                                 },
                                 scales: {
-                                    x: { ticks: { color: '#aaa', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                                    y: { ticks: { color: '#aaa', callback: function(value){ return value + '°'; } }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                                    x: { ticks: { color: '#aaa', font: { size: 11, family: 'Roboto Condensed' } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                                    y: { ticks: { color: '#aaa', font: { family: 'Roboto Condensed' }, callback: function(value){ return value + '°'; } }, grid: { color: 'rgba(255,255,255,0.05)' } }
                                 },
                                 interaction: { mode: 'nearest', axis: 'x', intersect: false }
                             }
@@ -2051,10 +2117,10 @@
             } else {
                 mosHtml = `
                 <div class="glass" style="padding: 25px; margin-bottom: 20px;">
-                    <div style="display:flex; align-items:center; gap:8px; font-size:15px; font-weight:900; margin-bottom: 10px; color: var(--accent);">
-                        <i class="ph-fill ph-chart-bar" style="font-size: 24px;"></i> DAILY STATISTICAL UNCERTAINTY (MOS)
+                    <div style="display:flex; align-items:center; gap:8px; font-size:15px; font-weight:900; margin-bottom: 10px; color: #fff;">
+                        <i class="ph-fill ph-chart-bar" style="font-size: 24px;"></i> DAILY STATISTICAL UNCERTAINTY (MODEL OUTPUT STATISTICS)
                     </div>
-                    <div style="opacity: 0.8; font-style: italic; color: var(--warning);"><i class="ph-fill ph-warning"></i> MOS data is actively generating or unavailable for this location. Ensure the GitHub Action has completed.</div>
+                    <div style="opacity: 0.8; font-style: italic; color: #fff;"><i class="ph-fill ph-warning"></i> Model Output Statistics data is actively generating or unavailable for this location. Ensure the GitHub Action has completed.</div>
                 </div>`;
             }
             
@@ -2077,7 +2143,7 @@
                 </div>
             `;
 
-            main.innerHTML = headerHtml + alertsHtml + currentAndDetailedHtml + spcHtml + hourlyHtml + dailyHtml + mosHtml + `<div style="padding-bottom: 50px;"></div>`;
+            main.innerHTML = headerHtml + alertsHtml + currentAndDetailedHtml + spcHtml + dailyHtml + hourlyHtml + mosHtml + `<div style="padding-bottom: 50px;"></div>`;
         }
 
         window.filterLFCities = function(val) {
