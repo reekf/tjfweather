@@ -1117,8 +1117,10 @@
 
             const riskNames = ["No Severe Expected", "General Thunderstorms", "Marginal Risk", "Slight Risk", "Enhanced Risk", "Moderate Risk", "High Risk"];
             const riskExp = { "No Severe Expected": "No Severe Expected", "General Thunderstorms": "General Thunderstorms", "Marginal Risk": "Marginal Risk of Severe Weather", "Slight Risk": "Slight Risk of Severe Weather", "Enhanced Risk": "Enhanced Risk of Severe Weather", "Moderate Risk": "Moderate Risk of Severe Weather", "High Risk": "High Risk of Severe Weather" };
-            const riskColors = ["#444", "#8bc34a", "#00a152", "#f1c40f", "#e67e22", "#e74c3c", "#ff00ff"];
-            const textColors = ["#fff", "#000", "#fff", "#000", "#000", "#fff", "#fff"];
+            
+            // Exactly matching Official NWS Categorical colors:
+            const riskColors = ["#444444", "#c1e9c1", "#008b00", "#ffc800", "#ff9900", "#ff0000", "#ff00ff"];
+            const textColors = ["#ffffff", "#000000", "#ffffff", "#000000", "#000000", "#ffffff", "#ffffff"];
 
             return {
                 level: riskLvl === 0 ? "0" : (riskLvl === 1 ? "TSTM" : riskLvl - 1),
@@ -1134,14 +1136,25 @@
             
             let riskBadge = spc.rawLvl === 1 ? "Thunderstorm" : `<span style="font-size: 2.5em; font-weight: 900; line-height: 0.8;">${spc.level}</span><span style="font-size: 1.2em; opacity: 0.7; margin-left: 2px;">/5</span>`;
             
-            let getColor = (val, isCig) => {
-                if (isCig) return '#ff00ff';
-                if (val >= 45) return '#ff00ff';
-                if (val >= 30) return '#e74c3c';
-                if (val >= 15) return '#f1c40f';
-                if (val >= 5) return '#e67e22';
-                if (val >= 2) return '#00a152';
-                return '#ffffff';
+            // Percentage to Categorical Risk Style Mapper
+            let getRiskStyle = (val, isCig, type) => {
+                if (isCig) return { bg: '#ff00ff', text: '#ffffff', border: '#ff00ff' };
+                if (type === 'tor') {
+                    if (val >= 60) return { bg: '#104e8b', text: '#ffffff', border: '#104e8b' };
+                    if (val >= 45) return { bg: '#912cee', text: '#ffffff', border: '#912cee' };
+                    if (val >= 30) return { bg: '#ff00ff', text: '#ffffff', border: '#ff00ff' };
+                    if (val >= 15) return { bg: '#ff0000', text: '#ffffff', border: '#ff0000' };
+                    if (val >= 10) return { bg: '#ffc800', text: '#000000', border: '#ffc800' };
+                    if (val >= 5)  return { bg: '#8b4726', text: '#ffffff', border: '#8b4726' };
+                    if (val >= 2)  return { bg: '#008b00', text: '#ffffff', border: '#008b00' };
+                } else {
+                    if (val >= 60) return { bg: '#104e8b', text: '#ffffff', border: '#104e8b' };
+                    if (val >= 45) return { bg: '#912cee', text: '#ffffff', border: '#912cee' };
+                    if (val >= 30) return { bg: '#ff0000', text: '#ffffff', border: '#ff0000' };
+                    if (val >= 15) return { bg: '#ffc800', text: '#000000', border: '#ffc800' };
+                    if (val >= 5)  return { bg: '#8b4726', text: '#ffffff', border: '#8b4726' };
+                }
+                return { bg: 'transparent', text: '#ffffff', border: 'rgba(255,255,255,0.1)' };
             };
 
             let torVal = spc.tor.replace(/\s*\((CIG|SIG).*\)/, '');
@@ -1160,9 +1173,9 @@
             let windNum = parseInt(windVal) || 0;
             let hailNum = parseInt(hailVal) || 0;
 
-            let torColor = getColor(torNum, torCig);
-            let windColor = getColor(windNum, windCig);
-            let hailColor = getColor(hailNum, hailCig);
+            let torStyle = getRiskStyle(torNum, torCig, 'tor');
+            let windStyle = getRiskStyle(windNum, windCig, 'wind');
+            let hailStyle = getRiskStyle(hailNum, hailCig, 'hail');
 
             let getDescText = (type, val, cigTag) => {
                 let text = "";
@@ -1193,23 +1206,23 @@
             return `
                 <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 15px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="background: ${spc.bgColor}; color: ${spc.textColor}; padding: 8px 14px; border-radius: 8px; font-weight: 900; font-size: 15px; display: flex; align-items: baseline; gap: 2px;">${riskBadge}</div>
-                        <div style="font-weight: 900; font-size: 16px; color: ${spc.bgColor};">${spc.name}</div>
+                        <div style="background: ${spc.bgColor}; color: ${spc.textColor}; padding: 8px 14px; border-radius: 8px; font-weight: 900; font-size: 15px; display: flex; align-items: baseline; gap: 2px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);">${riskBadge}</div>
+                        <div style="font-weight: 900; font-size: 16px; color: ${spc.bgColor}; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">${spc.name}</div>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px;">
-                        <div style="background: rgba(0,0,0,0.2); border: 1px solid ${torNum > 0 || torCig ? torColor : 'rgba(255,255,255,0.1)'}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${torNum > 0 || torCig ? 'inset 0 0 15px '+torColor+'33' : 'none'};">
+                        <div style="background: rgba(0,0,0,0.2); border: 1px solid ${torStyle.border}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${torNum > 0 || torCig ? 'inset 0 0 15px '+torStyle.border+'33' : 'none'};">
                             <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Tornado</div>
-                            <div style="font-size: 28px; font-weight: 900; color: ${torColor}; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">${torVal}%</div>
+                            <div style="font-size: 24px; font-weight: 900; background: ${torStyle.bg}; color: ${torStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${torVal}%</div>
                             <div style="font-size: 11px; line-height: 1.4; color: #fff;">${torDesc}</div>
                         </div>
-                        <div style="background: rgba(0,0,0,0.2); border: 1px solid ${windNum > 0 || windCig ? windColor : 'rgba(255,255,255,0.1)'}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${windNum > 0 || windCig ? 'inset 0 0 15px '+windColor+'33' : 'none'};">
+                        <div style="background: rgba(0,0,0,0.2); border: 1px solid ${windStyle.border}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${windNum > 0 || windCig ? 'inset 0 0 15px '+windStyle.border+'33' : 'none'};">
                             <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Wind</div>
-                            <div style="font-size: 28px; font-weight: 900; color: ${windColor}; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">${windVal}%</div>
+                            <div style="font-size: 24px; font-weight: 900; background: ${windStyle.bg}; color: ${windStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${windVal}%</div>
                             <div style="font-size: 11px; line-height: 1.4; color: #fff;">${windDesc}</div>
                         </div>
-                        <div style="background: rgba(0,0,0,0.2); border: 1px solid ${hailNum > 0 || hailCig ? hailColor : 'rgba(255,255,255,0.1)'}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${hailNum > 0 || hailCig ? 'inset 0 0 15px '+hailColor+'33' : 'none'};">
+                        <div style="background: rgba(0,0,0,0.2); border: 1px solid ${hailStyle.border}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${hailNum > 0 || hailCig ? 'inset 0 0 15px '+hailStyle.border+'33' : 'none'};">
                             <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Hail</div>
-                            <div style="font-size: 28px; font-weight: 900; color: ${hailColor}; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">${hailVal}%</div>
+                            <div style="font-size: 24px; font-weight: 900; background: ${hailStyle.bg}; color: ${hailStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${hailVal}%</div>
                             <div style="font-size: 11px; line-height: 1.4; color: #fff;">${hailDesc}</div>
                         </div>
                     </div>
@@ -1249,6 +1262,18 @@
             return 'alert-other';
         }
 
+        // Object Hail Size Translator logic
+        window.getHailTranslation = function(sizeInInches) {
+            const hailSizes = {
+                0.25: "Pea", 0.50: "Mothball", 0.75: "Penny", 0.88: "Nickel",
+                1.00: "Quarter", 1.25: "Half Dollar", 1.50: "Ping Pong Ball",
+                1.75: "Golf Ball", 2.00: "Hen Egg", 2.50: "Tennis Ball",
+                2.75: "Baseball", 3.00: "Teacup", 4.00: "Grapefruit", 4.50: "Softball"
+            };
+            const size = parseFloat(sizeInInches);
+            return hailSizes[size] ? `${size}" (${hailSizes[size]})` : `${size}"`;
+        };
+
         window.alertBadgeHTML = function(f) {
             const cls = window.alertClass(f.properties.event);
             const area = (f.properties.areaDesc || '').split(';').slice(0, 2).join(', ');
@@ -1257,9 +1282,23 @@
                 let expDate = new Date(f.properties.expires);
                 expText = `<div style="font-size:10px; margin-top:6px; opacity:0.8; font-weight:800; text-transform:uppercase;">Expires: ${expDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })}</div>`;
             }
+
+            // Extract Hail and Wind parameters and apply Hail translation
+            let tagsHtml = '';
+            if (f.properties.parameters) {
+                let maxHail = f.properties.parameters.maxHailSize ? f.properties.parameters.maxHailSize[0] : null;
+                let maxWind = f.properties.parameters.maxWindGust ? f.properties.parameters.maxWindGust[0] : null;
+                if (maxHail || maxWind) {
+                    tagsHtml = `<div style="display:flex; gap:8px; margin-top:6px; flex-wrap:wrap;">`;
+                    if (maxHail) tagsHtml += `<span style="background:rgba(0,0,0,0.4); padding:3px 6px; border-radius:4px; font-size:11px; font-weight:bold; color:#fff;"><i class="ph-fill ph-snowflake" style="color:#00d2ff;"></i> Hail: ${window.getHailTranslation(maxHail)}</span>`;
+                    if (maxWind) tagsHtml += `<span style="background:rgba(0,0,0,0.4); padding:3px 6px; border-radius:4px; font-size:11px; font-weight:bold; color:#fff;"><i class="ph-fill ph-wind" style="color:#00d2ff;"></i> Wind: ${maxWind} mph</span>`;
+                    tagsHtml += `</div>`;
+                }
+            }
+
             let icon = "ph-warning";
             if(cls === 'alert-tornado') icon = "ph-wind"; else if(cls === 'alert-thunderstorm') icon = "ph-cloud-lightning"; else if(cls === 'alert-winter') icon = "ph-snowflake";
-            return `<div class="alert-badge ${cls}"><i class="ph-fill ${icon}" style="font-size: 20px; margin-top: 2px;"></i><div><div class="ab-title">${f.properties.event}</div><div class="ab-area">${area}</div>${expText}</div></div>`;
+            return `<div class="alert-badge ${cls}"><i class="ph-fill ${icon}" style="font-size: 20px; margin-top: 2px;"></i><div style="flex:1;"><div class="ab-title">${f.properties.event}</div><div class="ab-area">${area}</div>${tagsHtml}${expText}</div></div>`;
         }
 
         window.loadNWSAlerts = async function() {
@@ -1411,6 +1450,103 @@
             return R * c;
         };
 
+        // --- NEW MISSING FUNCTIONS RE-ADDED ---
+        window.setupHomeLocation = function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        window.currentHomeLat = pos.coords.latitude;
+                        window.currentHomeLon = pos.coords.longitude;
+                        window.fetchHomeData(pos.coords.latitude, pos.coords.longitude, "Current Location");
+                    },
+                    err => {
+                        window.currentHomeLat = 42.0308;
+                        window.currentHomeLon = -93.6319;
+                        window.fetchHomeData(42.0308, -93.6319, "Ames, IA");
+                    }
+                );
+            } else {
+                window.currentHomeLat = 42.0308;
+                window.currentHomeLon = -93.6319;
+                window.fetchHomeData(42.0308, -93.6319, "Ames, IA");
+            }
+        };
+
+        window.fetchHomeData = async function(lat, lon, locationName) {
+            document.getElementById('homeLocationName').innerText = `Official National Weather Service Forecast — ${locationName}`;
+            window.updateHomeSPC();
+            if (window.nwsAlerts && window.nwsAlerts.length > 0) window.updateHomeAlerts(lat, lon);
+
+            try {
+                let ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
+                if (ptData && ptData.properties) {
+                    let fData = await window.robustNWSFetch(ptData.properties.forecast);
+                    if (fData && fData.properties && fData.properties.periods.length > 0) {
+                        let current = fData.properties.periods[0];
+                        document.getElementById('homeTempVal').innerText = `${current.temperature}°`;
+                        
+                        let iconInfo = window.getWeatherIconInfo(current.shortForecast, current.isDaytime);
+                        document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${iconInfo.icon}" style="font-size: 36px; color: ${iconInfo.color};"></i> <span style="font-size: 16px; font-weight: bold; color: #fff;">${current.shortForecast}</span>`;
+                        
+                        let windStr = current.windSpeed || '0 mph';
+                        document.getElementById('homeWindVal').innerText = `Wind: ${windStr}`;
+                        
+                        let winds = parseWinds(current.windSpeed, current.windGust);
+                        
+                        let dewF = '--';
+                        if (current.dewpoint && current.dewpoint.value !== null) {
+                            dewF = Math.round(current.dewpoint.value * 9/5 + 32);
+                            document.getElementById('homeDewVal').innerText = `Dew Point: ${dewF}°`;
+                        } else {
+                            document.getElementById('homeDewVal').innerText = `Dew Point: --`;
+                        }
+                        
+                        let rh = current.relativeHumidity?.value || null;
+                        let fl = getFeelsLike(current.temperature, winds.sustained, rh);
+                        document.getElementById('homeFeelsLikeVal').innerText = `Feels Like: ${fl}°`;
+                        
+                        let qpf = current.quantitativePrecipitation?.value;
+                        if (qpf > 0) document.getElementById('homeQpfVal').innerText = `Precipitation Forecast: ${(qpf / 25.4).toFixed(2)}"`;
+                        else {
+                            let pop = current.probabilityOfPrecipitation?.value || 0;
+                            document.getElementById('homeQpfVal').innerText = `Precipitation Forecast: ${pop}%`;
+                        }
+                    }
+                }
+            } catch (e) {
+                document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ph-warning" style="font-size: 36px; color: var(--warning);"></i> <span style="font-size: 16px; font-weight: bold; color: #fff;">Data Unavailable</span>`;
+            }
+        };
+
+        window.fetchLiveASOS = async function(lat, lon, fallbackAd) {
+            if (fallbackAd) return fallbackAd;
+            try {
+                let ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
+                let hData = await window.robustNWSFetch(ptData.properties.forecastHourly);
+                if (hData && hData.properties && hData.properties.periods.length > 0) {
+                    let p = hData.properties.periods[0];
+                    let winds = parseWinds(p.windSpeed, p.windGust);
+                    return {
+                        temp: p.temperature,
+                        wind: winds.sustained,
+                        gust: winds.gust,
+                        rh: p.relativeHumidity?.value || 50,
+                        dewp: p.dewpoint?.value ? Math.round(p.dewpoint.value * 9/5 + 32) : null,
+                        iconInfo: window.getWeatherIconInfo(p.shortForecast, p.isDaytime),
+                        interpolated: true
+                    };
+                }
+            } catch(e) {}
+            return { temp: '--', wind: null, gust: null, rh: 50, dewp: null, iconInfo: { icon: 'ph-question', color: '#fff' }, interpolated: false };
+        };
+
+        window.buildMeteorologistCreditHTML = function(gridId, lat, lon) {
+            return `<div style="font-size:11px; opacity:0.6; margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
+                <i class="ph-fill ph-check-circle"></i> Official Forecast by NWS ${gridId}
+            </div>`;
+        };
+        // --- END NEW FUNCTIONS ---
+
         window.getNearestPreloadedCity = function(lat, lon) {
             let nearest = null;
             let minDist = Infinity;
@@ -1539,8 +1675,8 @@
                             
                             let hWinds = parseWinds(p.windSpeed, p.windGust);
                             let hRh = p.relativeHumidity?.value || null;
-                            let fl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
-                            let flHtml = `<div style="font-size:12px; font-weight:bold; color:#fff; opacity:0.9; margin-top:6px;">Feels Like: ${fl}&deg;</div>`;
+                            let hFl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
+                            let flHtml = `<div style="font-size:12px; font-weight:bold; color:#fff; opacity:0.9; margin-top:6px;">Feels Like: ${hFl}&deg;</div>`;
 
                             if (hWinds.gust > hWinds.sustained && p.temperature <= 50) {
                                 let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
@@ -1685,7 +1821,7 @@
                     <div class="glass nws-panel" style="background: rgba(0, 210, 255, 0.05); padding: 25px;">
                         <div style="font-size:22px; font-weight:900; margin-bottom: 15px; color:#fff;">${period.name}: ${period.temperature}°F</div>
                         <div style="font-size:15px; opacity:0.9; line-height: 1.6; color:#fff;">${period.detailedForecast}</div>
-                        ${buildMeteorologistCreditHTML(gridId, dataCity.lat, dataCity.lon)}
+                        ${window.buildMeteorologistCreditHTML(gridId, dataCity.lat, dataCity.lon)}
                     </div>`;
                 }
             } catch(e) { nwsHtml = "<div class='glass' style='padding:25px; color:#fff;'><i class=\"ph-fill ph-warning\"></i> National Weather Service Forecast temporarily unavailable.</div>" }
