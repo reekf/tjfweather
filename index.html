@@ -1,12 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>National Weather Service Dashboard | TJFWeather</title>
-    
-    <!-- PWA Meta Tags for iOS & Android -->
     <meta name="theme-color" content="#0b0e11">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -24,153 +21,54 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     
     <style>
-        /* Universal Box-Sizing */
         *, *::before, *::after { box-sizing: border-box; }
-
-        :root {
-            --bg: #0b0e11;
-            --panel: rgba(15, 18, 22, 0.45);
-            --text: #ffffff;
-            --accent: #00d2ff;
-            --border: rgba(255, 255, 255, 0.15);
-            --danger: #ff4757;
-            --warning: #ffa502;
-            --success: #2ecc71;
-            --info: #70a1ff;
-        }
-
-        html, body {
-            margin: 0; padding: 0; height: 100vh; width: 100vw;
-            font-family: 'Roboto Condensed', sans-serif; background-color: var(--bg);
-            background-image: url('https://images.pexels.com/photos/1162251/pexels-photo-1162251.jpeg?auto=compress&cs=tinysrgb&w=2560');
-            background-size: cover; background-position: center;
-            background-repeat: no-repeat; background-attachment: fixed;
-            color: var(--text); overflow: hidden; position: fixed;
-        }
-
-        .bg-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(11, 14, 17, 0.40); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-            z-index: 0; pointer-events: none;
-        }
-
-        .leaflet-image-layer, .leaflet-tile-container img {
-            image-rendering: crisp-edges; image-rendering: pixelated;
-        }
-
-        .glass {
-            background: var(--panel); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--border); border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            position: relative; z-index: 1;
-            overflow-wrap: break-word; word-wrap: break-word;
-        }
-
-        .glass-btn {
-            background: rgba(0, 210, 255, 0.2) !important; backdrop-filter: blur(12px) !important;
-            border: 1px solid rgba(0, 210, 255, 0.5) !important; color: #fff !important;
-            padding: 10px 20px; border-radius: 12px; font-weight: 900; font-size: 14px;
-            cursor: pointer; min-width: 100px; transition: all 0.3s ease;
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            font-family: 'Roboto Condensed', sans-serif;
-        }
-
-        .glass-btn:hover {
-            background: rgba(0, 210, 255, 0.4) !important;
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); transform: scale(1.05);
-        }
-
-        nav {
-            height: 65px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 5000; position: relative; display: flex; align-items: center;
-            justify-content: flex-start; padding: 0 25px;
-            background: rgba(11, 14, 17, 0.55); backdrop-filter: blur(24px);
-        }
-
-        @keyframes fadeInScale {
-            0% { opacity: 0; transform: translateY(10px) scale(0.99); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        @keyframes slideDownFadeIn {
-            0% { opacity: 0; transform: translateY(-30px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        .splash-container {
-            display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 20px;
-        }
+        :root { --bg: #0b0e11; --panel: rgba(15, 18, 22, 0.45); --text: #ffffff; --accent: #00d2ff; --border: rgba(255, 255, 255, 0.15); --danger: #ff4757; --warning: #ffa502; --success: #2ecc71; --info: #70a1ff; }
+        html, body { margin: 0; padding: 0; height: 100vh; width: 100vw; font-family: 'Roboto Condensed', sans-serif; background-color: var(--bg); background-image: url('https://images.pexels.com/photos/1162251/pexels-photo-1162251.jpeg?auto=compress&cs=tinysrgb&w=2560'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed; color: var(--text); overflow: hidden; position: fixed; }
+        .bg-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(11, 14, 17, 0.40); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 0; pointer-events: none; }
+        .leaflet-image-layer, .leaflet-tile-container img { image-rendering: crisp-edges; image-rendering: pixelated; }
+        .glass { background: var(--panel); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4); transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); position: relative; z-index: 1; overflow-wrap: break-word; word-wrap: break-word; }
+        .glass-btn { background: rgba(0, 210, 255, 0.2) !important; backdrop-filter: blur(12px) !important; border: 1px solid rgba(0, 210, 255, 0.5) !important; color: #fff !important; padding: 10px 20px; border-radius: 12px; font-weight: 900; font-size: 14px; cursor: pointer; min-width: 100px; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: 'Roboto Condensed', sans-serif; }
+        .glass-btn:hover { background: rgba(0, 210, 255, 0.4) !important; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); transform: scale(1.05); }
+        nav { height: 65px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); z-index: 5000; position: relative; display: flex; align-items: center; justify-content: flex-start; padding: 0 25px; background: rgba(11, 14, 17, 0.55); backdrop-filter: blur(24px); }
+        @keyframes fadeInScale { 0% { opacity: 0; transform: translateY(10px) scale(0.99); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes slideDownFadeIn { 0% { opacity: 0; transform: translateY(-30px); } 100% { opacity: 1; transform: translateY(0); } }
+        .splash-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 20px; }
         .animate-pop { opacity: 0; animation: slideDownFadeIn 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
         .delay-1 { animation-delay: 0.2s; }
         .delay-2 { animation-delay: 0.4s; }
         .delay-3 { animation-delay: 0.6s; }
-
-        .tab-content {
-            display: none; height: calc(100vh - 65px); position: relative;
-            z-index: 1; overflow-y: auto; overflow-x: hidden; pointer-events: none;
-        }
-
+        .tab-content { display: none; height: calc(100vh - 65px); position: relative; z-index: 1; overflow-y: auto; overflow-x: hidden; pointer-events: none; }
         .tab-content.active { display: block; pointer-events: auto; animation: fadeInScale 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
-
         .logo { font-size: 24px; font-weight: 900; color: var(--text); letter-spacing: -0.5px; cursor: pointer; transition: 0.2s; z-index: 5100; }
         .logo:hover { transform: scale(1.05); }
-
-        .mobile-menu-btn {
-            display: none; font-size: 24px; cursor: pointer; color: var(--text); z-index: 5100;
-            background: rgba(0, 210, 255, 0.2) !important; backdrop-filter: blur(12px) !important;
-            border: 1px solid rgba(0, 210, 255, 0.5) !important; padding: 4px 14px; border-radius: 8px;
-        }
-
+        .mobile-menu-btn { display: none; font-size: 24px; cursor: pointer; color: var(--text); z-index: 5100; background: rgba(0, 210, 255, 0.2) !important; backdrop-filter: blur(12px) !important; border: 1px solid rgba(0, 210, 255, 0.5) !important; padding: 4px 14px; border-radius: 8px; }
         .nav-links { display: flex; gap: 10px; align-items: center; margin-left: auto; }
-        .nav-item {
-            cursor: pointer; font-weight: 800; font-size: 13px; letter-spacing: 0.5px;
-            padding: 8px 16px; border-radius: 12px; transition: all 0.3s ease; opacity: 0.9;
-            background: rgba(0, 210, 255, 0.08); border: 1px solid rgba(0, 210, 255, 0.2);
-            color: var(--text); text-transform: uppercase;
-        }
+        .nav-item { cursor: pointer; font-weight: 800; font-size: 13px; letter-spacing: 0.5px; padding: 8px 16px; border-radius: 12px; transition: all 0.3s ease; opacity: 0.9; background: rgba(0, 210, 255, 0.08); border: 1px solid rgba(0, 210, 255, 0.2); color: var(--text); text-transform: uppercase; }
         .nav-item:hover { background: rgba(0, 210, 255, 0.2); border-color: rgba(0, 210, 255, 0.4); transform: translateY(-2px); opacity: 1; }
         .nav-item.active { background: rgba(0, 210, 255, 0.3); border-color: rgba(0, 210, 255, 0.6); color: #fff; opacity: 1; }
-
-        .donate-btn {
-            background: rgba(243, 156, 18, 0.15) !important; color: #f39c12 !important; text-decoration: none;
-            border: 1px solid rgba(243, 156, 18, 0.4) !important; display: flex; align-items: center; gap: 6px;
-        }
-
-        .radar-controls {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            z-index: 1600; padding: 12px 25px; display: flex; align-items: center; gap: 20px; border-radius: 20px;
-        }
-
+        .donate-btn { background: rgba(243, 156, 18, 0.15) !important; color: #f39c12 !important; text-decoration: none; border: 1px solid rgba(243, 156, 18, 0.4) !important; display: flex; align-items: center; gap: 6px; }
+        .radar-controls { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1600; padding: 12px 25px; display: flex; align-items: center; gap: 20px; border-radius: 20px; }
         .map-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background-color: #0b0e11 !important; }
-
         .city-label { font-size: 13px; font-weight: 900; color: #ffffff; text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000; text-align: center; line-height: 1.1; font-family: 'Roboto Condensed', sans-serif; }
         .city-name { font-size: 11px; }
-
         .lf-container { display: flex; height: 100%; overflow: hidden; }
         .lf-sidebar { width: 320px; min-width: 280px; padding: 20px; border-right: 1.5px solid var(--border); overflow-y: auto; background: var(--panel); display: flex; flex-direction: column; gap: 16px; z-index: 2; }
         .lf-main { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
-        
         .lf-search-wrap { display: flex; gap: 8px; }
         .lf-search-wrap input { flex: 1; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text); padding: 10px 14px; border-radius: 12px; outline: none; font-weight: 500; font-family: 'Roboto Condensed', sans-serif; }
         .lf-search-wrap button { background: var(--accent); border: none; color: #000; font-weight: 900; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-family: 'Roboto Condensed', sans-serif; }
-        
         .lf-city-list { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
         .lf-city-item { padding: 10px 14px; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 600; border: 1px solid transparent; display: flex; align-items: center; }
         .lf-city-item:hover, .lf-city-item.selected { background: rgba(0, 210, 255, 0.15); border-color: var(--accent); color: var(--accent); }
-
         .lf-hourly-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: thin; }
         .lf-hour-col { min-width: 140px; text-align: center; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;}
         .lf-hour-col .hr-label { opacity: 0.7; margin-bottom: 8px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
         .lf-hour-col .hr-temp { font-size: 20px; font-weight: 900; color: #fff; margin-top: 8px; }
-
         .lf-daily-col { min-width: 190px; text-align: center; background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(20, 30, 40, 0.6) 100%); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.2s; }
         .lf-daily-col:hover { background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(30, 45, 60, 0.8) 100%); border-color: var(--accent); transform: translateY(-2px); }
-
         .alert-badge { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.4; border-left: 4px solid currentColor; background: rgba(0, 0, 0, 0.5); word-wrap: break-word; white-space: normal; height: auto; min-height: min-content; }
         .alert-badge .ab-title { font-weight: 900; font-size: 14px; text-transform: uppercase; word-break: break-word; }
         .alert-badge .ab-area { opacity: 0.8; font-size: 12px; margin-top: 4px; word-break: break-word; }
-
         .alert-tornado { color: var(--danger); border: 1px solid rgba(255, 0, 0, 0.4); box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.15); }
         .alert-thunderstorm { color: var(--warning); border: 1px solid rgba(255, 165, 0, 0.4); box-shadow: inset 0 0 20px rgba(255, 165, 0, 0.15); }
         .alert-flash-flood { color: var(--success); border: 1px solid rgba(0, 200, 83, 0.4); box-shadow: inset 0 0 20px rgba(0, 200, 83, 0.15); }
@@ -178,11 +76,8 @@
         .alert-winter { color: #9b9bff; border: 1px solid rgba(150, 150, 255, 0.4); }
         .alert-wind { color: #f4e03b; border: 1px solid rgba(255, 235, 59, 0.4); }
         .alert-other { color: #aaaaaa; border: 1px solid rgba(180, 180, 180, 0.4); }
-
         .home-weather-content { display: flex; gap: 20px; align-items: center; }
         .home-temp-val { font-size: 54px; font-weight: 900; color: var(--text); line-height: 1; }
-
-        /* Responsive Layouts for ASOS & NWS side-by-side */
         .current-detailed-wrapper { display: flex; gap: 20px; margin-bottom: 20px; align-items: stretch; flex-wrap: wrap; }
         .current-detailed-wrapper > div { margin-bottom: 0 !important; }
         .asos-panel { flex: 1; min-width: 250px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -200,15 +95,10 @@
         @media (max-width: 768px) {
             .tab-content { height: calc(100vh - 65px); overflow-y: auto; overflow-x: hidden; }
             #dashboard > div { padding: 15px !important; gap: 15px !important; }
-            
-            /* Home Page specifically needs to break flex layout on mobile */
             .home-panels-container { flex-direction: column !important; flex-wrap: nowrap !important; width: 100%; }
             .home-panels-container > .glass { flex: none !important; width: 100% !important; max-width: 100% !important; min-width: 0 !important; padding: 20px !important; box-sizing: border-box; }
-            
-            /* General glass padding adjustments */
             .glass { box-sizing: border-box; width: 100%; max-width: 100%; }
             .lf-main > .glass, .lf-main > div > .glass { padding: 15px !important; box-sizing: border-box; }
-            
             .radar-controls { width: 95% !important; padding: 10px; flex-direction: column; gap: 10px; }
             .lf-container { display: block; overflow-y: visible; height: auto; }
             .lf-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); height: auto; overflow: visible; padding: 15px; }
@@ -217,11 +107,9 @@
             #radarAlertsPanel { position: fixed !important; top: 0 !important; left: 0 !important; transform: translateX(-105%) !important; width: 85% !important; max-width: 320px !important; height: 100vh !important; max-height: 100vh !important; background: rgba(11, 14, 17, 0.95) !important; z-index: 8000 !important; transition: transform 0.3s !important; display: block !important; border-radius: 0 24px 24px 0 !important; padding: 60px 20px 20px 20px !important; border: none !important; border-right: 1px solid var(--border) !important; }
             #radarAlertsPanel.open { transform: translateX(0) !important; }
             #mobileSettingsBtn { display: block; position: fixed; top: 80px; right: 15px; z-index: 4000; background: rgba(0, 210, 255, 0.2) !important; border: 1px solid rgba(0, 210, 255, 0.5) !important; padding: 8px 16px; border-radius: 12px; font-weight: 900; font-size: 13px; text-transform: uppercase; color: #fff; display: flex; align-items: center; gap: 6px; }
-            
             .home-weather-content { flex-direction: row; align-items: center; gap: 15px; flex-wrap: wrap; }
             .home-temp-val { font-size: 42px; }
             #homeLocationName { font-size: 10px; }
-
             .current-detailed-wrapper { flex-direction: column; gap: 15px; }
             .asos-panel, .nws-panel { width: 100%; min-width: 0 !important; flex: none !important; }
         }
@@ -417,7 +305,7 @@
             </h1>
 
             <div class="glass" style="padding: 30px; margin-bottom: 25px;">
-                <h3 style="margin: 0 0 12px; color: var(--accent); font-size: 24px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                <h3 style="margin: 0 0 12px; color: var(--accent); font-size: 28px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
                     <i class="ph-fill ph-cloud-lightning"></i> Storm Prediction Center Outlook
                 </h3>
                 <p style="font-size: 16px; line-height: 1.6; opacity: 0.9; margin: 0;">
@@ -427,7 +315,7 @@
             </div>
 
             <div class="glass" style="padding: 30px; margin-bottom: 25px;">
-                <h3 style="margin: 0 0 12px; color: var(--accent); font-size: 24px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                <h3 style="margin: 0 0 12px; color: var(--accent); font-size: 28px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
                     <i class="ph-fill ph-chart-bar"></i> Numerical Weather Prediction
                 </h3>
                 <ul style="font-size: 16px; line-height: 1.8; opacity: 0.9; margin: 0; padding-left: 20px;">
@@ -439,7 +327,7 @@
             </div>
 
             <div class="glass" style="padding: 30px; margin-bottom: 25px;">
-                <h3 style="margin: 0 0 12px; color: var(--accent); font-size: 24px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                <h3 style="margin: 0 0 12px; color: var(--accent); font-size: 28px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
                     <i class="ph-fill ph-thermometer"></i> Live Surface Observations
                 </h3>
                 <p style="font-size: 16px; line-height: 1.6; opacity: 0.9; margin: 0;">
@@ -448,7 +336,7 @@
             </div>
 
             <div class="glass" style="padding: 30px; margin-bottom: 25px;">
-                <h3 style="margin: 0 0 12px; color: var(--accent); font-size: 24px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                <h3 style="margin: 0 0 12px; color: var(--accent); font-size: 28px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
                     <i class="ph-fill ph-thermometer-cold"></i> Wind Chill & Min Chill
                 </h3>
                 <p style="font-size: 16px; line-height: 1.6; opacity: 0.9; margin: 0 0 10px 0;">
@@ -486,7 +374,7 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v20.0 (Fast Caching & Icon Update) | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v21.2 (Final Engine Patch) | AMES, IA</p>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <h3 style="font-size: 16px; color: var(--info); margin-top: 0;">App Features & Notifications</h3>
@@ -629,6 +517,7 @@
         const LF_CITIES=[{id:'New York',display:'New York, NY',lat:40.71,lon:-74.00},{id:'Los Angeles',display:'Los Angeles, CA',lat:34.05,lon:-118.24},{id:'Chicago',display:'Chicago, IL',lat:41.87,lon:-87.62},{id:'Houston',display:'Houston, TX',lat:29.76,lon:-95.36},{id:'Phoenix',display:'Phoenix, AZ',lat:33.44,lon:-112.07},{id:'Philadelphia',display:'Philadelphia, PA',lat:39.95,lon:-75.16},{id:'San Antonio',display:'San Antonio, TX',lat:29.42,lon:-98.49},{id:'San Diego',display:'San Diego, CA',lat:32.71,lon:-117.16},{id:'Dallas',display:'Dallas, TX',lat:32.77,lon:-96.79},{id:'Denver',display:'Denver, CO',lat:39.73,lon:-104.99},{id:'Seattle',display:'Seattle, WA',lat:47.60,lon:-122.33},{id:'Miami',display:'Miami, FL',lat:25.76,lon:-80.19},{id:'Atlanta',display:'Atlanta, GA',lat:33.74,lon:-84.38},{id:'Minneapolis',display:'Minneapolis, MN',lat:44.97,lon:-93.26},{id:'Des Moines',display:'Des Moines, IA',lat:41.60,lon:-93.60},{id:'Omaha',display:'Omaha, NE',lat:41.25,lon:-95.93},{id:'Kansas City',display:'Kansas City, MO',lat:39.09,lon:-94.57},{id:'St. Louis',display:'St. Louis, MO',lat:38.62,lon:-90.19},{id:'Milwaukee',display:'Milwaukee, WI',lat:43.03,lon:-87.90},{id:'Madison',display:'Madison, WI',lat:43.07,lon:-89.40},{id:'Indianapolis',display:'Indianapolis, IN',lat:39.76,lon:-86.15},{id:'Columbus',display:'Columbus, OH',lat:39.96,lon:-82.99},{id:'Wichita',display:'Wichita, KS',lat:37.68,lon:-97.33},{id:'Sioux Falls',display:'Sioux Falls, SD',lat:43.54,lon:-96.72},{id:'Austin',display:'Austin, TX',lat:30.26,lon:-97.74},{id:'San Francisco',display:'San Francisco, CA',lat:37.77,lon:-122.41},{id:'Charlotte',display:'Charlotte, NC',lat:35.22,lon:-80.84},{id:'Nashville',display:'Nashville, TN',lat:36.16,lon:-86.78},{id:'Oklahoma City',display:'Oklahoma City, OK',lat:35.46,lon:-97.51},{id:'Portland',display:'Portland, OR',lat:45.52,lon:-122.67},{id:'Las Vegas',display:'Las Vegas, NV',lat:36.16,lon:-115.13},{id:'Detroit',display:'Detroit, MI',lat:42.33,lon:-83.04},{id:'Memphis',display:'Memphis, TN',lat:35.14,lon:-90.04},{id:'Baltimore',display:'Baltimore, MD',lat:39.29,lon:-76.61},{id:'Salt Lake City',display:'Salt Lake City, UT',lat:40.76,lon:-111.89},{id:'New Orleans',display:'New Orleans, LA',lat:29.95,lon:-90.07},{id:'Ames',display:'Ames, IA',lat:42.03,lon:-93.62},{id:'Iowa City',display:'Iowa City, IA',lat:41.66,lon:-91.53},{id:'Cedar Rapids',display:'Cedar Rapids, IA',lat:41.97,lon:-91.66},{id:'Davenport',display:'Davenport, IA',lat:41.52,lon:-90.57},{id:'Waterloo',display:'Waterloo, IA',lat:42.49,lon:-92.33},{id:'Sioux City',display:'Sioux City, IA',lat:42.49,lon:-96.40},{id:'Council Bluffs',display:'Council Bluffs, IA',lat:41.26,lon:-95.86},{id:'Dubuque',display:'Dubuque, IA',lat:42.50,lon:-90.66},{id:'Ankeny',display:'Ankeny, IA',lat:41.72,lon:-93.60},{id:'Naperville',display:'Naperville, IL',lat:41.75,lon:-88.15},{id:'Aurora',display:'Aurora, IL',lat:41.76,lon:-88.31},{id:'Rockford',display:'Rockford, IL',lat:42.27,lon:-89.09},{id:'Peoria',display:'Peoria, IL',lat:40.69,lon:-89.58},{id:'Mason City',display:'Mason City, IA',lat:43.15,lon:-93.20},{id:'Fort Dodge',display:'Fort Dodge, IA',lat:42.49,lon:-94.16},{id:'Ottumwa',display:'Ottumwa, IA',lat:41.01,lon:-92.41},{id:'Burlington',display:'Burlington, IA',lat:40.80,lon:-91.10},{id:'Fargo',display:'Fargo, ND',lat:46.87,lon:-96.78},{id:'Bismarck',display:'Bismarck, ND',lat:46.80,lon:-100.78},{id:'Little Rock',display:'Little Rock, AR',lat:34.74,lon:-92.28},{id:'Boise',display:'Boise, ID',lat:45.61,lon:-114.31},{id:'Raleigh',display:'Raleigh, NC',lat:35.77,lon:-78.63},{id:'Lincoln',display:'Lincoln, NE',lat:40.82,lon:-96.68},{id:'South Bend',display:'South Bend, IN',lat:41.67,lon:-86.25},{id:'Lansing',display:'Lansing, MI',lat:42.73,lon:-84.55},{id:'Columbia',display:'Columbia, SC',lat:34.00,lon:-81.03},{id:'Eugene',display:'Eugene, OR',lat:44.05,lon:-123.09},{id:'Surprise',display:'Surprise, AZ',lat:33.63,lon:-112.37}].sort((a,b)=>a.display.localeCompare(b.display));
         const RADAR_CITIES_COORDS=[{name:'New York, NY',lat:40.71,lon:-74.00},{name:'Los Angeles, CA',lat:34.05,lon:-118.24},{name:'Chicago, IL',lat:41.87,lon:-87.62},{name:'Houston, TX',lat:29.76,lon:-95.36},{name:'Phoenix, AZ',lat:33.44,lon:-112.07},{name:'Denver, CO',lat:39.73,lon:-104.99},{name:'Seattle, WA',lat:47.60,lon:-122.33},{name:'Miami, FL',lat:25.76,lon:-80.19},{name:'Atlanta, GA',lat:33.74,lon:-84.38},{name:'Minneapolis, MN',lat:44.97,lon:-93.26},{name:'Dallas, TX',lat:32.77,lon:-96.79},{name:'Ames, IA',lat:42.03,lon:-93.62},{name:'Charlotte, NC',lat:35.22,lon:-80.84},{name:'Raleigh, NC',lat:35.77,lon:-78.63},{name:'Columbia, SC',lat:34.00,lon:-81.03},{name:'Omaha, NE',lat:41.25,lon:-95.93},{name:'Kansas City, MO',lat:39.09,lon:-94.57},{name:'St. Louis, MO',lat:38.62,lon:-90.19},{name:'Des Moines, IA',lat:41.60,lon:-93.60},{name:'South Bend, IN',lat:41.67,lon:-86.25},{name:'Eugene, OR',lat:44.05,lon:-123.09},{name:'Surprise, AZ',lat:33.63,lon:-112.37}];
 
+        // 2. Settings & Notifications
         window.notifSettings = null;
         try { window.notifSettings = JSON.parse(localStorage.getItem('tjf_notif_settings')); } catch(e) {}
         if (!window.notifSettings) {
@@ -654,11 +543,11 @@
             window.notifSettings.eveningTime = document.getElementById('settingEvening').value || '18:00';
             localStorage.setItem('tjf_notif_settings', JSON.stringify(window.notifSettings));
         };
-        
+
+        // 3. Auth UI Logic
         window.toggleAuthMode = function(mode, e) {
             if(e) e.preventDefault();
             window.authMode = mode;
-            
             const title = document.getElementById('authModalTitle');
             const mainBtn = document.getElementById('mainAuthBtn');
             const toggleLink = document.getElementById('authToggleLink');
@@ -771,11 +660,11 @@
             }
         };
 
+        // 4. Notifications Engine
         window.fireNotification = function(title, body) {
             const options = { body: body, vibrate: [200, 100, 200] };
-            
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.ready.then(function(reg) {
+                navigator.serviceWorker.getRegistration().then(function(reg) {
                     if (reg && reg.showNotification) {
                         reg.showNotification(title, options);
                     } else {
@@ -889,13 +778,14 @@
             }
         }, 60000);
 
+        // 5. Core Mapping & Utils
         window.initMaps = function() {
             const fullMapEl = document.getElementById('fullRadarMap');
             const miniMapEl = document.getElementById('miniRadarMap');
             if (!fullMapEl || !miniMapEl) { setTimeout(window.initMaps, 100); return; }
 
-            if (window._mapFull) { window._mapFull.off(); window._mapFull.remove(); }
-            if (window._mapMini) { window._mapMini.off(); window._mapMini.remove(); }
+            if (window._mapFull && typeof window._mapFull.remove === 'function') { window._mapFull.off(); window._mapFull.remove(); }
+            if (window._mapMini && typeof window._mapMini.remove === 'function') { window._mapMini.off(); window._mapMini.remove(); }
 
             const standardBasemap = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
@@ -999,12 +889,13 @@
         window.getWeatherIconInfo = function(wx, isDaytime = true) {
             const text = (wx || "").toLowerCase();
             if (text.includes("thunder") || text.includes("t-storm")) return { icon: "ph-cloud-lightning", color: "#f1c40f" };
-            if (text.includes("snow") || text.includes("blizzard") || text.includes("flurries")) return { icon: "ph-snowflake", color: "#ffffff" };
+            if (text.includes("snow") || text.includes("blizzard") || text.includes("flurries") || text.includes("ice") || text.includes("freez")) return { icon: "ph-snowflake", color: "#ffffff" };
             if (text.includes("rain") || text.includes("shower") || text.includes("drizzle")) return { icon: "ph-cloud-rain", color: "#70a1ff" };
             if (text.includes("fog") || text.includes("mist")) return { icon: "ph-cloud-fog", color: "#b2bec3" };
             if (text.includes("wind") || text.includes("breezy")) return { icon: "ph-wind", color: "#b2bec3" };
-            if (text.includes("mostly cloudy") || text.includes("partly sunny") || text.includes("partly cloudy") || text.includes("mostly clear") || text.includes("few clouds")) return { icon: isDaytime ? "ph-cloud-sun" : "ph-cloud-moon", color: isDaytime ? "#f1c40f" : "#b2bec3" };
-            if (text.includes("cloud") || text.includes("overcast")) return { icon: "ph-cloud", color: "#b2bec3" };
+            if (text.includes("mostly cloudy") || text.includes("overcast") || text.includes("cloudy")) return { icon: "ph-cloud", color: "#b2bec3" };
+            if (text.includes("partly") || text.includes("few clouds")) return { icon: isDaytime ? "ph-cloud-sun" : "ph-cloud-moon", color: "#b2bec3" };
+            if (text.includes("mostly clear") || text.includes("clear") || text.includes("fair")) return { icon: isDaytime ? "ph-sun" : "ph-moon", color: isDaytime ? "#f1c40f" : "#dfe6e9" };
             return { icon: isDaytime ? "ph-sun" : "ph-moon", color: isDaytime ? "#f1c40f" : "#dfe6e9" };
         }
 
@@ -1044,8 +935,12 @@
             if (tab === 'localforecast' && cityParam) {
                 if (window.lfSelectedCity !== cityParam) {
                     let existingCity = LF_CITIES.find(c => c.id === cityParam);
-                    if (existingCity) window.selectLFCity(cityParam, true);
-                    else window.triggerSearch(cityParam.replace(/_/g, ' '), true);
+                    if (existingCity) {
+                        let safeId = String(cityParam).replace(/'/g, "\\'");
+                        window.selectLFCity(safeId, true);
+                    } else {
+                        window.triggerSearch(cityParam.replace(/_/g, ' '), true);
+                    }
                 }
             }
         });
@@ -1094,8 +989,8 @@
             }
 
             if (spcData.day1.cat) {
-                let d1 = renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 0));
-                let d2 = renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 1));
+                let d1 = window.renderSPCHTML(window.getRealSPCOutlook(cityObj.lat, cityObj.lon, 0));
+                let d2 = window.renderSPCHTML(window.getRealSPCOutlook(cityObj.lat, cityObj.lon, 1));
                 spcRiskCache[cacheKey] = { day1: d1, day2: d2 };
                 if (todayEl) todayEl.innerHTML = d1;
                 if (tomEl) tomEl.innerHTML = d2;
@@ -1128,7 +1023,7 @@
             window.updateHomeSPC(); window.updateLocalSPC();
         }
 
-        function isPointInNWSFeature(lon, lat, feature) {
+        window.isPointInNWSFeature = function(lon, lat, feature) {
             if (!feature.geometry || !feature.geometry.coordinates) return false;
             const type = feature.geometry.type;
             const coords = feature.geometry.coordinates;
@@ -1155,18 +1050,27 @@
 
         window.getCityAlerts = function(lat, lon) {
             if (!window.nwsAlerts || window.nwsAlerts.length === 0) return [];
-            return window.nwsAlerts.filter(f => { if (f.geometry) return isPointInNWSFeature(lon, lat, f); return false; });
+            return window.nwsAlerts.filter(f => { if (f.geometry) return window.isPointInNWSFeature(lon, lat, f); return false; });
         };
 
-        function extractHighestProb(geojsonData, lat, lon) {
-            let maxProb = 0; let sig = false;
+        window.extractHighestProb = function(geojsonData, lat, lon) {
+            let maxProb = 0; let cigStr = '';
             if (geojsonData && geojsonData.features) {
                 geojsonData.features.forEach(f => {
-                    if (isPointInNWSFeature(lon, lat, f)) {
+                    if (window.isPointInNWSFeature(lon, lat, f)) {
                         let props = f.properties || {};
                         let labelStr = (props.LABEL || props.label || props.LABEL2 || props.DN || props.dn || props.qualifier || "").toString().toUpperCase().trim();
-                        if (labelStr.includes("SIG") || props.sig === 1 || props.SIG === 1) sig = true;
-                        let match = labelStr.match(/(?:0\.\d+|\d+)/);
+                        
+                        if (labelStr.includes("SIG")) cigStr = "CIG"; 
+                        if (labelStr.includes("CIG")) {
+                            let m = labelStr.match(/CIG\s*(\d*)/);
+                            if (m) cigStr = "CIG" + m[1];
+                            else cigStr = "CIG";
+                        }
+                        if (props.sig === 1 || props.SIG === 1 || props.cig === 1 || props.CIG === 1) cigStr = "CIG";
+
+                        let probText = labelStr.replace(/CIG\s*\d*/g, '').replace(/SIG/g, '');
+                        let match = probText.match(/(?:0\.\d+|\d+)/);
                         if (match) {
                             let probNum = parseFloat(match[0]);
                             if (probNum > 0 && probNum <= 1) probNum = Math.round(probNum * 100);
@@ -1176,18 +1080,18 @@
                     }
                 });
             }
-            if (maxProb === 0 && !sig) return "0%";
-            if (maxProb === 0 && sig) return "SIG";
-            return maxProb + "%" + (sig ? " (SIG)" : "");
+            if (maxProb === 0 && !cigStr) return "0%";
+            if (maxProb === 0 && cigStr) return cigStr;
+            return maxProb + "%" + (cigStr ? " (" + cigStr + ")" : "");
         }
 
-        function getRealSPCOutlook(lat, lon, dayOffset) {
+        window.getRealSPCOutlook = function(lat, lon, dayOffset) {
             const data = dayOffset === 0 ? spcData.day1 : spcData.day2;
             let riskLvl = 0;
 
             if (data.cat && data.cat.features) {
                 data.cat.features.forEach(f => {
-                    if (isPointInNWSFeature(lon, lat, f)) {
+                    if (window.isPointInNWSFeature(lon, lat, f)) {
                         let props = f.properties || {};
                         let labelStr = (props.LABEL || props.label || props.LABEL2 || props.qualifier || "").toString().toUpperCase().trim();
                         let lvl = 0;
@@ -1219,35 +1123,95 @@
             return {
                 level: riskLvl === 0 ? "0" : (riskLvl === 1 ? "TSTM" : riskLvl - 1),
                 name: riskExp[riskNames[riskLvl]], bgColor: riskColors[riskLvl], textColor: textColors[riskLvl],
-                tor: extractHighestProb(data.tor, lat, lon), wind: extractHighestProb(data.wind, lat, lon), hail: extractHighestProb(data.hail, lat, lon), rawLvl: riskLvl
+                tor: window.extractHighestProb(data.tor, lat, lon), wind: window.extractHighestProb(data.wind, lat, lon), hail: window.extractHighestProb(data.hail, lat, lon), rawLvl: riskLvl
             };
         }
 
-        function renderSPCHTML(spc) {
+        window.renderSPCHTML = function(spc) {
             if (spc.rawLvl === 0) return `
                 <div style="padding: 10px 14px; background: rgba(255,255,255,0.05); border-radius: 8px; font-size: 15px; opacity: 0.7; font-weight: 500; margin-bottom: 12px; color:#fff;">No Severe Weather Expected</div>
                 <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official Storm Prediction Center Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
             
             let riskBadge = spc.rawLvl === 1 ? "Thunderstorm" : `<span style="font-size: 2.5em; font-weight: 900; line-height: 0.8;">${spc.level}</span><span style="font-size: 1.2em; opacity: 0.7; margin-left: 2px;">/5</span>`;
             
-            let sigTor = spc.tor.includes('SIG') ? `<div style="font-size:11px; color:var(--warning); margin-top:4px; font-weight:bold;"><i class="ph-fill ph-warning"></i> EF2+ tornadoes possible</div>` : '';
-            let sigWind = spc.wind.includes('SIG') ? `<div style="font-size:11px; color:var(--warning); margin-top:4px; font-weight:bold;"><i class="ph-fill ph-warning"></i> 75+ mph winds possible</div>` : '';
-            let sigHail = spc.hail.includes('SIG') ? `<div style="font-size:11px; color:var(--warning); margin-top:4px; font-weight:bold;"><i class="ph-fill ph-warning"></i> 2+ inch (baseball sized) hail possible</div>` : '';
-            
-            let torVal = spc.tor.replace(' (SIG)', '');
-            let windVal = spc.wind.replace(' (SIG)', '');
-            let hailVal = spc.hail.replace(' (SIG)', '');
+            let getColor = (val, isCig) => {
+                if (isCig) return '#ff00ff';
+                if (val >= 45) return '#ff00ff';
+                if (val >= 30) return '#e74c3c';
+                if (val >= 15) return '#f1c40f';
+                if (val >= 5) return '#e67e22';
+                if (val >= 2) return '#00a152';
+                return '#ffffff';
+            };
+
+            let torVal = spc.tor.replace(/\s*\((CIG|SIG).*\)/, '');
+            let windVal = spc.wind.replace(/\s*\((CIG|SIG).*\)/, '');
+            let hailVal = spc.hail.replace(/\s*\((CIG|SIG).*\)/, '');
+
+            let torCigMatch = spc.tor.match(/(CIG\d*|SIG)/);
+            let windCigMatch = spc.wind.match(/(CIG\d*|SIG)/);
+            let hailCigMatch = spc.hail.match(/(CIG\d*|SIG)/);
+
+            let torCig = torCigMatch ? torCigMatch[0].replace('SIG', 'CIG') : null;
+            let windCig = windCigMatch ? windCigMatch[0].replace('SIG', 'CIG') : null;
+            let hailCig = hailCigMatch ? hailCigMatch[0].replace('SIG', 'CIG') : null;
+
+            let torNum = parseInt(torVal) || 0;
+            let windNum = parseInt(windVal) || 0;
+            let hailNum = parseInt(hailVal) || 0;
+
+            let torColor = getColor(torNum, torCig);
+            let windColor = getColor(windNum, windCig);
+            let hailColor = getColor(hailNum, hailCig);
+
+            let getDescText = (type, val, cigTag) => {
+                let text = "";
+                if (type === 'tor') {
+                    if (val >= 15) text = "Numerous tornadoes possible";
+                    else if (val >= 5) text = "A few tornadoes possible";
+                    else if (val >= 2) text = "Isolated tornado possible";
+                    if (cigTag) text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:900; display:flex; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> ${cigTag}: EF2+ tornadoes possible</span>`;
+                } else if (type === 'wind') {
+                    if (val >= 30) text = "Widespread damaging winds possible";
+                    else if (val >= 15) text = "Scattered damaging winds possible";
+                    else if (val >= 5) text = "Isolated damaging winds possible";
+                    if (cigTag) text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:900; display:flex; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> ${cigTag}: 75+ mph winds possible</span>`;
+                } else if (type === 'hail') {
+                    if (val >= 30) text = "Widespread large hail possible";
+                    else if (val >= 15) text = "Scattered large hail possible";
+                    else if (val >= 5) text = "Isolated large hail possible";
+                    if (cigTag) text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:900; display:flex; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> ${cigTag}: 2+ inch hail possible</span>`;
+                }
+                if (!text && !cigTag) text = "<span style='opacity:0.4'>No significant risk</span>";
+                return text;
+            };
+
+            let torDesc = getDescText('tor', torNum, torCig);
+            let windDesc = getDescText('wind', windNum, windCig);
+            let hailDesc = getDescText('hail', hailNum, hailCig);
 
             return `
-                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;">
+                <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 15px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="background: ${spc.bgColor}; color: ${spc.textColor}; padding: 8px 14px; border-radius: 8px; font-weight: 900; font-size: 15px; display: flex; align-items: baseline; gap: 2px;">${riskBadge}</div>
                         <div style="font-weight: 900; font-size: 16px; color: ${spc.bgColor};">${spc.name}</div>
                     </div>
-                    <div style="display: flex; gap: 18px; font-size: 14px; font-weight: 800; opacity: 0.85; margin-top: 4px; align-items: flex-start;">
-                        <div>Tornado: <span style="color:#fff">${torVal}</span>${sigTor}</div>
-                        <div>Wind: <span style="color:#fff">${windVal}</span>${sigWind}</div>
-                        <div>Hail: <span style="color:#fff">${hailVal}</span>${sigHail}</div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px;">
+                        <div style="background: rgba(0,0,0,0.2); border: 1px solid ${torNum > 0 || torCig ? torColor : 'rgba(255,255,255,0.1)'}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${torNum > 0 || torCig ? 'inset 0 0 15px '+torColor+'33' : 'none'};">
+                            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Tornado</div>
+                            <div style="font-size: 28px; font-weight: 900; color: ${torColor}; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">${torVal}%</div>
+                            <div style="font-size: 11px; line-height: 1.4; color: #fff;">${torDesc}</div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.2); border: 1px solid ${windNum > 0 || windCig ? windColor : 'rgba(255,255,255,0.1)'}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${windNum > 0 || windCig ? 'inset 0 0 15px '+windColor+'33' : 'none'};">
+                            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Wind</div>
+                            <div style="font-size: 28px; font-weight: 900; color: ${windColor}; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">${windVal}%</div>
+                            <div style="font-size: 11px; line-height: 1.4; color: #fff;">${windDesc}</div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.2); border: 1px solid ${hailNum > 0 || hailCig ? hailColor : 'rgba(255,255,255,0.1)'}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${hailNum > 0 || hailCig ? 'inset 0 0 15px '+hailColor+'33' : 'none'};">
+                            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Hail</div>
+                            <div style="font-size: 28px; font-weight: 900; color: ${hailColor}; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">${hailVal}%</div>
+                            <div style="font-size: 11px; line-height: 1.4; color: #fff;">${hailDesc}</div>
+                        </div>
                     </div>
                 </div>
                 <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official Storm Prediction Center Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
@@ -1266,15 +1230,15 @@
             
             if (!spcRiskCache[cacheKey]) {
                 spcRiskCache[cacheKey] = {
-                    day1: renderSPCHTML(getRealSPCOutlook(lat, lon, 0)),
-                    day2: renderSPCHTML(getRealSPCOutlook(lat, lon, 1))
+                    day1: window.renderSPCHTML(window.getRealSPCOutlook(lat, lon, 0)),
+                    day2: window.renderSPCHTML(window.getRealSPCOutlook(lat, lon, 1))
                 };
             }
             document.getElementById('spcTodayHome').innerHTML = spcRiskCache[cacheKey].day1;
             document.getElementById('spcTomHome').innerHTML = spcRiskCache[cacheKey].day2;
         }
 
-        function alertClass(event) {
+        window.alertClass = function(event) {
             const e = (event || '').toLowerCase();
             if (e.includes('tornado')) return 'alert-tornado';
             if (e.includes('thunderstorm')) return 'alert-thunderstorm';
@@ -1285,8 +1249,8 @@
             return 'alert-other';
         }
 
-        function alertBadgeHTML(f) {
-            const cls = alertClass(f.properties.event);
+        window.alertBadgeHTML = function(f) {
+            const cls = window.alertClass(f.properties.event);
             const area = (f.properties.areaDesc || '').split(';').slice(0, 2).join(', ');
             let expText = '';
             if (f.properties.expires) {
@@ -1331,7 +1295,7 @@
         window.updateHomeAlerts = function(cityLat, cityLon) {
             const relevant = window.getCityAlerts(cityLat, cityLon).slice(0, 4);
             const box = document.getElementById('homeAlertsList');
-            if (relevant.length > 0) box.innerHTML = relevant.map(alertBadgeHTML).join('');
+            if (relevant.length > 0) box.innerHTML = relevant.map(window.alertBadgeHTML).join('');
             else box.innerHTML = '<div style="opacity:0.4; font-size:13px; font-style: italic;">No active alerts for this location.</div>';
         }
 
@@ -1341,7 +1305,7 @@
                 return (mapSev[b.properties.severity] || 0) - (mapSev[a.properties.severity] || 0);
             });
             const srcLink = `<div style="text-align:right;"><a href="https://mobile.weather.gov" target="_blank" rel="noopener noreferrer" class="source-link" style="color: #fff;">View National Weather Service <i class="ph ph-arrow-up-right"></i></a></div>`;
-            const html = sortedAlerts.length ? sortedAlerts.slice(0, 30).map(alertBadgeHTML).join('') + srcLink : '<div style="opacity:0.4; font-size:13px; font-style: italic;">No active alerts nationwide.</div>';
+            const html = sortedAlerts.length ? sortedAlerts.slice(0, 30).map(window.alertBadgeHTML).join('') + srcLink : '<div style="opacity:0.4; font-size:13px; font-style: italic;">No active alerts nationwide.</div>';
             const radEl = document.getElementById('radarAlertsList');
             if (radEl) radEl.innerHTML = html;
         }
@@ -1371,7 +1335,7 @@
             });
 
             const styleFn = (feature) => {
-                const cls = alertClass(feature.properties.event);
+                const cls = window.alertClass(feature.properties.event);
                 const isWarning = (feature.properties.event || '').toLowerCase().includes('warning');
                 return { color: colorMap[cls] || '#aaa', weight: isWarning ? 3 : 2, fillOpacity: 0, opacity: 0.95 };
             };
@@ -1437,340 +1401,26 @@
             document.getElementById('radarPlayBtn').innerHTML = isRadarPlaying ? '<i class="ph-fill ph-pause"></i> PAUSE' : '<i class="ph-fill ph-play"></i> PLAY';
         }
 
-        function buildMeteorologistCreditHTML(wfo, lat, lon) {
-            let afdLink = (wfo && wfo !== "NWS") ? `<a href="https://mesonet.agron.iastate.edu/wx/afos/p.php?pil=AFD${wfo}" target="_blank" rel="noopener noreferrer" class="glass-btn" style="text-decoration: none; padding: 10px 16px; font-size: 14px; min-width: auto; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important;">Read National Weather Service Discussion <i class="ph ph-arrow-up-right"></i></a>` : '';
-            return `
-            <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; line-height: 1.6;">
-                <div style="font-weight: bold; color: #fff; margin-bottom: 5px; display: flex; align-items: center; gap: 6px;"><i class="ph-fill ph-user-focus" style="font-size: 18px;"></i> NATIONAL WEATHER SERVICE FORECAST</div>
-                <div style="opacity: 0.85; margin-bottom: 15px;">These localized forecasts are actively monitored and adjusted by expert meteorologists at the National Weather Service ${(wfo && wfo !== "NWS") ? `office in <strong>${wfo}</strong>` : `offices`}.</div>
-                ${(wfo && wfo !== "NWS") ? `<div style="font-weight: bold; color: #f1c40f; margin-bottom: 10px;">Want to learn how these forecasts were made? Read the expert forecast discussion here:</div>` : ``}
-                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                    <a href="https://mobile.weather.gov/index.php?lat=${lat}&lon=${lon}" target="_blank" rel="noopener noreferrer" class="glass-btn" style="text-decoration: none; padding: 10px 16px; font-size: 14px; min-width: auto; background: rgba(0, 210, 255, 0.15)!important;">View Detailed National Weather Service Data <i class="ph ph-arrow-up-right"></i></a>
-                    ${afdLink}
-                </div>
-            </div>`;
-        }
-
-        window.fetchLiveASOS = async function(lat, lon, fallbackData) {
-            let result = { temp: '--', wind: null, gust: null, dewp: null, wx: 'Loading...', iconInfo: {icon: 'ph-cloud', color: '#b2bec3'}, rh: 50, interpolated: false };
-            try {
-                let cacheKey = `nws_pt_${lat.toFixed(2)}_${lon.toFixed(2)}`;
-                let ptData = null;
-                try { ptData = JSON.parse(localStorage.getItem(cacheKey)); } catch(e){}
-                
-                if (!ptData) {
-                    ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
-                    if (ptData) localStorage.setItem(cacheKey, JSON.stringify(ptData));
-                }
-                
-                let stationsRes = await window.robustNWSFetch(ptData.properties.observationStations);
-                let stationId = stationsRes.features[0].properties.stationIdentifier;
-                
-                let awcRes = await fetchWithTimeout(`https://aviationweather.gov/api/data/metar?ids=${stationId}&format=json&hours=3&t=${Date.now()}`, { timeout: 6000 });
-                let awcData = await awcRes.json();
-                
-                if (awcData && awcData.length > 0) {
-                    awcData.sort((a, b) => new Date(b.obsTime) - new Date(a.obsTime));
-                    let latest = awcData[0];
-                    let tempC = latest.temp;
-                    let isInterpolated = false;
-                    let latestTime = new Date(latest.obsTime).getTime();
-                    let hoursSinceLast = (Date.now() - latestTime) / 3600000;
-                    
-                    if (hoursSinceLast > 0.1 && awcData.length > 1) { 
-                        let older = awcData.find(m => {
-                            let diff = (latestTime - new Date(m.obsTime).getTime()) / 3600000;
-                            return diff >= 0.8 && m.temp !== null; 
-                        });
-                        
-                        if (older) {
-                            let timeDiff = (latestTime - new Date(older.obsTime).getTime()) / 3600000;
-                            let tempRate = (latest.temp - older.temp) / timeDiff;
-                            tempRate = Math.max(-2.5, Math.min(2.5, tempRate));
-                            tempC = latest.temp + (tempRate * hoursSinceLast);
-                            isInterpolated = true;
-                        }
-                    }
-
-                    if (tempC !== null && tempC !== undefined) {
-                        result.temp = Math.round((tempC * 9/5) + 32);
-                        result.interpolated = isInterpolated;
-                    }
-                    if (latest.dewp !== null && latest.dewp !== undefined) {
-                        result.dewp = Math.round((latest.dewp * 9/5) + 32);
-                    }
-                    if (latest.wspd !== null) result.wind = Math.round(latest.wspd * 1.15078);
-                    if (latest.wgst !== null) result.gust = Math.round(latest.wgst * 1.15078);
-                    if (latest.dewp !== null && latest.temp !== null) result.rh = 100 * Math.exp((17.625 * latest.dewp)/(243.04 + latest.dewp)) / Math.exp((17.625 * latest.temp)/(243.04 + latest.temp));
-                    
-                    let transWx = translateWx(latest.wxString || "");
-                    result.wx = transWx || "Clear"; 
-                    result.iconInfo = window.getWeatherIconInfo(result.wx, true);
-                    return result;
-                }
-            } catch(e) {}
-
-            if (fallbackData && fallbackData.temp !== null && fallbackData.temp !== undefined) {
-                result.temp = fallbackData.temp;
-                result.wind = fallbackData.wind !== null ? fallbackData.wind : null;
-                result.gust = fallbackData.gust !== null ? fallbackData.gust : null;
-                let transWx = translateWx(fallbackData.wx || "");
-                result.wx = transWx || "Clear"; 
-                result.iconInfo = window.getWeatherIconInfo(result.wx, true);
-            } else if (result.temp === '--') {
-                try {
-                    let omRes = await fetchWithTimeout(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`, { timeout: 4000 });
-                    let omData = await omRes.json();
-                    if(omData && omData.current_weather) {
-                        result.temp = Math.round((omData.current_weather.temperature * 9/5) + 32);
-                        result.wind = Math.round(omData.current_weather.windspeed * 0.621371);
-                        result.wx = "Fair"; 
-                        result.iconInfo = window.getWeatherIconInfo(result.wx, true);
-                        return result;
-                    }
-                } catch(e) {}
-                result.wx = "Observation Unavailable"; 
-                result.iconInfo = { icon: "ph-cloud-slash", color: "#b2bec3" };
-            }
-            return result;
-        }
-
-        window.renderPinnedCities = async function() {
-            const sec = document.getElementById('homePinnedSection');
-            const cards = document.getElementById('homePinnedCards');
-            if (!window.pinnedCities || window.pinnedCities.length === 0) {
-                sec.style.display = 'none';
-                return;
-            }
-            
-            let html = "";
-            let validCards = 0;
-            for (let pc of window.pinnedCities) {
-                if (pc.id === window.currentHomeCityId) continue; 
-                validCards++;
-                
-                let cAlerts = window.getCityAlerts(pc.lat, pc.lon);
-                let alertIconHtml = cAlerts.length > 0 ? `<i class="ph-fill ph-warning" style="color:var(--danger); font-size:16px;" title="${cAlerts.length} Active Alert(s)"></i>` : '';
-
-                html += `<div id="pinned-card-${pc.id}" class="glass" style="min-width: 240px; padding: 20px; cursor: pointer; display: flex; flex-direction: column; gap: 10px; transition:0.2s;" onclick="window.showTab('localforecast'); window.selectLFCity('${pc.id}', false);" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div style="font-size:13px; font-weight:800; color:#fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform:uppercase;">${pc.display}</div>
-                        ${alertIconHtml}
-                    </div>
-                    <div style="display:flex; align-items:center; gap:12px; margin-top:5px;">
-                        <i class="ph ph-spinner ph-spin" style="font-size:32px; opacity:0.5;"></i>
-                        <span style="font-size:14px; opacity:0.6; font-weight:600;">Loading...</span>
-                    </div>
-                </div>`;
-                
-                window.fetchPinnedCityData(pc);
-            }
-            
-            if(validCards > 0) {
-                sec.style.display = 'flex';
-                cards.innerHTML = html;
-            } else {
-                sec.style.display = 'none';
-            }
+        // 9. Location & Core Fetching
+        window.getDistanceMiles = function(lat1, lon1, lat2, lon2) {
+            const R = 3958.8; 
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
         };
 
-        window.fetchPinnedCityData = async function(pc) {
-            try {
-                let liveASOS = await window.fetchLiveASOS(pc.lat, pc.lon, null);
-                const card = document.getElementById(`pinned-card-${pc.id}`);
-                if(card) {
-                    let cAlerts = window.getCityAlerts(pc.lat, pc.lon);
-                    let alertIconHtml = cAlerts.length > 0 ? `<i class="ph-fill ph-warning" style="color:var(--danger); font-size:16px;" title="${cAlerts.length} Active Alert(s)"></i>` : '';
-                    
-                    card.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div style="font-size:13px; font-weight:800; color:#fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform:uppercase;">${pc.display}</div>
-                            ${alertIconHtml}
-                        </div>
-                        <div style="display:flex; align-items:center; gap:15px; margin-top:5px;">
-                            <i class="ph-fill ${liveASOS.iconInfo.icon}" style="font-size:36px; color:${liveASOS.iconInfo.color};"></i>
-                            <div>
-                                <div style="font-size:26px; font-weight:900; line-height:1; color:#fff;">${liveASOS.temp !== '--' ? liveASOS.temp+'°F' : '--'}</div>
-                                <div style="font-size:12px; opacity:0.8; margin-top:4px; font-weight:600;">${liveASOS.wx}</div>
-                            </div>
-                        </div>
-                    `;
-                }
-            } catch(e) {}
-        };
-
-        window.setupHomeLocation = async function() {
-            window.currentHomeLat = 42.03; window.currentHomeLon = -93.62;
-            window.currentHomeCityId = "Ames_IA";
-            document.getElementById('homeLocationName').innerText = `Official National Weather Service Forecast — Ames, IA`;
-            window.loadHomeNWS(42.03, -93.62, false); window.updateHomeAlerts(42.03, -93.62); window.updateHomeSPC();
-            if(window.renderPinnedCities) window.renderPinnedCities();
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    async pos => {
-                        window.currentHomeLat = pos.coords.latitude; window.currentHomeLon = pos.coords.longitude;
-                        document.getElementById('homeLocationName').innerText = `Official National Weather Service Forecast — Locating...`;
-                        
-                        try {
-                            let cacheKey = `nws_pt_${pos.coords.latitude.toFixed(2)}_${pos.coords.longitude.toFixed(2)}`;
-                            let ptData = null;
-                            try { ptData = JSON.parse(localStorage.getItem(cacheKey)); } catch(e){}
-                            
-                            if (!ptData) {
-                                ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${pos.coords.latitude},${pos.coords.longitude}`);
-                                if (ptData) localStorage.setItem(cacheKey, JSON.stringify(ptData));
-                            }
-                            
-                            if(ptData && ptData.properties) {
-                                let c = ptData.properties.relativeLocation.properties.city;
-                                let s = ptData.properties.relativeLocation.properties.state;
-                                let mCity = LF_CITIES.find(city => city.display.includes(c) && city.display.includes(s));
-                                window.currentHomeCityId = mCity ? mCity.id : `${c}_${s}`;
-                            }
-                        } catch(e) {}
-                        
-                        window.loadHomeNWS(pos.coords.latitude, pos.coords.longitude, true);
-                        if (window._mapMini && typeof window._mapMini.setView === 'function') window._mapMini.setView([pos.coords.latitude, pos.coords.longitude], 6);
-                        window.updateHomeAlerts(pos.coords.latitude, pos.coords.longitude); window.updateHomeSPC();
-                        if(window.renderPinnedCities) window.renderPinnedCities();
-                    },
-                    err => {}, { timeout: 5000, maximumAge: 60000 }
-                );
+        window.getNearestPreloadedCity = function(lat, lon) {
+            let nearest = null;
+            let minDist = Infinity;
+            for (let c of LF_CITIES) {
+                if (c.isDynamic) continue;
+                let d = Math.pow(c.lat - lat, 2) + Math.pow(c.lon - lon, 2);
+                if (d < minDist) { minDist = d; nearest = c; }
             }
-        };
-
-        window.loadHomeNWS = async function(lat, lon, isGeo = false) {
-            let tempStr = "—"; let windStr = "Wind: —"; let dewpStr = "Dew Point: —"; let flStr = ""; let wxStr = "Observation Unavailable"; let wxIconInfo = { icon: "ph-cloud-slash", color: "#b2bec3" };
-            let fallbackAd = null;
-            let staticFile = (!isGeo && lat === 42.03 && lon === -93.62) ? 'Ames' : null;
-
-            if (staticFile) {
-                try {
-                    const asosRes = await fetchWithTimeout(`static/asos_conditions.json?t=${Date.now()}`, { timeout: 3000 });
-                    if (asosRes.ok) { const asosData = await asosRes.json(); if (asosData['Ames']) fallbackAd = asosData['Ames']; }
-                } catch (e) { }
-            }
-
-            let liveASOS = await window.fetchLiveASOS(lat, lon, fallbackAd);
-            tempStr = liveASOS.temp !== '--' ? `${liveASOS.temp}°F` : '--';
-            wxIconInfo = liveASOS.iconInfo; wxStr = liveASOS.wx;
-            
-            if (liveASOS.wind !== null) {
-                windStr = `Wind: ${liveASOS.wind} mph`;
-                if(liveASOS.gust) windStr += ` (Gusts: ${liveASOS.gust} mph)`;
-            }
-            if (liveASOS.dewp !== null && liveASOS.dewp !== undefined) {
-                dewpStr = `Dew Point: ${liveASOS.dewp}°F`;
-            }
-            
-            if (liveASOS.temp !== '--' && liveASOS.wind !== null) {
-                let fl = getFeelsLike(liveASOS.temp, liveASOS.wind, liveASOS.rh);
-                flStr = `Feels Like: ${fl}°F`;
-                if (liveASOS.gust && liveASOS.gust > liveASOS.wind && liveASOS.temp <= 50) {
-                    let mc = getFeelsLike(liveASOS.temp, liveASOS.gust, liveASOS.rh);
-                    if (mc < fl) flStr += ` | <span style="color:#fff; opacity:0.8;">Min Chill (Gusts): ${mc}°F</span> <a href="#datasources" onclick="window.showTab('datasources')" style="color:#fff; text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a>`;
-                    else flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">Gusts don't lower temp</span>`;
-                } else if (liveASOS.gust && liveASOS.gust > liveASOS.wind) {
-                    flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">Gusts don't lower temp</span>`;
-                } else flStr += ` | <span style="font-size:11px; opacity:0.8; font-style:italic;">No gusts past hour</span>`;
-            }
-
-            document.getElementById('homeTempVal').innerText = tempStr;
-            document.getElementById('homeWindVal').innerText = windStr;
-            if(document.getElementById('homeDewVal')) document.getElementById('homeDewVal').innerText = dewpStr;
-            document.getElementById('homeFeelsLikeVal').innerHTML = flStr;
-            
-            let interpTag = liveASOS.interpolated && tempStr !== '--' ? `<span style="font-size:10px; color:#fff; vertical-align:super;" title="Interpolated from recent trend">*</span>` : '';
-            document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIconInfo.icon}" style="font-size: 36px; color: ${wxIconInfo.color};"></i> ${interpTag}`;
-
-            try {
-                let cacheKey = `nws_pt_${lat.toFixed(2)}_${lon.toFixed(2)}`;
-                let ptData = null; let gridId = "NWS"; let nwsData = null; let cacheValid = false;
-                
-                if (staticFile) {
-                    try {
-                        let cacheRes = await fetchWithTimeout(`static/nws/${staticFile}.json?t=${Date.now()}`, { timeout: 3000 });
-                        if(cacheRes.ok) {
-                            let cData = await cacheRes.json();
-                            if (cData && cData.hourly && cData.hourly.properties) {
-                                let validPeriods = cData.hourly.properties.periods.filter(p => new Date(p.startTime).getTime() > Date.now() - 3600000);
-                                if (validPeriods.length >= 4) { nwsData = cData; cacheValid = true; }
-                            }
-                        }
-                    } catch(e){}
-                }
-
-                if (!cacheValid) {
-                    try { ptData = JSON.parse(localStorage.getItem(cacheKey)); } catch(e){}
-                    if (!ptData) {
-                        ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
-                        if (ptData) localStorage.setItem(cacheKey, JSON.stringify(ptData));
-                    }
-                    
-                    if (!ptData || !ptData.properties) throw new Error("Invalid National Weather Service Point Data");
-                    if(isGeo) {
-                        const city = ptData.properties.relativeLocation?.properties?.city || "Unknown";
-                        const state = ptData.properties.relativeLocation?.properties?.state || "";
-                        document.getElementById('homeLocationName').innerText = `Official National Weather Service Forecast — ${city}, ${state}`;
-                    }
-                    gridId = ptData.properties.gridId;
-                    let fData = await window.robustNWSFetch(ptData.properties.forecast);
-                    let hData = await window.robustNWSFetch(ptData.properties.forecastHourly);
-                    nwsData = { daily: fData, hourly: hData };
-                } else if(nwsData && nwsData.daily && nwsData.daily.properties) {
-                    gridId = nwsData.daily.properties.gridId || "NWS";
-                }
-
-                if (nwsData && nwsData.daily && nwsData.daily.properties) {
-                    const cp = nwsData.daily.properties.periods[0];
-                    document.getElementById('homeQpfVal').innerText = `Precipitation Forecast: ${cp.shortForecast}`;
-                }
-
-                if (nwsData && nwsData.hourly && nwsData.hourly.properties) {
-                    let validHourly = nwsData.hourly.properties.periods.filter(p => new Date(p.startTime).getTime() > Date.now() - 3600000);
-                    let tempsHtml = `<div style="display:flex; gap:10px; margin-top:20px; overflow-x: auto; padding-bottom: 5px;">`;
-                    for (let i = 0; i < Math.min(4, validHourly.length); i++) {
-                        let p = validHourly[i];
-                        if (p) {
-                            let tDate = new Date(p.startTime);
-                            let pIconInfo = window.getWeatherIconInfo(p.shortForecast, p.isDaytime);
-                            let hWinds = parseWinds(p.windSpeed, p.windGust);
-                            let hRh = p.relativeHumidity?.value || null;
-                            let hFl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
-                            let flHtml = `<div style="font-size:12px; font-weight:bold; color:#fff; opacity:0.9; margin-top:6px;">Feels Like: ${hFl}&deg;</div>`;
-
-                            if (hWinds.gust > hWinds.sustained && p.temperature <= 50) {
-                                let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
-                                if (mc < hFl) flHtml += `<div style="font-size:12px; font-weight:bold; color:#fff; opacity:0.8; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
-                                else flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
-                            } else if (hWinds.gust > hWinds.sustained) {
-                                flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
-                            } else flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">No gusts<br>expected</div>`;
-
-                            let qpfVal = p.quantitativePrecipitation?.value;
-                            let qpfStr = '';
-                            if (qpfVal > 0) {
-                                let inches = (qpfVal / 25.4).toFixed(2);
-                                qpfStr = `<div style="color:#fff; opacity:0.9; font-size:11px; font-weight:900; margin-top:8px;">${inches}"</div>`;
-                            } else {
-                                let pop = p.probabilityOfPrecipitation?.value || 0;
-                                if (pop > 0) qpfStr = `<div style="color:#fff; opacity:0.8; font-size:12px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
-                                else qpfStr = `<div style="color:transparent; font-size:11px; margin-top:8px;">0%</div>`;
-                            }
-                            tempsHtml += `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
-                                <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
-                                <i class="ph-fill ${pIconInfo.icon}" style="font-size: 26px; margin: 4px 0; color: ${pIconInfo.color};"></i>
-                                <div class="hr-temp" style="color:#fff;">${p.temperature}&deg;</div>
-                                ${flHtml} ${qpfStr}
-                            </div>`;
-                        }
-                    }
-                    tempsHtml += `</div>`;
-                    document.getElementById('homeNextTemps').innerHTML = tempsHtml;
-                }
-                document.getElementById('homeForecastFootnote').innerHTML = buildMeteorologistCreditHTML(gridId, lat, lon);
-            } catch (err) {}
+            if (!nearest) return null;
+            return { city: nearest, distance: window.getDistanceMiles(lat, lon, nearest.lat, nearest.lon) };
         }
 
         window.renderCityForecast = async function(dataCity, displayCity, isPlaceholder, renderId) {
@@ -1782,7 +1432,7 @@
                 }
             }
 
-            let cityAlerts = window.nwsAlerts ? window.nwsAlerts.filter(f => isPointInNWSFeature(dataCity.lon, dataCity.lat, f)) : [];
+            let cityAlerts = window.nwsAlerts ? window.nwsAlerts.filter(f => window.isPointInNWSFeature(dataCity.lon, dataCity.lat, f)) : [];
             let alertsHtml = "";
             if (cityAlerts.length > 0) {
                 alertsHtml = `
@@ -1790,7 +1440,7 @@
                     <h3 style="margin: 0 0 16px; font-size: 14px; text-transform: uppercase; color: #fff; font-weight: 900; display: flex; align-items: center; gap: 8px;">
                         <i class="ph-fill ph-warning-circle" style="font-size: 20px;"></i> ACTIVE WEATHER ALERTS
                     </h3>
-                    ${cityAlerts.map(alertBadgeHTML).join('')}
+                    ${cityAlerts.map(window.alertBadgeHTML).join('')}
                 </div>`;
             }
 
@@ -1894,7 +1544,7 @@
 
                             if (hWinds.gust > hWinds.sustained && p.temperature <= 50) {
                                 let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
-                                if (mc < fl) {
+                                if (mc < hFl) {
                                     flHtml += `<div style="font-size:12px; font-weight:bold; color:#fff; opacity:0.8; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
                                 } else {
                                     flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
@@ -2047,7 +1697,7 @@
                             <i class="ph-fill ph-calendar-blank"></i> TODAY'S STORM PREDICTION CENTER OUTLOOK
                         </div>
                         <div id="lfSpcToday">
-                            ${spcData.day1 && spcData.day1.cat ? renderSPCHTML(getRealSPCOutlook(dataCity.lat, dataCity.lon, 0)) : '<div style="opacity:0.5; font-size:13px; color:#fff;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>'}
+                            ${spcData.day1 && spcData.day1.cat ? window.renderSPCHTML(window.getRealSPCOutlook(dataCity.lat, dataCity.lon, 0)) : '<div style="opacity:0.5; font-size:13px; color:#fff;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>'}
                         </div>
                     </div>
                     <div class="glass" style="flex:1; min-width:280px; padding: 25px;">
@@ -2055,7 +1705,7 @@
                             <i class="ph-fill ph-calendar-plus"></i> TOMORROW'S STORM PREDICTION CENTER OUTLOOK
                         </div>
                         <div id="lfSpcTom">
-                            ${spcData.day2 && spcData.day2.cat ? renderSPCHTML(getRealSPCOutlook(dataCity.lat, dataCity.lon, 1)) : '<div style="opacity:0.5; font-size:13px; color:#fff;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>'}
+                            ${spcData.day2 && spcData.day2.cat ? window.renderSPCHTML(window.getRealSPCOutlook(dataCity.lat, dataCity.lon, 1)) : '<div style="opacity:0.5; font-size:13px; color:#fff;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>'}
                         </div>
                     </div>
                 </div>
@@ -2169,10 +1819,12 @@
             let pinColor = isPinned ? 'var(--accent)' : '#fff';
             let pinText = isPinned ? 'Pinned' : 'Pin City';
             
+            let safeCityId = String(cityId).replace(/'/g, "\\'");
+
             let headerHtml = `
                 <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 25px; flex-wrap:wrap; gap:10px;">
                     <h2 style="font-size: 36px; font-weight: 900; margin: 0;">${displayCity.display}</h2>
-                    <button id="pinCityBtn" onclick="window.togglePinCity('${displayCity.id}')" class="glass-btn" style="font-size:12px; padding:8px 16px;">
+                    <button id="pinCityBtn" onclick="window.togglePinCity('${safeCityId}')" class="glass-btn" style="font-size:12px; padding:8px 16px;">
                         <i id="pinCityIcon" class="${pinIcon}" style="color:${pinColor}; font-size:16px;"></i> <span id="pinCityText">${pinText}</span>
                     </button>
                 </div>
@@ -2217,7 +1869,7 @@
 
             if (cityObj.isDynamic) {
                 let nearestInfo = window.getNearestPreloadedCity(cityObj.lat, cityObj.lon);
-                if (nearestInfo.city && nearestInfo.distance <= 50) {
+                if (nearestInfo && nearestInfo.distance <= 50) {
                     await window.renderCityForecast(nearestInfo.city, cityObj, true, myRenderId);
                     if (window.currentRenderId !== myRenderId) return;
                 } else {
@@ -2248,7 +1900,8 @@
                                      pCities.map(c => {
                                          let cAlerts = window.getCityAlerts(c.lat, c.lon);
                                          let alertHtml = cAlerts.length > 0 ? `<i class="ph-fill ph-warning" style="color:var(--danger); margin-left:auto;" title="Active Alerts"></i>` : '';
-                                         return `<div class="lf-city-item${c.id === window.lfSelectedCity ? ' selected' : ''}" style="display:flex; align-items:center;" onclick="window.selectLFCity('${c.id}', false)"><i class="ph-fill ph-push-pin" style="color:var(--accent); margin-right:6px;"></i> <span>${c.display}</span> ${alertHtml}</div>`;
+                                         let safeId = String(c.id).replace(/'/g, "\\'");
+                                         return `<div class="lf-city-item${c.id === window.lfSelectedCity ? ' selected' : ''}" style="display:flex; align-items:center;" onclick="window.selectLFCity('${safeId}', false)"><i class="ph-fill ph-push-pin" style="color:var(--accent); margin-right:6px;"></i> <span>${c.display}</span> ${alertHtml}</div>`;
                                      }).join('');
                         remainingCities = LF_CITIES.filter(c => !pIds.includes(c.id));
                     }
@@ -2256,7 +1909,10 @@
             }
 
             let filtered = remainingCities.filter(c => c.display.toLowerCase().includes((val||'').toLowerCase()));
-            let localHtml = filtered.map(c => `<div class="lf-city-item${c.id === window.lfSelectedCity ? ' selected' : ''}" onclick="window.selectLFCity('${c.id}', false)">${c.display}</div>`).join('');
+            let localHtml = filtered.map(c => {
+                let safeId = String(c.id).replace(/'/g, "\\'");
+                return `<div class="lf-city-item${c.id === window.lfSelectedCity ? ' selected' : ''}" onclick="window.selectLFCity('${safeId}', false)">${c.display}</div>`;
+            }).join('');
             
             if (!val || val.length < 2) {
                 el.innerHTML = pinnedHtml + (pinnedHtml ? `<div style="height:1px; background:var(--border); margin:8px 10px;"></div>` : '') + localHtml;
@@ -2277,7 +1933,9 @@
                             let display = `${loc.name}, ${stateOrCountry}`;
                             let newCityId = `${loc.name}_${stateOrCountry}`;
                             if (LF_CITIES.find(c => c.id === newCityId || c.display === display)) return '';
-                            return `<div class="lf-city-item" style="border-left: 2px solid var(--accent);" onclick="window.addAndSelectCity('${newCityId}', '${display}', ${loc.latitude}, ${loc.longitude})"><i class="ph ph-globe" style="margin-right:4px;"></i> ${display}</div>`;
+                            let safeId = String(newCityId).replace(/'/g, "\\'");
+                            let safeDisplay = String(display).replace(/'/g, "\\'");
+                            return `<div class="lf-city-item" style="border-left: 2px solid var(--accent);" onclick="window.addAndSelectCity('${safeId}', '${safeDisplay}', ${loc.latitude}, ${loc.longitude})"><i class="ph ph-globe" style="margin-right:4px;"></i> ${display}</div>`;
                         }).join('');
                     }
                     el.innerHTML = remoteHtml || localHtml ? localHtml + remoteHtml : `<div style="padding:10px; opacity:0.5; font-size:12px; text-align:center;">No results found.</div>`;
@@ -2368,12 +2026,14 @@
                 if (tab === 'localforecast' && cityParam) {
                     let existingCity = LF_CITIES.find(c => c.id === cityParam);
                     if (existingCity) {
-                        window.selectLFCity(cityParam, true);
+                        let safeId = String(cityParam).replace(/'/g, "\\'");
+                        window.selectLFCity(safeId, true);
                     } else {
                         window.triggerSearch(cityParam.replace(/_/g, ' '), true);
                     }
                 } else if (window.lfSelectedCity) {
-                    window.selectLFCity(window.lfSelectedCity, true);
+                    let safeId = String(window.lfSelectedCity).replace(/'/g, "\\'");
+                    window.selectLFCity(safeId, true);
                 }
             });
         };
