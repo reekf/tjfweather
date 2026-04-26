@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://d3js.org/topojson.v3.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -93,6 +93,19 @@
             100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
+        @keyframes slideDownFadeIn {
+            0% { opacity: 0; transform: translateY(-30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .splash-container {
+            display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 20px;
+        }
+        .animate-pop { opacity: 0; animation: slideDownFadeIn 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+
         .tab-content {
             display: none; height: calc(100vh - 65px); position: relative;
             z-index: 1; overflow-y: auto; overflow-x: hidden; pointer-events: none;
@@ -111,7 +124,7 @@
 
         .nav-links { display: flex; gap: 10px; align-items: center; margin-left: auto; }
         .nav-item {
-            cursor: pointer; font-weight: 800; font-size: 12px; letter-spacing: 0.5px;
+            cursor: pointer; font-weight: 800; font-size: 13px; letter-spacing: 0.5px;
             padding: 8px 16px; border-radius: 12px; transition: all 0.3s ease; opacity: 0.9;
             background: rgba(0, 210, 255, 0.08); border: 1px solid rgba(0, 210, 255, 0.2);
             color: var(--text); text-transform: uppercase;
@@ -186,7 +199,7 @@
 
         @media (max-width: 768px) {
             .tab-content { height: calc(100vh - 65px); overflow-y: auto; overflow-x: hidden; }
-            #home > div { padding: 15px !important; gap: 15px !important; }
+            #dashboard > div { padding: 15px !important; gap: 15px !important; }
             
             /* Home Page specifically needs to break flex layout on mobile */
             .home-panels-container { flex-direction: column !important; flex-wrap: nowrap !important; width: 100%; }
@@ -222,6 +235,7 @@
         <div class="logo" onclick="window.showTab('home'); window.toggleNavMenu(true);">TJF<span style="color:var(--accent)">WEATHER</span></div>
         <div class="nav-links" id="navLinks">
             <div class="nav-item active" onclick="window.showTab('home', this); window.toggleNavMenu(true);">HOME</div>
+            <div class="nav-item" onclick="window.showTab('dashboard', this); window.toggleNavMenu(true);">DASHBOARD</div>
             <div class="nav-item" onclick="window.showTab('localforecast', this); window.toggleNavMenu(true);">LOCAL FORECAST</div>
             <div id="navRadarBtn" class="nav-item" onclick="window.showTab('radar', this); window.toggleNavMenu(true);">LIVE RADAR</div>
             <div class="nav-item" onclick="window.showTab('datasources', this); window.toggleNavMenu(true);">WHAT DOES THIS MEAN?</div>
@@ -234,8 +248,24 @@
 
     <button id="mobileSettingsBtn" onclick="window.toggleMobileSettings()" style="display: none;"><i class="ph ph-warning"></i> ALERTS</button>
 
-    <!-- HOME TAB -->
+    <!-- NEW HOME SPLASH PAGE -->
     <div id="home" class="tab-content active">
+        <div class="splash-container">
+            <h1 class="animate-pop" style="font-size: 68px; font-weight: 900; margin: 0; color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,0.8); letter-spacing: -1px;">TJF<span style="color:var(--accent)">WEATHER</span></h1>
+            <p class="animate-pop delay-1" style="font-size: 22px; max-width: 650px; line-height: 1.6; opacity: 0.9; margin: 20px 0; font-weight: 300;">
+                A clean, accessible dashboard for viewing National Weather Service and Storm Prediction Center forecasts.
+            </p>
+            <div class="animate-pop delay-2" style="font-size: 14px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; opacity: 0.8; margin-bottom: 40px; border: 1px solid rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 30px; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="ph-fill ph-device-mobile" style="font-size: 18px;"></i> Mobile Friendly
+            </div>
+            <button class="glass-btn animate-pop delay-3" style="font-size: 18px; padding: 15px 35px; border-radius: 30px;" onclick="window.showTab('dashboard', document.querySelector('.nav-item:nth-child(2)'));">
+                Go to Dashboard <i class="ph ph-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- DASHBOARD TAB (Formerly Home) -->
+    <div id="dashboard" class="tab-content">
         <div style="padding: 30px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; padding-bottom: 80px;">
             <div class="home-panels-container" style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
 
@@ -255,7 +285,7 @@
 
                     <div id="homeLocalWeather" class="glass"
                         style="background: rgba(0,210,255,0.05); border: 1px solid var(--accent); padding: 20px; cursor:pointer; transition: transform 0.2s;"
-                        onclick="window.showTab('localforecast', document.querySelector('.nav-item:nth-child(2)')); if(window.lfSelectedCity) window.selectLFCity(window.lfSelectedCity, true);"
+                        onclick="window.showTab('localforecast', document.querySelector('.nav-item:nth-child(3)')); if(window.lfSelectedCity) window.selectLFCity(window.lfSelectedCity, true);"
                         onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
                         <div id="homeLocationName" style="opacity:0.6; font-size:11px; font-weight: 800; letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; color: var(--accent); word-break: break-word; line-height: 1.4;">
                             Official National Weather Service Forecast &mdash; Locating...
@@ -269,7 +299,7 @@
                                 <div id="homeWindVal" style="font-size:14px; opacity:0.8; font-weight:600; margin-top: 6px;">Wind: &mdash;</div>
                                 <div id="homeDewVal" style="font-size:13px; opacity:0.8; margin-top: 4px;">Dew Point: &mdash;</div>
                                 <div id="homeFeelsLikeVal" style="font-size:13px; font-weight:bold; color:#fff; opacity:0.9; margin-top: 4px;"></div>
-                                <div id="homeQpfVal" style="font-size:13px; opacity:0.6; margin-top:6px;">Forecast: &mdash;</div>
+                                <div id="homeQpfVal" style="font-size:13px; opacity:0.6; margin-top:6px;">Precipitation Forecast: &mdash;</div>
                             </div>
                         </div>
                         <div id="homeNextTemps"></div>
@@ -277,14 +307,11 @@
                     </div>
                 </div>
                 
-                <!-- Pinned Cities Section -->
                 <div id="homePinnedSection" style="display:none; flex-direction:column; gap:15px; width:100%; margin-bottom:20px; order: 2;">
                     <h3 style="margin:0; font-size:12px; opacity:0.6; text-transform:uppercase; letter-spacing:2px; display:flex; align-items:center; gap:8px;">
                         <i class="ph-fill ph-push-pin"></i> Pinned Locations
                     </h3>
-                    <div id="homePinnedCards" style="display:flex; gap:15px; overflow-x:auto; padding-bottom:10px; scrollbar-width:thin;">
-                        <!-- Cards injected here -->
-                    </div>
+                    <div id="homePinnedCards" style="display:flex; gap:15px; overflow-x:auto; padding-bottom:10px; scrollbar-width:thin;"></div>
                 </div>
 
                 <div class="glass" style="padding: 25px; flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 15px; order: 3;">
@@ -385,48 +412,49 @@
     <!-- WHAT DOES THIS MEAN TAB -->
     <div id="datasources" class="tab-content">
         <div style="padding: 60px 20px; max-width: 900px; margin: auto; position: relative; z-index: 2; overflow-y: auto;">
-            <h1 style="font-size: 32px; margin-top: 0; margin-bottom: 35px; color: #fff; display: flex; align-items: center; gap: 12px; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+            <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 35px; color: #fff; display: flex; align-items: center; gap: 12px; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
                 <i class="ph-fill ph-question"></i> What does this mean?
             </h1>
 
             <div class="glass" style="padding: 30px; margin-bottom: 25px;">
-                <h3 style="margin: 0 0 12px; color: #ffffff; font-size: 18px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                <h3 style="margin: 0 0 12px; color: var(--accent); font-size: 24px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
                     <i class="ph-fill ph-cloud-lightning"></i> Storm Prediction Center Outlook
                 </h3>
-                <p style="font-size: 15px; line-height: 1.6; opacity: 0.85; margin: 0;">
+                <p style="font-size: 16px; line-height: 1.6; opacity: 0.9; margin: 0;">
                     The <strong>Storm Prediction Center</strong> issues daily severe weather outlooks indicating the risk of organized severe thunderstorms (tornadoes, damaging winds, and large hail) over the contiguous United States.
                     Risks are categorized from 1 to 5: <strong>Marginal, Slight, Enhanced, Moderate, and High</strong>.
                 </p>
             </div>
 
             <div class="glass" style="padding: 30px; margin-bottom: 25px;">
-                <h3 style="margin: 0 0 12px; color: #ffffff; font-size: 18px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                <h3 style="margin: 0 0 12px; color: var(--accent); font-size: 24px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
                     <i class="ph-fill ph-chart-bar"></i> Numerical Weather Prediction
                 </h3>
-                <ul style="font-size: 15px; line-height: 1.8; opacity: 0.85; margin: 0; padding-left: 20px;">
+                <ul style="font-size: 16px; line-height: 1.8; opacity: 0.9; margin: 0; padding-left: 20px;">
                     <li style="margin-bottom: 8px;"><strong>National Blend of Models:</strong> The gold-standard official National Oceanic and Atmospheric Administration ensemble, blending dozens of models for the most accurate consensus.</li>
                     <li style="margin-bottom: 8px;"><strong>Model Output Statistics:</strong> Statistical post-processing that corrects known numerical model biases for specific point locations based on historical data.</li>
                     <li><strong>Global Forecast System:</strong> The flagship United States medium-range model (0-384 hours out), useful for forecasting broad weather patterns days in advance.</li>
+                    <li><strong>North American Mesoscale:</strong> A high-resolution regional model utilized for precise, near-term forecast uncertainty representation.</li>
                 </ul>
             </div>
 
             <div class="glass" style="padding: 30px; margin-bottom: 25px;">
-                <h3 style="margin: 0 0 12px; color: #ffffff; font-size: 18px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                <h3 style="margin: 0 0 12px; color: var(--accent); font-size: 24px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
                     <i class="ph-fill ph-thermometer"></i> Live Surface Observations
                 </h3>
-                <p style="font-size: 15px; line-height: 1.6; opacity: 0.85; margin: 0;">
+                <p style="font-size: 16px; line-height: 1.6; opacity: 0.9; margin: 0;">
                     The <strong>Automated Surface Observing System</strong> is a massive network of climate sensors heavily concentrated at United States airports. They provide highly accurate, minute-by-minute updates of the current temperature, wind speed, and visibility. When viewing the Local Forecast tab, TJFWeather queries the nearest aviation sensor to give you absolute ground truth.
                 </p>
             </div>
 
             <div class="glass" style="padding: 30px; margin-bottom: 25px;">
-                <h3 style="margin: 0 0 12px; color: #ffffff; font-size: 18px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                <h3 style="margin: 0 0 12px; color: var(--accent); font-size: 24px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
                     <i class="ph-fill ph-thermometer-cold"></i> Wind Chill & Min Chill
                 </h3>
-                <p style="font-size: 15px; line-height: 1.6; opacity: 0.85; margin: 0 0 10px 0;">
+                <p style="font-size: 16px; line-height: 1.6; opacity: 0.9; margin: 0 0 10px 0;">
                     <strong>Feels Like / Wind Chill:</strong> Calculates the perceived decrease in air temperature felt by the body on exposed skin. It is calculated using the official National Weather Service formula (valid for temps &le; 50°F and wind &gt; 3 mph). Between 50°F and 80°F, it defaults to ambient temperature, and above 80°F it switches to the official Heat Index.
                 </p>
-                <p style="font-size: 15px; line-height: 1.6; opacity: 0.85; margin: 0;">
+                <p style="font-size: 16px; line-height: 1.6; opacity: 0.9; margin: 0;">
                     <strong>Min Chill (Gusts):</strong> A specialized calculation unique to TJFWeather. Instead of using the <em>sustained</em> wind speed, we use the highest forecasted or recently recorded <strong>wind gust</strong>. This tells you exactly how cold the air will feel the moment a strong gust hits you.
                 </p>
             </div>
@@ -458,7 +486,7 @@
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
                 <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v17.0 (Unified & Styled) | AMES, IA</p>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v18.0 (Splash & UI Audit) | AMES, IA</p>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <h3 style="font-size: 16px; color: var(--info); margin-top: 0;">App Features & Notifications</h3>
@@ -540,6 +568,7 @@
 
     <!-- UI Interaction Scripts -->
     <script>
+        // GLOBALS FOR MODULE COMMUNICATION
         window.pinnedCities = [];
         window.currentHomeCityId = null;
         window.renderPinnedCities = function(){};
@@ -936,7 +965,7 @@
             if (text.includes("rain") || text.includes("shower") || text.includes("drizzle")) return "ph-cloud-rain";
             if (text.includes("fog") || text.includes("mist")) return "ph-cloud-fog";
             if (text.includes("wind") || text.includes("breezy")) return "ph-wind";
-            if (text.includes("mostly cloudy") || text.includes("partly sunny")) return isDaytime ? "ph-cloud-sun" : "ph-cloud-moon";
+            if (text.includes("mostly cloudy") || text.includes("partly sunny") || text.includes("partly cloudy") || text.includes("mostly clear") || text.includes("few clouds")) return isDaytime ? "ph-cloud-sun" : "ph-cloud-moon";
             if (text.includes("cloud") || text.includes("overcast")) return "ph-cloud";
             return isDaytime ? "ph-sun" : "ph-moon";
         }
@@ -986,7 +1015,7 @@
 
             setTimeout(() => {
                 if (id === 'radar' && window._mapFull) window._mapFull.invalidateSize();
-                if (id === 'home' && window._mapMini) window._mapMini.invalidateSize();
+                if (id === 'dashboard' && window._mapMini) window._mapMini.invalidateSize();
             }, 150);
         }
 
@@ -1062,13 +1091,12 @@
                 if (todayEl) todayEl.innerHTML = d1;
                 if (tomEl) tomEl.innerHTML = d2;
             } else {
-                if (todayEl) todayEl.innerHTML = '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>';
-                if (tomEl) tomEl.innerHTML = '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>';
+                if (todayEl) todayEl.innerHTML = '<div style="opacity:0.5; font-size:13px; color:#fff;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>';
+                if (tomEl) tomEl.innerHTML = '<div style="opacity:0.5; font-size:13px; color:#fff;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>';
             }
         }
 
         window.loadSPCOutlooks = async function() {
-            // Attempt to hit static cached files first to dramatically improve load speed
             try {
                 const [d1Res, d2Res] = await Promise.all([
                     fetchWithTimeout(`static/spc_day1.json?t=${Date.now()}`, { timeout: 3000 }),
@@ -1082,7 +1110,6 @@
                 return;
             } catch(e) { }
 
-            // If static files are unavailable, fetch them directly
             const [d1c, d1t, d1w, d1h, d2c, d2t, d2w, d2h] = await Promise.all([
                 fetchSPCDynamic(1, 'cat'), fetchSPCDynamic(1, 'torn'), fetchSPCDynamic(1, 'wind'), fetchSPCDynamic(1, 'hail'),
                 fetchSPCDynamic(2, 'cat'), fetchSPCDynamic(2, 'torn'), fetchSPCDynamic(2, 'wind'), fetchSPCDynamic(2, 'hail')
@@ -1189,19 +1216,29 @@
 
         function renderSPCHTML(spc) {
             if (spc.rawLvl === 0) return `
-                <div style="padding: 10px 14px; background: rgba(255,255,255,0.05); border-radius: 8px; font-size: 15px; opacity: 0.7; font-weight: 500; margin-bottom: 12px;">No Severe Weather Expected</div>
+                <div style="padding: 10px 14px; background: rgba(255,255,255,0.05); border-radius: 8px; font-size: 15px; opacity: 0.7; font-weight: 500; margin-bottom: 12px; color:#fff;">No Severe Weather Expected</div>
                 <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official Storm Prediction Center Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
             
-            let riskBadge = spc.rawLvl === 1 ? "Thunderstorm" : `<span style="font-size: 2.2em; line-height: 0.7;">${spc.level}</span><span style="font-size: 1.1em; opacity: 0.85; margin-left: 2px;">/5</span>`;
+            let riskBadge = spc.rawLvl === 1 ? "Thunderstorm" : `<span style="font-size: 2.5em; font-weight: 900; line-height: 0.8;">${spc.level}</span><span style="font-size: 1.2em; opacity: 0.7; margin-left: 2px;">/5</span>`;
             
+            let sigTor = spc.tor.includes('SIG') ? `<div style="font-size:11px; color:var(--warning); margin-top:4px; font-weight:bold;"><i class="ph-fill ph-warning"></i> EF2+ tornadoes possible</div>` : '';
+            let sigWind = spc.wind.includes('SIG') ? `<div style="font-size:11px; color:var(--warning); margin-top:4px; font-weight:bold;"><i class="ph-fill ph-warning"></i> 75+ mph winds possible</div>` : '';
+            let sigHail = spc.hail.includes('SIG') ? `<div style="font-size:11px; color:var(--warning); margin-top:4px; font-weight:bold;"><i class="ph-fill ph-warning"></i> 2+ inch (baseball sized) hail possible</div>` : '';
+            
+            let torVal = spc.tor.replace(' (SIG)', '');
+            let windVal = spc.wind.replace(' (SIG)', '');
+            let hailVal = spc.hail.replace(' (SIG)', '');
+
             return `
                 <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="background: ${spc.bgColor}; color: ${spc.textColor}; padding: 8px 14px; border-radius: 8px; font-weight: 900; font-size: 15px; display: flex; align-items: baseline; gap: 2px;">${riskBadge}</div>
                         <div style="font-weight: 900; font-size: 16px; color: ${spc.bgColor};">${spc.name}</div>
                     </div>
-                    <div style="display: flex; gap: 18px; font-size: 14px; font-weight: 800; opacity: 0.85; margin-top: 4px;">
-                        <div>Tornado: <span style="color:#fff">${spc.tor}</span></div><div>Wind: <span style="color:#fff">${spc.wind}</span></div><div>Hail: <span style="color:#fff">${spc.hail}</span></div>
+                    <div style="display: flex; gap: 18px; font-size: 14px; font-weight: 800; opacity: 0.85; margin-top: 4px; align-items: flex-start;">
+                        <div>Tornado: <span style="color:#fff">${torVal}</span>${sigTor}</div>
+                        <div>Wind: <span style="color:#fff">${windVal}</span>${sigWind}</div>
+                        <div>Hail: <span style="color:#fff">${hailVal}</span>${sigHail}</div>
                     </div>
                 </div>
                 <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official Storm Prediction Center Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
@@ -1213,8 +1250,8 @@
             let cacheKey = `home_${lat},${lon}`;
 
             if (spcData.day1.cat === null) {
-                document.getElementById('spcTodayHome').innerHTML = '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>';
-                document.getElementById('spcTomHome').innerHTML = '<div style="opacity:0.5; font-size:13px;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>';
+                document.getElementById('spcTodayHome').innerHTML = '<div style="opacity:0.5; font-size:13px; color:#fff;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>';
+                document.getElementById('spcTomHome').innerHTML = '<div style="opacity:0.5; font-size:13px; color:#fff;"><i class="ph ph-spinner ph-spin"></i> Loading Storm Prediction Center Data...</div>';
                 return;
             }
             
@@ -1408,7 +1445,6 @@
         async function fetchLiveASOS(lat, lon, fallbackData) {
             let result = { temp: '--', wind: null, gust: null, dewp: null, wx: 'Loading...', icon: 'ph-cloud', rh: 50, interpolated: false };
             try {
-                // Instantly grab cached NWS Point grid data
                 let cacheKey = `nws_pt_${lat.toFixed(2)}_${lon.toFixed(2)}`;
                 let ptData = null;
                 try { ptData = JSON.parse(localStorage.getItem(cacheKey)); } catch(e){}
@@ -1501,7 +1537,7 @@
                 validCards++;
                 
                 let cAlerts = window.getCityAlerts(pc.lat, pc.lon);
-                let alertIconHtml = cAlerts.length > 0 ? `<i class="ph-fill ph-warning" style="color:#fff; font-size:16px;" title="${cAlerts.length} Active Alert(s)"></i>` : '';
+                let alertIconHtml = cAlerts.length > 0 ? `<i class="ph-fill ph-warning" style="color:var(--danger); font-size:16px;" title="${cAlerts.length} Active Alert(s)"></i>` : '';
 
                 html += `<div id="pinned-card-${pc.id}" class="glass" style="min-width: 240px; padding: 20px; cursor: pointer; display: flex; flex-direction: column; gap: 10px; transition:0.2s;" onclick="window.showTab('localforecast'); window.selectLFCity('${pc.id}', false);" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1675,7 +1711,7 @@
 
                 if (nwsData && nwsData.daily && nwsData.daily.properties) {
                     const cp = nwsData.daily.properties.periods[0];
-                    document.getElementById('homeQpfVal').innerText = `Forecast: ${cp.shortForecast}`;
+                    document.getElementById('homeQpfVal').innerText = `Precipitation Forecast: ${cp.shortForecast}`;
                 }
 
                 if (nwsData && nwsData.hourly && nwsData.hourly.properties) {
@@ -1705,11 +1741,11 @@
                             let qpfStr = '';
                             if (qpfVal > 0) {
                                 let inches = (qpfVal / 25.4).toFixed(2);
-                                qpfStr = `<div style="color:#fff; font-size:11px; font-weight:900; margin-top:8px;">${inches}"</div>`;
+                                qpfStr = `<div style="color:#fff; opacity:0.9; font-size:11px; font-weight:900; margin-top:8px;">${inches}"</div>`;
                             } else {
                                 let pop = p.probabilityOfPrecipitation?.value || 0;
-                                if (pop > 0) qpfStr = `<div style="color:#fff; opacity:0.9; font-size:11px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
-                                else qpfStr = `<div style="color:transparent; font-size:11px; margin-top:8px;">0%</div>`;
+                                if (pop > 0) qpfStr = `<div style="color:#fff; opacity:0.8; font-size:12px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
+                                else qpfStr = `<div style="color:transparent; font-size:12px; margin-top:8px;">0%</div>`;
                             }
                             tempsHtml += `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
                                 <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
