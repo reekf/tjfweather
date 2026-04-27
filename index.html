@@ -1804,21 +1804,25 @@
 
                 if (!cacheValid) {
                     try { ptData = JSON.parse(localStorage.getItem(cacheKey)); } catch(e){}
-                    if (!ptData) {
-                        ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${rLat},${rLon}`);
-                        if (ptData) localStorage.setItem(cacheKey, JSON.stringify(ptData));
+                    try {
+                        if (!ptData) {
+                            ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${rLat},${rLon}`);
+                            if (ptData) localStorage.setItem(cacheKey, JSON.stringify(ptData));
+                        }
+                        
+                        if (!ptData || !ptData.properties) throw new Error("Invalid National Weather Service Point Data");
+                        if(isGeo) {
+                            const city = ptData.properties.relativeLocation?.properties?.city || "Unknown";
+                            const state = ptData.properties.relativeLocation?.properties?.state || "";
+                            document.getElementById('homeLocationName').innerText = `Official National Weather Service Forecast — ${city}, ${state}`;
+                        }
+                        gridId = ptData.properties.gridId;
+                        let fData = await window.robustNWSFetch(ptData.properties.forecast);
+                        let hData = await window.robustNWSFetch(ptData.properties.forecastHourly);
+                        nwsData = { daily: fData, hourly: hData };
+                    } catch (err) {
+                        console.warn("Live NWS fetch failed, flowing to fallback: ", err);
                     }
-                    
-                    if (!ptData || !ptData.properties) throw new Error("Invalid National Weather Service Point Data");
-                    if(isGeo) {
-                        const city = ptData.properties.relativeLocation?.properties?.city || "Unknown";
-                        const state = ptData.properties.relativeLocation?.properties?.state || "";
-                        document.getElementById('homeLocationName').innerText = `Official National Weather Service Forecast — ${city}, ${state}`;
-                    }
-                    gridId = ptData.properties.gridId;
-                    let fData = await window.robustNWSFetch(ptData.properties.forecast);
-                    let hData = await window.robustNWSFetch(ptData.properties.forecastHourly);
-                    nwsData = { daily: fData, hourly: hData };
                 } else if(nwsData && nwsData.daily && nwsData.daily.properties) {
                     gridId = nwsData.daily.properties.gridId || "NWS";
                 }
@@ -2002,15 +2006,19 @@
                     let cacheKey = `nws_pt_${rLat}_${rLon}`;
                     let ptData = null;
                     try { ptData = JSON.parse(localStorage.getItem(cacheKey)); } catch(e){}
-                    if (!ptData) {
-                        ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${rLat},${rLon}`);
-                        if (ptData) localStorage.setItem(cacheKey, JSON.stringify(ptData));
-                    }
-                    if(ptData && ptData.properties) {
-                        gridId = ptData.properties.gridId;
-                        let fData = await window.robustNWSFetch(ptData.properties.forecast);
-                        let hData = await window.robustNWSFetch(ptData.properties.forecastHourly);
-                        nwsData = { daily: fData, hourly: hData };
+                    try {
+                        if (!ptData) {
+                            ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${rLat},${rLon}`);
+                            if (ptData) localStorage.setItem(cacheKey, JSON.stringify(ptData));
+                        }
+                        if(ptData && ptData.properties) {
+                            gridId = ptData.properties.gridId;
+                            let fData = await window.robustNWSFetch(ptData.properties.forecast);
+                            let hData = await window.robustNWSFetch(ptData.properties.forecastHourly);
+                            nwsData = { daily: fData, hourly: hData };
+                        }
+                    } catch (err) {
+                        console.warn("Live NWS fetch failed, flowing to fallback: ", err);
                     }
                 } else if(nwsData && nwsData.daily && nwsData.daily.properties) {
                     gridId = nwsData.daily.properties.gridId || "NWS";
