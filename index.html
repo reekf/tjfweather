@@ -1230,14 +1230,23 @@
         };
 
         function extractHighestProb(geojsonData, lat, lon) {
-            let maxProb = 0; let sig = false;
+            let maxProb = 0; let cigStr = '';
             if (geojsonData && geojsonData.features) {
                 geojsonData.features.forEach(f => {
                     if (isPointInNWSFeature(lon, lat, f)) {
                         let props = f.properties || {};
                         let labelStr = (props.LABEL || props.label || props.LABEL2 || props.DN || props.dn || props.qualifier || "").toString().toUpperCase().trim();
-                        if (labelStr.includes("SIG") || props.sig === 1 || props.SIG === 1) sig = true;
-                        let match = labelStr.match(/(?:0\.\d+|\d+)/);
+                        
+                        if (labelStr.includes("SIG")) cigStr = "SIG"; 
+                        if (labelStr.includes("CIG")) {
+                            let m = labelStr.match(/CIG\s*(\d+(?:\.\d+)?)/);
+                            if (m && m[1]) cigStr = "CIG" + m[1];
+                            else cigStr = "CIG";
+                        }
+                        if (props.sig === 1 || props.SIG === 1 || props.cig === 1 || props.CIG === 1) cigStr = cigStr || "SIG";
+
+                        let probText = labelStr.replace(/CIG\s*\d*(?:\.\d+)?/g, '').replace(/SIG/g, '');
+                        let match = probText.match(/(?:0\.\d+|\d+)/);
                         if (match) {
                             let probNum = parseFloat(match[0]);
                             if (probNum > 0 && probNum <= 1) probNum = Math.round(probNum * 100);
@@ -1247,9 +1256,9 @@
                     }
                 });
             }
-            if (maxProb === 0 && !sig) return "0%";
-            if (maxProb === 0 && sig) return "SIG";
-            return maxProb + "%" + (sig ? " (SIG)" : "");
+            if (maxProb === 0 && !cigStr) return "0%";
+            if (maxProb === 0 && cigStr) return cigStr;
+            return maxProb + "%" + (cigStr ? " (" + cigStr + ")" : "");
         }
 
         function getRealSPCOutlook(lat, lon, dayOffset) {
