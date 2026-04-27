@@ -241,7 +241,7 @@
             <div class="nav-item" onclick="window.showTab('datasources', this); window.toggleNavMenu(true);">WHAT DOES THIS MEAN?</div>
             <div class="nav-item" onclick="window.showTab('about', this); window.toggleNavMenu(true);">ABOUT</div>
             <div class="nav-item" onclick="window.showTab('feedback', this); window.toggleNavMenu(true);">FEEDBACK</div>
-            <a href="https://www.buymeacoffee.com/tyreek" target="_blank" rel="noopener noreferrer" class="nav-item donate-btn"><i class="ph ph-coffee"></i> DONATE</a>
+            <div class="nav-item donate-btn" onclick="document.getElementById('supportModal').style.display='flex'; window.toggleNavMenu(true);"><i class="ph ph-coffee"></i> SUPPORT ME</div>
             <div id="authNavBtn" class="nav-item" onclick="window.toggleAuth()"><i class="ph ph-user"></i> LOGIN / REGISTER</div>
         </div>
     </nav>
