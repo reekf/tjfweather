@@ -965,32 +965,19 @@
 
         window.getWeatherSVG = function(wx, isDaytime = true, size = 36) {
             const text = (wx || "").toLowerCase();
-            const sun = `<circle cx="14" cy="14" r="5" fill="#f1c40f"/><path d="M14 6V3m0 22v-3m8-8h3M3 14h3m13.66-5.66l2.12-2.12M6.22 21.78l-2.12 2.12m15.56 0l2.12-2.12M6.22 6.22L4.1 4.1" stroke="#f1c40f" stroke-width="2" stroke-linecap="round"/>`;
-            const moon = `<path d="M22 16.5A9.5 9.5 0 1112.5 5a7.5 7.5 0 009.5 11.5z" fill="#dfe6e9"/>`;
-            const cloud = `<path d="M19.5 21a5.5 5.5 0 00-.4-10.9 8.5 8.5 0 00-14.2 3.4 6 6 0 001.6 11.5h12.5a6 6 0 00.5-4z" fill="#a4b0be"/>`;
-            const lightning = `<path d="M15 4l-8 12h7l-2 9 10-14h-7l3-7z" fill="#f1c40f" stroke="#f1c40f" stroke-width="1" stroke-linejoin="round"/>`;
-            const rain = `<path d="M14 23v4m-5-3v4m10-5v4" stroke="#74b9ff" stroke-width="2.5" stroke-linecap="round"/>`;
-            const snow = `<path d="M14 23v6m-3-4.5l6 3m-6 0l6-3M9 25v4m-1.5-3l3 2m-3 0l3-2m10-1v4m-1.5-3l3 2m-3 0l3-2" stroke="#dfe6e9" stroke-width="1.5" stroke-linecap="round"/>`;
-            const fog = `<path d="M6 14h16m-14 5h12m-10 5h8" stroke="#b2bec3" stroke-width="2" stroke-linecap="round"/>`;
+            let glyph = "☀️";
+            
+            if (text.includes("thunder") || text.includes("t-storm")) glyph = "⛈️";
+            else if (text.includes("snow") || text.includes("blizzard") || text.includes("flurries") || text.includes("ice") || text.includes("freez")) glyph = "❄️";
+            else if (text.includes("rain") || text.includes("shower") || text.includes("drizzle")) glyph = "🌧️";
+            else if (text.includes("fog") || text.includes("mist")) glyph = "🌫️";
+            else if (text.includes("wind") || text.includes("breezy")) glyph = "💨";
+            else if (text.includes("mostly cloudy") || text.includes("overcast") || text.includes("cloudy")) glyph = "☁️";
+            else if (text.includes("partly") || text.includes("few clouds") || text.includes("fair")) glyph = isDaytime ? "⛅" : "☁️";
+            else if (text.includes("mostly clear") || text.includes("clear")) glyph = isDaytime ? "☀️" : "🌙";
+            else glyph = isDaytime ? "☀️" : "🌙";
 
-            let content = '';
-            let isRain = text.includes("rain") || text.includes("shower") || text.includes("drizzle");
-            let isSnow = text.includes("snow") || text.includes("blizzard") || text.includes("flurries") || text.includes("ice") || text.includes("freez");
-            let isThunder = text.includes("thunder") || text.includes("t-storm");
-
-            if (isThunder) content = cloud + `<g transform="translate(0, 2) scale(0.9)">${lightning}</g>`;
-            else if (isSnow) content = cloud + `<g transform="translate(0, -1)">${snow}</g>`;
-            else if (isRain) content = cloud + `<g transform="translate(0, -1)">${rain}</g>`;
-            else if (text.includes("fog") || text.includes("mist") || text.includes("wind") || text.includes("breezy")) content = fog;
-            else if (text.includes("mostly cloudy") || text.includes("overcast") || text.includes("cloudy")) {
-                content = `<path d="M19.5 17a5.5 5.5 0 00-.4-10.9 8.5 8.5 0 00-14.2 3.4 6 6 0 001.6 11.5h12.5a6 6 0 00.5-4z" fill="#747d8c"/>` + `<g transform="translate(0, 4)">${cloud}</g>`;
-            }
-            else if (text.includes("partly") || text.includes("few clouds")) {
-                content = (isDaytime ? `<g transform="translate(-2, -4) scale(0.85)">${sun}</g>` : `<g transform="translate(-2, -4) scale(0.85)">${moon}</g>`) + `<g transform="translate(0, 4)">${cloud}</g>`;
-            }
-            else content = isDaytime ? sun : moon;
-
-            return `<svg width="${size}" height="${size}" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block; vertical-align:middle;">${content}</svg>`;
+            return `<span style="font-size: ${size}px; line-height: 1; display: inline-block; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.4)); font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;">${glyph}</span>`;
         }
 
         function translateWx(wx) {
