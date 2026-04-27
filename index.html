@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>National Weather Service Dashboard | TJFWeather</title>
+    <title>TJFWeather</title>
     
     <!-- PWA Meta Tags for iOS & Android -->
     <meta name="theme-color" content="#0b0e11">
@@ -958,17 +958,34 @@
             return { sustained, gust };
         }
 
-        window.getWeatherIconInfo = function(wx, isDaytime = true) {
+        window.getWeatherSVG = function(wx, isDaytime = true, size = 36) {
             const text = (wx || "").toLowerCase();
-            if (text.includes("thunder") || text.includes("t-storm")) return { icon: "ph-cloud-lightning", color: "#f1c40f" };
-            if (text.includes("snow") || text.includes("blizzard") || text.includes("flurries") || text.includes("ice") || text.includes("freez")) return { icon: "ph-snowflake", color: "#ffffff" };
-            if (text.includes("rain") || text.includes("shower") || text.includes("drizzle")) return { icon: "ph-cloud-rain", color: "#70a1ff" };
-            if (text.includes("fog") || text.includes("mist")) return { icon: "ph-cloud-fog", color: "#b2bec3" };
-            if (text.includes("wind") || text.includes("breezy")) return { icon: "ph-wind", color: "#b2bec3" };
-            if (text.includes("mostly cloudy") || text.includes("overcast") || text.includes("cloudy") || text.includes("partly sunny")) return { icon: "ph-cloud", color: "#b2bec3" };
-            if (text.includes("partly") || text.includes("few clouds")) return { icon: isDaytime ? "ph-cloud-sun" : "ph-cloud-moon", color: "#b2bec3" };
-            if (text.includes("mostly clear") || text.includes("clear") || text.includes("fair")) return { icon: isDaytime ? "ph-sun" : "ph-moon", color: isDaytime ? "#f1c40f" : "#dfe6e9" };
-            return { icon: isDaytime ? "ph-sun" : "ph-moon", color: isDaytime ? "#f1c40f" : "#dfe6e9" };
+            const sun = `<circle cx="14" cy="14" r="5" fill="#f1c40f"/><path d="M14 6V3m0 22v-3m8-8h3M3 14h3m13.66-5.66l2.12-2.12M6.22 21.78l-2.12 2.12m15.56 0l2.12-2.12M6.22 6.22L4.1 4.1" stroke="#f1c40f" stroke-width="2" stroke-linecap="round"/>`;
+            const moon = `<path d="M22 16.5A9.5 9.5 0 1112.5 5a7.5 7.5 0 009.5 11.5z" fill="#dfe6e9"/>`;
+            const cloud = `<path d="M19.5 21a5.5 5.5 0 00-.4-10.9 8.5 8.5 0 00-14.2 3.4 6 6 0 001.6 11.5h12.5a6 6 0 00.5-4z" fill="#a4b0be"/>`;
+            const lightning = `<path d="M15 4l-8 12h7l-2 9 10-14h-7l3-7z" fill="#f1c40f" stroke="#f1c40f" stroke-width="1" stroke-linejoin="round"/>`;
+            const rain = `<path d="M14 23v4m-5-3v4m10-5v4" stroke="#74b9ff" stroke-width="2.5" stroke-linecap="round"/>`;
+            const snow = `<path d="M14 23v6m-3-4.5l6 3m-6 0l6-3M9 25v4m-1.5-3l3 2m-3 0l3-2m10-1v4m-1.5-3l3 2m-3 0l3-2" stroke="#dfe6e9" stroke-width="1.5" stroke-linecap="round"/>`;
+            const fog = `<path d="M6 14h16m-14 5h12m-10 5h8" stroke="#b2bec3" stroke-width="2" stroke-linecap="round"/>`;
+
+            let content = '';
+            let isRain = text.includes("rain") || text.includes("shower") || text.includes("drizzle");
+            let isSnow = text.includes("snow") || text.includes("blizzard") || text.includes("flurries") || text.includes("ice") || text.includes("freez");
+            let isThunder = text.includes("thunder") || text.includes("t-storm");
+
+            if (isThunder) content = cloud + `<g transform="translate(0, 2) scale(0.9)">${lightning}</g>`;
+            else if (isSnow) content = cloud + `<g transform="translate(0, -1)">${snow}</g>`;
+            else if (isRain) content = cloud + `<g transform="translate(0, -1)">${rain}</g>`;
+            else if (text.includes("fog") || text.includes("mist") || text.includes("wind") || text.includes("breezy")) content = fog;
+            else if (text.includes("mostly cloudy") || text.includes("overcast") || text.includes("cloudy")) {
+                content = `<path d="M19.5 17a5.5 5.5 0 00-.4-10.9 8.5 8.5 0 00-14.2 3.4 6 6 0 001.6 11.5h12.5a6 6 0 00.5-4z" fill="#747d8c"/>` + `<g transform="translate(0, 4)">${cloud}</g>`;
+            }
+            else if (text.includes("partly") || text.includes("few clouds")) {
+                content = (isDaytime ? `<g transform="translate(-2, -4) scale(0.85)">${sun}</g>` : `<g transform="translate(-2, -4) scale(0.85)">${moon}</g>`) + `<g transform="translate(0, 4)">${cloud}</g>`;
+            }
+            else content = isDaytime ? sun : moon;
+
+            return `<svg width="${size}" height="${size}" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block; vertical-align:middle;">${content}</svg>`;
         }
 
         function translateWx(wx) {
@@ -1223,21 +1240,25 @@
             let riskBadge = spc.rawLvl === 1 ? "Thunderstorm" : `<span style="font-size: 2.5em; font-weight: 900; line-height: 0.8;">${spc.level}</span><span style="font-size: 1.2em; opacity: 0.7; margin-left: 2px;">/5</span>`;
             
             let getRiskStyle = (val, isCig, type) => {
-                if (isCig) return { bg: '#ff00ff', text: '#ffffff', border: '#ff00ff' };
+                let b = 'transparent', t = '#ffffff', c = 'rgba(255,255,255,0.1)';
                 if (type === 'tor') {
-                    if (val >= 30) return { bg: '#ff00ff', text: '#ffffff', border: '#ff00ff' };
-                    if (val >= 15) return { bg: '#ff0000', text: '#ffffff', border: '#ff0000' };
-                    if (val >= 10) return { bg: '#ffc800', text: '#000000', border: '#ffc800' };
-                    if (val >= 5)  return { bg: '#8b4726', text: '#ffffff', border: '#8b4726' };
-                    if (val >= 2)  return { bg: '#008b00', text: '#ffffff', border: '#008b00' };
+                    if (val >= 30) { b = '#ff00ff'; t = '#ffffff'; c = b; }
+                    else if (val >= 15) { b = '#e74c3c'; t = '#ffffff'; c = b; }
+                    else if (val >= 10) { b = '#e67e22'; t = '#000000'; c = b; }
+                    else if (val >= 5)  { b = '#f1c40f'; t = '#000000'; c = b; }
+                    else if (val >= 2)  { b = '#00a152'; t = '#ffffff'; c = b; }
                 } else {
-                    if (val >= 60) return { bg: '#104e8b', text: '#ffffff', border: '#104e8b' };
-                    if (val >= 45) return { bg: '#912cee', text: '#ffffff', border: '#912cee' };
-                    if (val >= 30) return { bg: '#ff0000', text: '#ffffff', border: '#ff0000' };
-                    if (val >= 15) return { bg: '#ffc800', text: '#000000', border: '#ffc800' };
-                    if (val >= 5)  return { bg: '#8b4726', text: '#ffffff', border: '#8b4726' };
+                    if (val >= 60) { b = '#ff00ff'; t = '#ffffff'; c = b; }
+                    else if (val >= 45) { b = '#e74c3c'; t = '#ffffff'; c = b; }
+                    else if (val >= 30) { b = '#e67e22'; t = '#000000'; c = b; }
+                    else if (val >= 15) { b = '#f1c40f'; t = '#000000'; c = b; }
+                    else if (val >= 5)  { b = '#00a152'; t = '#ffffff'; c = b; }
                 }
-                return { bg: 'transparent', text: '#ffffff', border: 'rgba(255,255,255,0.1)' };
+                
+                if (isCig && val < 30 && type === 'tor') c = '#ff00ff';
+                if (isCig && val < 45 && type !== 'tor') c = '#ff00ff';
+                
+                return { bg: b, text: t, border: c };
             };
 
             let formatVal = (v) => {
@@ -1578,7 +1599,6 @@
                     
                     let transWx = translateWx(latest.wxString || "");
                     result.wx = transWx || "Clear"; 
-                    result.iconInfo = window.getWeatherIconInfo(result.wx, true);
                     return result;
                 }
             } catch(e) {}
@@ -1589,7 +1609,6 @@
                 result.gust = fallbackData.gust !== null ? fallbackData.gust : null;
                 let transWx = translateWx(fallbackData.wx || "");
                 result.wx = transWx || "Clear"; 
-                result.iconInfo = window.getWeatherIconInfo(result.wx, true);
             } else if (result.temp === '--') {
                 try {
                     let omRes = await fetchWithTimeout(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`, { timeout: 4000 });
@@ -1598,12 +1617,10 @@
                         result.temp = Math.round((omData.current_weather.temperature * 9/5) + 32);
                         result.wind = Math.round(omData.current_weather.windspeed * 0.621371);
                         result.wx = "Fair"; 
-                        result.iconInfo = window.getWeatherIconInfo(result.wx, true);
                         return result;
                     }
                 } catch(e) {}
                 result.wx = "Observation Unavailable"; 
-                result.iconInfo = { icon: "ph-cloud-slash", color: "#b2bec3" };
             }
             return result;
         }
@@ -1661,7 +1678,7 @@
                             ${alertIconHtml}
                         </div>
                         <div style="display:flex; align-items:center; gap:15px; margin-top:5px;">
-                            <i class="ph-fill ${liveASOS.iconInfo.icon}" style="font-size:36px; color:${liveASOS.iconInfo.color};"></i>
+                            ${window.getWeatherSVG(liveASOS.wx, true, 36)}
                             <div>
                                 <div style="font-size:26px; font-weight:900; line-height:1; color:#fff;">${liveASOS.temp !== '--' ? liveASOS.temp+'°F' : '--'}</div>
                                 <div style="font-size:12px; opacity:0.8; margin-top:4px; font-weight:600;">${liveASOS.wx}</div>
@@ -1714,7 +1731,7 @@
         }
 
         window.loadHomeNWS = async function(lat, lon, isGeo = false) {
-            let tempStr = "—"; let windStr = "Wind: —"; let dewpStr = "Dew Point: —"; let flStr = ""; let wxStr = "Observation Unavailable"; let wxIconInfo = { icon: "ph-cloud-slash", color: "#b2bec3" };
+            let tempStr = "—"; let windStr = "Wind: —"; let dewpStr = "Dew Point: —"; let flStr = ""; let wxStr = "Observation Unavailable"; 
             let fallbackAd = null;
             let staticFile = (!isGeo && lat === 42.03 && lon === -93.62) ? 'Ames' : null;
 
@@ -1727,7 +1744,7 @@
 
             let liveASOS = await fetchLiveASOS(lat, lon, fallbackAd);
             tempStr = liveASOS.temp !== '--' ? `${liveASOS.temp}°F` : '--';
-            wxIconInfo = liveASOS.iconInfo || wxIconInfo; wxStr = liveASOS.wx;
+            wxStr = liveASOS.wx;
             
             if (liveASOS.wind !== null) {
                 windStr = `Wind: ${liveASOS.wind} mph`;
@@ -1755,7 +1772,7 @@
             document.getElementById('homeFeelsLikeVal').innerHTML = flStr;
             
             let interpTag = liveASOS.interpolated && tempStr !== '--' ? `<span style="font-size:10px; color:#fff; vertical-align:super;" title="Interpolated from recent trend">*</span>` : '';
-            document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIconInfo.icon}" style="font-size: 36px; color: ${wxIconInfo.color};"></i> ${interpTag}`;
+            document.getElementById('homeWxVal').innerHTML = `${window.getWeatherSVG(wxStr, true, 42)} ${interpTag}`;
 
             try {
                 let cacheKey = `nws_pt_${lat.toFixed(2)}_${lon.toFixed(2)}`;
@@ -1793,6 +1810,23 @@
                     nwsData = { daily: fData, hourly: hData };
                 } else if(nwsData && nwsData.daily && nwsData.daily.properties) {
                     gridId = nwsData.daily.properties.gridId || "NWS";
+                }
+
+                if (!nwsData || !nwsData.daily || !nwsData.hourly) {
+                    let nearestInfo = window.getNearestPreloadedCity(lat, lon);
+                    if (nearestInfo && nearestInfo.distance <= 50) {
+                        let safeFbName = nearestInfo.city.id.replace(/ /g, "_");
+                        try {
+                            let fbRes = await fetchWithTimeout(`static/nws/${safeFbName}.json?t=${Date.now()}`, { timeout: 3000 });
+                            if (fbRes.ok) {
+                                let fbData = await fbRes.json();
+                                if (fbData && fbData.hourly && fbData.hourly.properties) {
+                                    nwsData = fbData;
+                                    gridId = (nwsData.daily && nwsData.daily.properties) ? nwsData.daily.properties.gridId : "NWS";
+                                }
+                            }
+                        } catch(e) {}
+                    }
                 }
 
                 if (nwsData && nwsData.daily && nwsData.daily.properties) {
@@ -1835,7 +1869,7 @@
                             }
                             tempsHtml += `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
                                 <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
-                                <i class="ph-fill ${pIconInfo.icon}" style="font-size: 26px; margin: 4px 0; color:${pIconInfo.color};"></i>
+                                <div style="margin: 4px 0;">${window.getWeatherSVG(p.shortForecast, p.isDaytime, 28)}</div>
                                 <div class="hr-temp" style="color:#fff;">${p.temperature}&deg;</div>
                                 ${flHtml} ${qpfStr}
                             </div>`;
@@ -1869,9 +1903,10 @@
             
             let cityObj = LF_CITIES.find(c => c.id === cityId);
             if (!cityObj) return;
-
-            let cityAlerts = window.nwsAlerts ? window.nwsAlerts.filter(f => isPointInNWSFeature(cityObj.lon, cityObj.lat, f)) : [];
+            let cityAlerts = window.nwsAlerts ? window.nwsAlerts.filter(f => isPointInNWSFeature(dataCity.lon, dataCity.lat, f)) : [];
             let alertsHtml = "";
+            let bannerState = isPlaceholder ? "loading" : false;
+
             if (cityAlerts.length > 0) {
                 alertsHtml = `
                 <div class="glass" style="padding: 25px; margin-bottom: 20px; border: 2px solid #fff; background: rgba(255, 255, 255, 0.1); height: auto; min-height: fit-content; overflow: visible;">
@@ -1918,7 +1953,7 @@
                     <div style="font-size:12px; font-weight: 900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase; color:#fff;">
                         ${titleHtml}
                     </div>
-                    <i class="ph-fill ${liveASOS.iconInfo.icon}" style="font-size: 56px; margin-bottom: 12px; color: ${liveASOS.iconInfo.color};"></i>
+                    <div style="margin-bottom: 12px;">${window.getWeatherSVG(liveASOS.wx, true, 60)}</div>
                     <div style="font-size:42px; font-weight:900; color:#fff; line-height:1; margin-bottom:15px;">${liveASOS.temp}°F</div>
                     
                     <div style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; color:#fff;">
@@ -1965,6 +2000,24 @@
                 } else if(nwsData && nwsData.daily && nwsData.daily.properties) {
                     gridId = nwsData.daily.properties.gridId || "NWS";
                 }
+
+                if (!nwsData || !nwsData.daily || !nwsData.hourly) {
+                    let nearestInfo = window.getNearestPreloadedCity(dataCity.lat, dataCity.lon);
+                    if (nearestInfo && nearestInfo.distance <= 50 && nearestInfo.city.id !== dataCity.id) {
+                        let safeFbName = nearestInfo.city.id.replace(/ /g, "_");
+                        try {
+                            let fbRes = await fetchWithTimeout(`static/nws/${safeFbName}.json?t=${Date.now()}`, { timeout: 3000 });
+                            if (fbRes.ok) {
+                                let fbData = await fbRes.json();
+                                if (fbData && fbData.hourly && fbData.hourly.properties) {
+                                    nwsData = fbData;
+                                    gridId = (nwsData.daily && nwsData.daily.properties) ? nwsData.daily.properties.gridId : "NWS";
+                                    bannerState = `fallback_${nearestInfo.city.display}`;
+                                }
+                            }
+                        } catch(e) {}
+                    }
+                }
                 
                 if (nwsData && nwsData.daily && nwsData.daily.properties) {
                     let dailyPeriods = nwsData.daily.properties.periods;
@@ -2010,7 +2063,7 @@
                             }
                             return `<div class="lf-hour-col">
                                 <div class="hr-label">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
-                                <i class="ph-fill ${hIconInfo.icon}" style="font-size: 26px; margin: 4px 0; color:${hIconInfo.color};"></i>
+                                <div style="margin: 4px 0;">${window.getWeatherSVG(p.shortForecast, p.isDaytime, 32)}</div>
                                 <div class="hr-temp" style="color:#fff;">${p.temperature}&deg;</div>
                                 ${flHtml}
                                 ${qpfStr}
@@ -2038,7 +2091,6 @@
                             if (p1.isDaytime) {
                                 hi = p1.temperature;
                                 lo = (p2 && !p2.isDaytime) ? p2.temperature : '--';
-                                dIconInfo = window.getWeatherIconInfo(p1.shortForecast, true);
                                 
                                 let dWinds = parseWinds(p1.windSpeed, p1.windGust);
                                 let dRh = p1.relativeHumidity?.value || null;
@@ -2094,7 +2146,7 @@
                             dCols += `
                             <div class="lf-daily-col">
                                 <div style="font-weight: 800; font-size: 14px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; color:#fff;">${dayName}</div>
-                                <i class="ph-fill ${dIconInfo.icon}" style="font-size: 36px; margin-bottom: 12px; color: ${dIconInfo.color};"></i>
+                                <div style="margin-bottom: 12px;">${window.getWeatherSVG(p1.shortForecast, p1.isDaytime, 42)}</div>
                                 
                                 <div style="margin-bottom: 10px; min-height: 45px;">
                                     <div style="font-size: 24px; font-weight: 900; color: #fff; line-height: 1;">${hi !== '--' ? hi+'°' : '--'}</div>
@@ -2256,16 +2308,38 @@
             let pinColor = isPinned ? 'var(--accent)' : '#fff';
             let pinText = isPinned ? 'Pinned' : 'Pin City';
             
+            let placeholderBanner = '';
+            if (bannerState === "loading") {
+                placeholderBanner = `
+                <div class="placeholder-banner glass" style="padding: 15px; margin-bottom: 20px; border: 1px solid var(--warning); display: flex; align-items: center; gap: 12px; color: #fff; background: rgba(255, 165, 0, 0.15);">
+                    <i class="ph ph-spinner ph-spin" style="font-size: 28px; color: var(--warning);"></i> 
+                    <div>
+                        <div style="font-size: 15px; font-weight: 900; color: var(--warning); text-transform: uppercase;">Precise Forecast Loading...</div>
+                        <div style="font-size: 13px; opacity: 0.9; margin-top: 2px;">Temporarily displaying lightning-fast cached data from nearby <strong>${dataCity.display}</strong>.</div>
+                    </div>
+                </div>`;
+            } else if (typeof bannerState === 'string' && bannerState.startsWith('fallback_')) {
+                let fallbackName = bannerState.split('_')[1];
+                placeholderBanner = `
+                <div class="placeholder-banner glass" style="padding: 15px; margin-bottom: 20px; border: 1px solid var(--info); display: flex; align-items: center; gap: 12px; color: #fff; background: rgba(112, 161, 255, 0.15);">
+                    <i class="ph-fill ph-info" style="font-size: 28px; color: var(--info);"></i> 
+                    <div>
+                        <div style="font-size: 15px; font-weight: 900; color: var(--info); text-transform: uppercase;">Live NWS Data Unavailable</div>
+                        <div style="font-size: 13px; opacity: 0.9; margin-top: 2px;">Falling back to the nearest active forecast from <strong>${fallbackName}</strong>.</div>
+                    </div>
+                </div>`;
+            }
+
             let headerHtml = `
                 <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 25px; flex-wrap:wrap; gap:10px;">
-                    <h2 style="font-size: 36px; font-weight: 900; margin: 0;">${cityObj.display}</h2>
-                    <button id="pinCityBtn" onclick="window.togglePinCity('${cityId}')" class="glass-btn" style="font-size:12px; padding:8px 16px;">
+                    <h2 style="font-size: 36px; font-weight: 900; margin: 0;">${displayCity.display}</h2>
+                    <button id="pinCityBtn" onclick="window.togglePinCity('${safeCityId}')" class="glass-btn" style="font-size:12px; padding:8px 16px;">
                         <i id="pinCityIcon" class="${pinIcon}" style="color:${pinColor}; font-size:16px;"></i> <span id="pinCityText">${pinText}</span>
                     </button>
                 </div>
             `;
 
-            main.innerHTML = headerHtml + alertsHtml + currentAndDetailedHtml + spcHtml + dailyHtml + hourlyHtml + mosHtml + `<div style="padding-bottom: 50px;"></div>`;
+            main.innerHTML = headerHtml + placeholderBanner + alertsHtml + currentAndDetailedHtml + spcHtml + dailyHtml + hourlyHtml + mosHtml + `<div style="padding-bottom: 50px;"></div>`;
         }
 
         window.filterLFCities = function(val) {
