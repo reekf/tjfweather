@@ -827,19 +827,24 @@
 
         window.robustNWSFetch = async function(url) {
             try {
-                let res = await fetchWithTimeout(url, { headers: { 'Cache-Control': 'no-cache' }, timeout: 6000 });
-                if (res.ok) { let data = await res.json(); if (!data.status || data.status === 200) return data; }
+                let res = await fetchWithTimeout(url, { timeout: 8000 });
+                if (res.ok) { let data = await res.json(); if (data && data.properties) return data; }
             } catch (e) { }
             try {
-                let proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-                let pRes = await fetchWithTimeout(proxied, { timeout: 6000 });
-                if (pRes.ok) { let data = await pRes.json(); if (!data.status || data.status === 200) return data; }
+                let proxied = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+                let pRes = await fetchWithTimeout(proxied, { timeout: 8000 });
+                if (pRes.ok) { let data = await pRes.json(); if (data && data.properties) return data; }
+            } catch (e) { }
+            try {
+                let proxied2 = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                let pRes2 = await fetchWithTimeout(proxied2, { timeout: 8000 });
+                if (pRes2.ok) { let data = await pRes2.json(); if (data && data.properties) return data; }
             } catch (e) { }
             throw new Error("National Weather Service Fetch Failed");
         }
 
         async function fetchWithTimeout(resource, options = {}) {
-            const { timeout = 6000 } = options;
+            const { timeout = 8000 } = options;
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), timeout);
             const response = await fetch(resource, { ...options, signal: controller.signal });
@@ -1063,13 +1068,13 @@
                         
                         if (labelStr.includes("SIG")) cigStr = "CIG"; 
                         if (labelStr.includes("CIG")) {
-                            let m = labelStr.match(/CIG\s*(\d*)/);
-                            if (m) cigStr = "CIG" + m[1];
+                            let m = labelStr.match(/CIG\s*(\d+(?:\.\d+)?)/);
+                            if (m && m[1]) cigStr = "CIG" + m[1];
                             else cigStr = "CIG";
                         }
                         if (props.sig === 1 || props.SIG === 1 || props.cig === 1 || props.CIG === 1) cigStr = "CIG";
 
-                        let probText = labelStr.replace(/CIG\s*\d*/g, '').replace(/SIG/g, '');
+                        let probText = labelStr.replace(/CIG\s*\d*(?:\.\d+)?/g, '').replace(/SIG/g, '');
                         let match = probText.match(/(?:0\.\d+|\d+)/);
                         if (match) {
                             let probNum = parseFloat(match[0]);
@@ -1140,8 +1145,6 @@
             let getRiskStyle = (val, isCig, type) => {
                 if (isCig) return { bg: '#ff00ff', text: '#ffffff', border: '#ff00ff' };
                 if (type === 'tor') {
-                    if (val >= 60) return { bg: '#104e8b', text: '#ffffff', border: '#104e8b' };
-                    if (val >= 45) return { bg: '#912cee', text: '#ffffff', border: '#912cee' };
                     if (val >= 30) return { bg: '#ff00ff', text: '#ffffff', border: '#ff00ff' };
                     if (val >= 15) return { bg: '#ff0000', text: '#ffffff', border: '#ff0000' };
                     if (val >= 10) return { bg: '#ffc800', text: '#000000', border: '#ffc800' };
@@ -1157,13 +1160,20 @@
                 return { bg: 'transparent', text: '#ffffff', border: 'rgba(255,255,255,0.1)' };
             };
 
-            let torVal = spc.tor.replace(/\s*\((CIG|SIG).*\)/, '');
-            let windVal = spc.wind.replace(/\s*\((CIG|SIG).*\)/, '');
-            let hailVal = spc.hail.replace(/\s*\((CIG|SIG).*\)/, '');
+            // Aggressively strip the percentage sign here so we never have a double "%%" in the UI.
+            let formatVal = (v) => {
+                let s = v.replace(/\s*\((CIG|SIG).*\)/, '').replace(/%/g, '');
+                if (s.includes('CIG') || s.includes('SIG')) return "SIG";
+                return s ? s : "0";
+            };
 
-            let torCigMatch = spc.tor.match(/(CIG\d*|SIG)/);
-            let windCigMatch = spc.wind.match(/(CIG\d*|SIG)/);
-            let hailCigMatch = spc.hail.match(/(CIG\d*|SIG)/);
+            let torVal = formatVal(spc.tor);
+            let windVal = formatVal(spc.wind);
+            let hailVal = formatVal(spc.hail);
+
+            let torCigMatch = spc.tor.match(/(CIG\d*(?:\.\d+)?|SIG)/);
+            let windCigMatch = spc.wind.match(/(CIG\d*(?:\.\d+)?|SIG)/);
+            let hailCigMatch = spc.hail.match(/(CIG\d*(?:\.\d+)?|SIG)/);
 
             let torCig = torCigMatch ? torCigMatch[0].replace('SIG', 'CIG') : null;
             let windCig = windCigMatch ? windCigMatch[0].replace('SIG', 'CIG') : null;
@@ -1177,23 +1187,31 @@
             let windStyle = getRiskStyle(windNum, windCig, 'wind');
             let hailStyle = getRiskStyle(hailNum, hailCig, 'hail');
 
+            // Explicitly build display string avoiding any double percentages
+            let displayString = (val) => val === 'SIG' ? 'SIG' : val + '%';
+
             let getDescText = (type, val, cigTag) => {
                 let text = "";
                 if (type === 'tor') {
                     if (val >= 15) text = "Numerous tornadoes possible";
                     else if (val >= 5) text = "A few tornadoes possible";
                     else if (val >= 2) text = "Isolated tornado possible";
-                    if (cigTag) text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:900; display:flex; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> ${cigTag}: EF2+ tornadoes possible</span>`;
+                    if (cigTag) text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:900; display:flex; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: EF2+ tornadoes possible</span>`;
                 } else if (type === 'wind') {
                     if (val >= 30) text = "Widespread damaging winds possible";
                     else if (val >= 15) text = "Scattered damaging winds possible";
                     else if (val >= 5) text = "Isolated damaging winds possible";
-                    if (cigTag) text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:900; display:flex; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> ${cigTag}: 75+ mph winds possible</span>`;
+                    if (cigTag) text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:900; display:flex; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: 75+ mph winds possible</span>`;
                 } else if (type === 'hail') {
                     if (val >= 30) text = "Widespread large hail possible";
                     else if (val >= 15) text = "Scattered large hail possible";
                     else if (val >= 5) text = "Isolated large hail possible";
-                    if (cigTag) text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:900; display:flex; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> ${cigTag}: 2+ inch hail possible</span>`;
+                    if (cigTag) {
+                        let match = cigTag.match(/(\d+(?:\.\d+)?)/);
+                        let sizeNum = match ? match[1] : "2.0"; 
+                        let sizeStr = window.getHailTranslation(sizeNum);
+                        text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:900; display:flex; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: ${sizeStr} possible</span>`;
+                    }
                 }
                 if (!text && !cigTag) text = "<span style='opacity:0.4'>No significant risk</span>";
                 return text;
@@ -1212,17 +1230,17 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px;">
                         <div style="background: rgba(0,0,0,0.2); border: 1px solid ${torStyle.border}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${torNum > 0 || torCig ? 'inset 0 0 15px '+torStyle.border+'33' : 'none'};">
                             <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Tornado</div>
-                            <div style="font-size: 24px; font-weight: 900; background: ${torStyle.bg}; color: ${torStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${torVal}%</div>
+                            <div style="font-size: 24px; font-weight: 900; background: ${torStyle.bg}; color: ${torStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${displayString(torVal)}</div>
                             <div style="font-size: 11px; line-height: 1.4; color: #fff;">${torDesc}</div>
                         </div>
                         <div style="background: rgba(0,0,0,0.2); border: 1px solid ${windStyle.border}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${windNum > 0 || windCig ? 'inset 0 0 15px '+windStyle.border+'33' : 'none'};">
                             <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Wind</div>
-                            <div style="font-size: 24px; font-weight: 900; background: ${windStyle.bg}; color: ${windStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${windVal}%</div>
+                            <div style="font-size: 24px; font-weight: 900; background: ${windStyle.bg}; color: ${windStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${displayString(windVal)}</div>
                             <div style="font-size: 11px; line-height: 1.4; color: #fff;">${windDesc}</div>
                         </div>
                         <div style="background: rgba(0,0,0,0.2); border: 1px solid ${hailStyle.border}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${hailNum > 0 || hailCig ? 'inset 0 0 15px '+hailStyle.border+'33' : 'none'};">
                             <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Hail</div>
-                            <div style="font-size: 24px; font-weight: 900; background: ${hailStyle.bg}; color: ${hailStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${hailVal}%</div>
+                            <div style="font-size: 24px; font-weight: 900; background: ${hailStyle.bg}; color: ${hailStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${displayString(hailVal)}</div>
                             <div style="font-size: 11px; line-height: 1.4; color: #fff;">${hailDesc}</div>
                         </div>
                     </div>
@@ -1262,16 +1280,25 @@
             return 'alert-other';
         }
 
-        // Object Hail Size Translator logic
         window.getHailTranslation = function(sizeInInches) {
-            const hailSizes = {
-                0.25: "Pea", 0.50: "Mothball", 0.75: "Penny", 0.88: "Nickel",
-                1.00: "Quarter", 1.25: "Half Dollar", 1.50: "Ping Pong Ball",
-                1.75: "Golf Ball", 2.00: "Hen Egg", 2.50: "Tennis Ball",
-                2.75: "Baseball", 3.00: "Teacup", 4.00: "Grapefruit", 4.50: "Softball"
-            };
             const size = parseFloat(sizeInInches);
-            return hailSizes[size] ? `${size}" (${hailSizes[size]})` : `${size}"`;
+            if (isNaN(size)) return "2\"+ (Hen Egg)";
+            
+            if (size >= 4.5) return `${size}" (Softball)`;
+            if (size >= 4.0) return `${size}" (Grapefruit)`;
+            if (size >= 3.0) return `${size}" (Teacup)`;
+            if (size >= 2.75) return `${size}" (Baseball)`;
+            if (size >= 2.5) return `${size}" (Tennis Ball)`;
+            if (size >= 2.0) return `${size}" (Hen Egg)`;
+            if (size >= 1.75) return `${size}" (Golf Ball)`;
+            if (size >= 1.5) return `${size}" (Ping Pong Ball)`;
+            if (size >= 1.25) return `${size}" (Half Dollar)`;
+            if (size >= 1.0) return `${size}" (Quarter)`;
+            if (size >= 0.88) return `${size}" (Nickel)`;
+            if (size >= 0.75) return `${size}" (Penny)`;
+            if (size >= 0.5) return `${size}" (Mothball)`;
+            if (size >= 0.25) return `${size}" (Pea)`;
+            return `${size}"`;
         };
 
         window.alertBadgeHTML = function(f) {
@@ -1283,7 +1310,6 @@
                 expText = `<div style="font-size:10px; margin-top:6px; opacity:0.8; font-weight:800; text-transform:uppercase;">Expires: ${expDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })}</div>`;
             }
 
-            // Extract Hail and Wind parameters and apply Hail translation
             let tagsHtml = '';
             if (f.properties.parameters) {
                 let maxHail = f.properties.parameters.maxHailSize ? f.properties.parameters.maxHailSize[0] : null;
@@ -1291,7 +1317,11 @@
                 if (maxHail || maxWind) {
                     tagsHtml = `<div style="display:flex; gap:8px; margin-top:6px; flex-wrap:wrap;">`;
                     if (maxHail) tagsHtml += `<span style="background:rgba(0,0,0,0.4); padding:3px 6px; border-radius:4px; font-size:11px; font-weight:bold; color:#fff;"><i class="ph-fill ph-snowflake" style="color:#00d2ff;"></i> Hail: ${window.getHailTranslation(maxHail)}</span>`;
-                    if (maxWind) tagsHtml += `<span style="background:rgba(0,0,0,0.4); padding:3px 6px; border-radius:4px; font-size:11px; font-weight:bold; color:#fff;"><i class="ph-fill ph-wind" style="color:#00d2ff;"></i> Wind: ${maxWind} mph</span>`;
+                    
+                    if (maxWind) {
+                        let wStr = maxWind.includes('mph') ? maxWind : maxWind + ' mph';
+                        tagsHtml += `<span style="background:rgba(0,0,0,0.4); padding:3px 6px; border-radius:4px; font-size:11px; font-weight:bold; color:#fff;"><i class="ph-fill ph-wind" style="color:#00d2ff;"></i> Wind: ${wStr}</span>`;
+                    }
                     tagsHtml += `</div>`;
                 }
             }
@@ -1441,16 +1471,6 @@
         }
 
         // 9. Location & Core Fetching
-        window.getDistanceMiles = function(lat1, lon1, lat2, lon2) {
-            const R = 3958.8; 
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        };
-
-        // --- NEW MISSING FUNCTIONS RE-ADDED ---
         window.setupHomeLocation = function() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -1478,7 +1498,9 @@
             if (window.nwsAlerts && window.nwsAlerts.length > 0) window.updateHomeAlerts(lat, lon);
 
             try {
-                let ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
+                let rLat = Number(lat).toFixed(4);
+                let rLon = Number(lon).toFixed(4);
+                let ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${rLat},${rLon}`);
                 if (ptData && ptData.properties) {
                     let fData = await window.robustNWSFetch(ptData.properties.forecast);
                     if (fData && fData.properties && fData.properties.periods.length > 0) {
@@ -1521,7 +1543,9 @@
         window.fetchLiveASOS = async function(lat, lon, fallbackAd) {
             if (fallbackAd) return fallbackAd;
             try {
-                let ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
+                let rLat = Number(lat).toFixed(4);
+                let rLon = Number(lon).toFixed(4);
+                let ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${rLat},${rLon}`);
                 let hData = await window.robustNWSFetch(ptData.properties.forecastHourly);
                 if (hData && hData.properties && hData.properties.periods.length > 0) {
                     let p = hData.properties.periods[0];
@@ -1545,7 +1569,6 @@
                 <i class="ph-fill ph-check-circle"></i> Official Forecast by NWS ${gridId}
             </div>`;
         };
-        // --- END NEW FUNCTIONS ---
 
         window.getNearestPreloadedCity = function(lat, lon) {
             let nearest = null;
@@ -1631,7 +1654,7 @@
             let nwsHtml = ""; let hourlyHtml = ""; let dailyHtml = ""; let gridId = "NWS";
             
             try {
-                let cacheKey = `nws_pt_${dataCity.lat.toFixed(2)}_${dataCity.lon.toFixed(2)}`;
+                let cacheKey = `nws_pt_${dataCity.lat.toFixed(4)}_${dataCity.lon.toFixed(4)}`;
                 let ptData = null; let nwsData = null; let cacheValid = false;
                 
                 try {
@@ -1648,14 +1671,21 @@
                 
                 if (!cacheValid) {
                     try { ptData = JSON.parse(localStorage.getItem(cacheKey)); } catch(e){}
-                    if (!ptData) {
-                        ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${dataCity.lat},${dataCity.lon}`);
-                        if (ptData) localStorage.setItem(cacheKey, JSON.stringify(ptData));
+                    if (!ptData || !ptData.properties) {
+                        try {
+                            let latRound = Number(dataCity.lat).toFixed(4);
+                            let lonRound = Number(dataCity.lon).toFixed(4);
+                            ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${latRound},${lonRound}`);
+                            if (ptData && ptData.properties) localStorage.setItem(cacheKey, JSON.stringify(ptData));
+                        } catch(e) { console.error("Point fetch failed", e); }
                     }
                     if(ptData && ptData.properties) {
                         gridId = ptData.properties.gridId;
-                        let fData = await window.robustNWSFetch(ptData.properties.forecast);
-                        let hData = await window.robustNWSFetch(ptData.properties.forecastHourly);
+                        let fData = null, hData = null;
+                        
+                        try { fData = await window.robustNWSFetch(ptData.properties.forecast); } catch(e) { console.warn("Daily forecast failed", e); }
+                        try { hData = await window.robustNWSFetch(ptData.properties.forecastHourly); } catch(e) { console.warn("Hourly forecast failed", e); }
+                        
                         nwsData = { daily: fData, hourly: hData };
                     }
                 } else if(nwsData && nwsData.daily && nwsData.daily.properties) {
@@ -1816,13 +1846,19 @@
                         </div>`;
                     }
 
-                    let period = dailyPeriods[0];
-                    nwsHtml = `
-                    <div class="glass nws-panel" style="background: rgba(0, 210, 255, 0.05); padding: 25px;">
-                        <div style="font-size:22px; font-weight:900; margin-bottom: 15px; color:#fff;">${period.name}: ${period.temperature}°F</div>
-                        <div style="font-size:15px; opacity:0.9; line-height: 1.6; color:#fff;">${period.detailedForecast}</div>
-                        ${window.buildMeteorologistCreditHTML(gridId, dataCity.lat, dataCity.lon)}
-                    </div>`;
+                    if (dailyPeriods.length > 0) {
+                        let period = dailyPeriods[0];
+                        nwsHtml = `
+                        <div class="glass nws-panel" style="background: rgba(0, 210, 255, 0.05); padding: 25px;">
+                            <div style="font-size:22px; font-weight:900; margin-bottom: 15px; color:#fff;">${period.name}: ${period.temperature}°F</div>
+                            <div style="font-size:15px; opacity:0.9; line-height: 1.6; color:#fff;">${period.detailedForecast}</div>
+                            ${window.buildMeteorologistCreditHTML(gridId, dataCity.lat, dataCity.lon)}
+                        </div>`;
+                    } else {
+                        nwsHtml = "<div class='glass' style='padding:25px; color:#fff;'><i class=\"ph-fill ph-warning\"></i> National Weather Service Daily Forecast temporarily unavailable.</div>";
+                    }
+                } else {
+                    nwsHtml = "<div class='glass' style='padding:25px; color:#fff;'><i class=\"ph-fill ph-warning\"></i> National Weather Service Forecast temporarily unavailable.</div>";
                 }
             } catch(e) { nwsHtml = "<div class='glass' style='padding:25px; color:#fff;'><i class=\"ph-fill ph-warning\"></i> National Weather Service Forecast temporarily unavailable.</div>" }
 
@@ -1955,7 +1991,7 @@
             let pinColor = isPinned ? 'var(--accent)' : '#fff';
             let pinText = isPinned ? 'Pinned' : 'Pin City';
             
-            let safeCityId = String(cityId).replace(/'/g, "\\'");
+            let safeCityId = String(dataCity.id).replace(/'/g, "\\'");
 
             let headerHtml = `
                 <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 25px; flex-wrap:wrap; gap:10px;">
