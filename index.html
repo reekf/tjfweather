@@ -2322,6 +2322,7 @@
             let pinIcon = isPinned ? 'ph-fill ph-push-pin' : 'ph ph-push-pin';
             let pinColor = isPinned ? 'var(--accent)' : '#fff';
             let pinText = isPinned ? 'Pinned' : 'Pin City';
+            let safeCityId = String(cityId).replace(/'/g, "\\'");
             
             let placeholderBanner = '';
             if (typeof bannerState === 'string' && bannerState.startsWith('fallback_')) {
