@@ -1817,8 +1817,9 @@
                             document.getElementById('homeLocationName').innerText = `Official National Weather Service Forecast — ${city}, ${state}`;
                         }
                         gridId = ptData.properties.gridId;
-                        let fData = await window.robustNWSFetch(ptData.properties.forecast);
-                        let hData = await window.robustNWSFetch(ptData.properties.forecastHourly);
+                        let fData = null, hData = null;
+                        try { fData = await window.robustNWSFetch(ptData.properties.forecast); } catch(e) {}
+                        try { hData = await window.robustNWSFetch(ptData.properties.forecastHourly); } catch(e) {}
                         nwsData = { daily: fData, hourly: hData };
                     } catch (err) {
                         console.warn("Live NWS fetch failed, flowing to fallback: ", err);
@@ -1827,7 +1828,7 @@
                     gridId = nwsData.daily.properties.gridId || "NWS";
                 }
 
-                if (!nwsData || !nwsData.daily || !nwsData.hourly) {
+                if (!nwsData || (!nwsData.daily && !nwsData.hourly)) {
                     let nearestInfo = window.getNearestPreloadedCity(lat, lon);
                     if (nearestInfo && nearestInfo.distance <= 50) {
                         let safeFbName = nearestInfo.city.id.replace(/ /g, "_");
@@ -2013,8 +2014,9 @@
                         }
                         if(ptData && ptData.properties) {
                             gridId = ptData.properties.gridId;
-                            let fData = await window.robustNWSFetch(ptData.properties.forecast);
-                            let hData = await window.robustNWSFetch(ptData.properties.forecastHourly);
+                            let fData = null, hData = null;
+                            try { fData = await window.robustNWSFetch(ptData.properties.forecast); } catch(e) {}
+                            try { hData = await window.robustNWSFetch(ptData.properties.forecastHourly); } catch(e) {}
                             nwsData = { daily: fData, hourly: hData };
                         }
                     } catch (err) {
@@ -2024,7 +2026,7 @@
                     gridId = nwsData.daily.properties.gridId || "NWS";
                 }
 
-                if (!nwsData || !nwsData.daily || !nwsData.hourly) {
+                if (!nwsData || (!nwsData.daily && !nwsData.hourly)) {
                     let nearestInfo = window.getNearestPreloadedCity(cityObj.lat, cityObj.lon);
                     if (nearestInfo && nearestInfo.distance <= 50 && nearestInfo.city.id !== cityObj.id) {
                         let safeFbName = nearestInfo.city.id.replace(/ /g, "_");
