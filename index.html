@@ -958,16 +958,17 @@
             return { sustained, gust };
         }
 
-        function getWeatherIcon(wx, isDaytime = true) {
+        window.getWeatherIconInfo = function(wx, isDaytime = true) {
             const text = (wx || "").toLowerCase();
-            if (text.includes("thunder") || text.includes("t-storm")) return "ph-cloud-lightning";
-            if (text.includes("snow") || text.includes("blizzard") || text.includes("flurries")) return "ph-snowflake";
-            if (text.includes("rain") || text.includes("shower") || text.includes("drizzle")) return "ph-cloud-rain";
-            if (text.includes("fog") || text.includes("mist")) return "ph-cloud-fog";
-            if (text.includes("wind") || text.includes("breezy")) return "ph-wind";
-            if (text.includes("mostly cloudy") || text.includes("partly sunny") || text.includes("partly cloudy") || text.includes("mostly clear") || text.includes("few clouds")) return isDaytime ? "ph-cloud-sun" : "ph-cloud-moon";
-            if (text.includes("cloud") || text.includes("overcast")) return "ph-cloud";
-            return isDaytime ? "ph-sun" : "ph-moon";
+            if (text.includes("thunder") || text.includes("t-storm")) return { icon: "ph-cloud-lightning", color: "#f1c40f" };
+            if (text.includes("snow") || text.includes("blizzard") || text.includes("flurries") || text.includes("ice") || text.includes("freez")) return { icon: "ph-snowflake", color: "#ffffff" };
+            if (text.includes("rain") || text.includes("shower") || text.includes("drizzle")) return { icon: "ph-cloud-rain", color: "#70a1ff" };
+            if (text.includes("fog") || text.includes("mist")) return { icon: "ph-cloud-fog", color: "#b2bec3" };
+            if (text.includes("wind") || text.includes("breezy")) return { icon: "ph-wind", color: "#b2bec3" };
+            if (text.includes("mostly cloudy") || text.includes("overcast") || text.includes("cloudy") || text.includes("partly sunny")) return { icon: "ph-cloud", color: "#b2bec3" };
+            if (text.includes("partly") || text.includes("few clouds")) return { icon: isDaytime ? "ph-cloud-sun" : "ph-cloud-moon", color: "#b2bec3" };
+            if (text.includes("mostly clear") || text.includes("clear") || text.includes("fair")) return { icon: isDaytime ? "ph-sun" : "ph-moon", color: isDaytime ? "#f1c40f" : "#dfe6e9" };
+            return { icon: isDaytime ? "ph-sun" : "ph-moon", color: isDaytime ? "#f1c40f" : "#dfe6e9" };
         }
 
         function translateWx(wx) {
@@ -1221,24 +1222,105 @@
             
             let riskBadge = spc.rawLvl === 1 ? "Thunderstorm" : `<span style="font-size: 2.5em; font-weight: 900; line-height: 0.8;">${spc.level}</span><span style="font-size: 1.2em; opacity: 0.7; margin-left: 2px;">/5</span>`;
             
-            let sigTor = spc.tor.includes('SIG') ? `<div style="font-size:11px; color:var(--warning); margin-top:4px; font-weight:bold;"><i class="ph-fill ph-warning"></i> EF2+ tornadoes possible</div>` : '';
-            let sigWind = spc.wind.includes('SIG') ? `<div style="font-size:11px; color:var(--warning); margin-top:4px; font-weight:bold;"><i class="ph-fill ph-warning"></i> 75+ mph winds possible</div>` : '';
-            let sigHail = spc.hail.includes('SIG') ? `<div style="font-size:11px; color:var(--warning); margin-top:4px; font-weight:bold;"><i class="ph-fill ph-warning"></i> 2+ inch (baseball sized) hail possible</div>` : '';
-            
-            let torVal = spc.tor.replace(' (SIG)', '');
-            let windVal = spc.wind.replace(' (SIG)', '');
-            let hailVal = spc.hail.replace(' (SIG)', '');
+            let getRiskStyle = (val, isCig, type) => {
+                if (isCig) return { bg: '#ff00ff', text: '#ffffff', border: '#ff00ff' };
+                if (type === 'tor') {
+                    if (val >= 30) return { bg: '#ff00ff', text: '#ffffff', border: '#ff00ff' };
+                    if (val >= 15) return { bg: '#ff0000', text: '#ffffff', border: '#ff0000' };
+                    if (val >= 10) return { bg: '#ffc800', text: '#000000', border: '#ffc800' };
+                    if (val >= 5)  return { bg: '#8b4726', text: '#ffffff', border: '#8b4726' };
+                    if (val >= 2)  return { bg: '#008b00', text: '#ffffff', border: '#008b00' };
+                } else {
+                    if (val >= 60) return { bg: '#104e8b', text: '#ffffff', border: '#104e8b' };
+                    if (val >= 45) return { bg: '#912cee', text: '#ffffff', border: '#912cee' };
+                    if (val >= 30) return { bg: '#ff0000', text: '#ffffff', border: '#ff0000' };
+                    if (val >= 15) return { bg: '#ffc800', text: '#000000', border: '#ffc800' };
+                    if (val >= 5)  return { bg: '#8b4726', text: '#ffffff', border: '#8b4726' };
+                }
+                return { bg: 'transparent', text: '#ffffff', border: 'rgba(255,255,255,0.1)' };
+            };
+
+            let formatVal = (v) => {
+                let s = v.replace(/\s*\((CIG|SIG).*\)/, '').replace(/%/g, '');
+                if (s.includes('CIG') || s.includes('SIG')) return "SIG";
+                return s ? s : "0";
+            };
+
+            let torVal = formatVal(spc.tor);
+            let windVal = formatVal(spc.wind);
+            let hailVal = formatVal(spc.hail);
+
+            let torCigMatch = spc.tor.match(/(CIG\d*(?:\.\d+)?|SIG)/);
+            let windCigMatch = spc.wind.match(/(CIG\d*(?:\.\d+)?|SIG)/);
+            let hailCigMatch = spc.hail.match(/(CIG\d*(?:\.\d+)?|SIG)/);
+
+            let torCig = torCigMatch ? torCigMatch[0].replace('SIG', 'CIG') : null;
+            let windCig = windCigMatch ? windCigMatch[0].replace('SIG', 'CIG') : null;
+            let hailCig = hailCigMatch ? hailCigMatch[0].replace('SIG', 'CIG') : null;
+
+            let torNum = parseInt(torVal) || 0;
+            let windNum = parseInt(windVal) || 0;
+            let hailNum = parseInt(hailVal) || 0;
+
+            let torStyle = getRiskStyle(torNum, torCig, 'tor');
+            let windStyle = getRiskStyle(windNum, windCig, 'wind');
+            let hailStyle = getRiskStyle(hailNum, hailCig, 'hail');
+
+            let displayString = (val) => val === 'SIG' ? 'SIG' : val + '%';
+
+            let getDescText = (type, val, cigTag) => {
+                let text = "";
+                if (type === 'tor') {
+                    if (val >= 15) text = "Numerous tornadoes possible";
+                    else if (val >= 5) text = "A few tornadoes possible";
+                    else if (val >= 2) text = "Isolated tornado possible";
+                    if (cigTag) text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:900; display:flex; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: EF2+ tornadoes possible</span>`;
+                } else if (type === 'wind') {
+                    if (val >= 30) text = "Widespread damaging winds possible";
+                    else if (val >= 15) text = "Scattered damaging winds possible";
+                    else if (val >= 5) text = "Isolated damaging winds possible";
+                    if (cigTag) text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:900; display:flex; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: 75+ mph winds possible</span>`;
+                } else if (type === 'hail') {
+                    if (val >= 30) text = "Widespread large hail possible";
+                    else if (val >= 15) text = "Scattered large hail possible";
+                    else if (val >= 5) text = "Isolated large hail possible";
+                    if (cigTag) {
+                        let match = cigTag.match(/(\d+(?:\.\d+)?)/);
+                        let sizeNum = match ? match[1] : "2.0"; 
+                        let sizeStr = window.getHailTranslation ? window.getHailTranslation(sizeNum) : sizeNum + '"';
+                        text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:900; display:flex; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: ${sizeStr} possible</span>`;
+                    }
+                }
+                if (!text && !cigTag) text = "<span style='opacity:0.4'>No significant risk</span>";
+                return text;
+            };
+
+            let torDesc = getDescText('tor', torNum, torCig);
+            let windDesc = getDescText('wind', windNum, windCig);
+            let hailDesc = getDescText('hail', hailNum, hailCig);
 
             return `
-                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;">
+                <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 12px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="background: ${spc.bgColor}; color: ${spc.textColor}; padding: 8px 14px; border-radius: 8px; font-weight: 900; font-size: 15px; display: flex; align-items: baseline; gap: 2px;">${riskBadge}</div>
-                        <div style="font-weight: 900; font-size: 16px; color: ${spc.bgColor};">${spc.name}</div>
+                        <div style="background: ${spc.bgColor}; color: ${spc.textColor}; padding: 8px 14px; border-radius: 8px; font-weight: 900; font-size: 15px; display: flex; align-items: baseline; gap: 2px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);">${riskBadge}</div>
+                        <div style="font-weight: 900; font-size: 16px; color: ${spc.bgColor}; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">${spc.name}</div>
                     </div>
-                    <div style="display: flex; gap: 18px; font-size: 14px; font-weight: 800; opacity: 0.85; margin-top: 4px; align-items: flex-start;">
-                        <div>Tornado: <span style="color:#fff">${torVal}</span>${sigTor}</div>
-                        <div>Wind: <span style="color:#fff">${windVal}</span>${sigWind}</div>
-                        <div>Hail: <span style="color:#fff">${hailVal}</span>${sigHail}</div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px;">
+                        <div style="background: rgba(0,0,0,0.2); border: 1px solid ${torStyle.border}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${torNum > 0 || torCig ? 'inset 0 0 15px '+torStyle.border+'33' : 'none'};">
+                            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Tornado</div>
+                            <div style="font-size: 24px; font-weight: 900; background: ${torStyle.bg}; color: ${torStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${displayString(torVal)}</div>
+                            <div style="font-size: 11px; line-height: 1.4; color: #fff;">${torDesc}</div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.2); border: 1px solid ${windStyle.border}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${windNum > 0 || windCig ? 'inset 0 0 15px '+windStyle.border+'33' : 'none'};">
+                            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Wind</div>
+                            <div style="font-size: 24px; font-weight: 900; background: ${windStyle.bg}; color: ${windStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${displayString(windVal)}</div>
+                            <div style="font-size: 11px; line-height: 1.4; color: #fff;">${windDesc}</div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.2); border: 1px solid ${hailStyle.border}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${hailNum > 0 || hailCig ? 'inset 0 0 15px '+hailStyle.border+'33' : 'none'};">
+                            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Hail</div>
+                            <div style="font-size: 24px; font-weight: 900; background: ${hailStyle.bg}; color: ${hailStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${displayString(hailVal)}</div>
+                            <div style="font-size: 11px; line-height: 1.4; color: #fff;">${hailDesc}</div>
+                        </div>
                     </div>
                 </div>
                 <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official Storm Prediction Center Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
@@ -1495,7 +1577,8 @@
                     if (latest.dewp !== null && latest.temp !== null) result.rh = 100 * Math.exp((17.625 * latest.dewp)/(243.04 + latest.dewp)) / Math.exp((17.625 * latest.temp)/(243.04 + latest.temp));
                     
                     let transWx = translateWx(latest.wxString || "");
-                    result.wx = transWx || "Clear"; result.icon = getWeatherIcon(result.wx, true);
+                    result.wx = transWx || "Clear"; 
+                    result.iconInfo = window.getWeatherIconInfo(result.wx, true);
                     return result;
                 }
             } catch(e) {}
@@ -1505,7 +1588,8 @@
                 result.wind = fallbackData.wind !== null ? fallbackData.wind : null;
                 result.gust = fallbackData.gust !== null ? fallbackData.gust : null;
                 let transWx = translateWx(fallbackData.wx || "");
-                result.wx = transWx || "Clear"; result.icon = getWeatherIcon(result.wx, true);
+                result.wx = transWx || "Clear"; 
+                result.iconInfo = window.getWeatherIconInfo(result.wx, true);
             } else if (result.temp === '--') {
                 try {
                     let omRes = await fetchWithTimeout(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`, { timeout: 4000 });
@@ -1513,11 +1597,13 @@
                     if(omData && omData.current_weather) {
                         result.temp = Math.round((omData.current_weather.temperature * 9/5) + 32);
                         result.wind = Math.round(omData.current_weather.windspeed * 0.621371);
-                        result.wx = "Fair"; result.icon = getWeatherIcon(result.wx, true);
+                        result.wx = "Fair"; 
+                        result.iconInfo = window.getWeatherIconInfo(result.wx, true);
                         return result;
                     }
                 } catch(e) {}
-                result.wx = "Observation Unavailable"; result.icon = "ph-cloud-slash";
+                result.wx = "Observation Unavailable"; 
+                result.iconInfo = { icon: "ph-cloud-slash", color: "#b2bec3" };
             }
             return result;
         }
@@ -1575,7 +1661,7 @@
                             ${alertIconHtml}
                         </div>
                         <div style="display:flex; align-items:center; gap:15px; margin-top:5px;">
-                            <i class="ph-fill ${liveASOS.icon}" style="font-size:36px; color:#fff;"></i>
+                            <i class="ph-fill ${liveASOS.iconInfo.icon}" style="font-size:36px; color:${liveASOS.iconInfo.color};"></i>
                             <div>
                                 <div style="font-size:26px; font-weight:900; line-height:1; color:#fff;">${liveASOS.temp !== '--' ? liveASOS.temp+'°F' : '--'}</div>
                                 <div style="font-size:12px; opacity:0.8; margin-top:4px; font-weight:600;">${liveASOS.wx}</div>
@@ -1628,7 +1714,7 @@
         }
 
         window.loadHomeNWS = async function(lat, lon, isGeo = false) {
-            let tempStr = "—"; let windStr = "Wind: —"; let dewpStr = "Dew Point: —"; let flStr = ""; let wxStr = "Observation Unavailable"; let wxIcon = "ph-cloud-slash";
+            let tempStr = "—"; let windStr = "Wind: —"; let dewpStr = "Dew Point: —"; let flStr = ""; let wxStr = "Observation Unavailable"; let wxIconInfo = { icon: "ph-cloud-slash", color: "#b2bec3" };
             let fallbackAd = null;
             let staticFile = (!isGeo && lat === 42.03 && lon === -93.62) ? 'Ames' : null;
 
@@ -1641,7 +1727,7 @@
 
             let liveASOS = await fetchLiveASOS(lat, lon, fallbackAd);
             tempStr = liveASOS.temp !== '--' ? `${liveASOS.temp}°F` : '--';
-            wxIcon = liveASOS.icon; wxStr = liveASOS.wx;
+            wxIconInfo = liveASOS.iconInfo || wxIconInfo; wxStr = liveASOS.wx;
             
             if (liveASOS.wind !== null) {
                 windStr = `Wind: ${liveASOS.wind} mph`;
@@ -1669,7 +1755,7 @@
             document.getElementById('homeFeelsLikeVal').innerHTML = flStr;
             
             let interpTag = liveASOS.interpolated && tempStr !== '--' ? `<span style="font-size:10px; color:#fff; vertical-align:super;" title="Interpolated from recent trend">*</span>` : '';
-            document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIcon}" style="font-size: 36px; color: #fff;"></i> ${interpTag}`;
+            document.getElementById('homeWxVal').innerHTML = `<i class="ph-fill ${wxIconInfo.icon}" style="font-size: 36px; color: ${wxIconInfo.color};"></i> ${interpTag}`;
 
             try {
                 let cacheKey = `nws_pt_${lat.toFixed(2)}_${lon.toFixed(2)}`;
@@ -1721,7 +1807,7 @@
                         let p = validHourly[i];
                         if (p) {
                             let tDate = new Date(p.startTime);
-                            let pIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
+                            let pIconInfo = window.getWeatherIconInfo(p.shortForecast, p.isDaytime);
                             let hWinds = parseWinds(p.windSpeed, p.windGust);
                             let hRh = p.relativeHumidity?.value || null;
                             let hFl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
@@ -1749,7 +1835,7 @@
                             }
                             tempsHtml += `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
                                 <div class="hr-label" style="opacity: 0.8; font-size: 10px;">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
-                                <i class="ph-fill ${pIcon}" style="font-size: 26px; margin: 4px 0; color:#fff;"></i>
+                                <i class="ph-fill ${pIconInfo.icon}" style="font-size: 26px; margin: 4px 0; color:${pIconInfo.color};"></i>
                                 <div class="hr-temp" style="color:#fff;">${p.temperature}&deg;</div>
                                 ${flHtml} ${qpfStr}
                             </div>`;
@@ -1832,7 +1918,7 @@
                     <div style="font-size:12px; font-weight: 900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase; color:#fff;">
                         ${titleHtml}
                     </div>
-                    <i class="ph-fill ${liveASOS.icon}" style="font-size: 56px; margin-bottom: 12px; color: #fff;"></i>
+                    <i class="ph-fill ${liveASOS.iconInfo.icon}" style="font-size: 56px; margin-bottom: 12px; color: ${liveASOS.iconInfo.color};"></i>
                     <div style="font-size:42px; font-weight:900; color:#fff; line-height:1; margin-bottom:15px;">${liveASOS.temp}°F</div>
                     
                     <div style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; color:#fff;">
@@ -1889,7 +1975,7 @@
                     if (validHourly.length > 0) {
                         let hCols = validHourly.slice(0, 24).map(p => {
                             let tDate = new Date(p.startTime);
-                            let hIcon = getWeatherIcon(p.shortForecast, p.isDaytime);
+                            let hIconInfo = window.getWeatherIconInfo(p.shortForecast, p.isDaytime);
                             
                             let hWinds = parseWinds(p.windSpeed, p.windGust);
                             let hRh = p.relativeHumidity?.value || null;
@@ -1924,7 +2010,7 @@
                             }
                             return `<div class="lf-hour-col">
                                 <div class="hr-label">${tDate.toLocaleTimeString([], { hour: 'numeric' })}</div>
-                                <i class="ph-fill ${hIcon}" style="font-size: 26px; margin: 4px 0; color:#fff;"></i>
+                                <i class="ph-fill ${hIconInfo.icon}" style="font-size: 26px; margin: 4px 0; color:${hIconInfo.color};"></i>
                                 <div class="hr-temp" style="color:#fff;">${p.temperature}&deg;</div>
                                 ${flHtml}
                                 ${qpfStr}
@@ -1952,7 +2038,7 @@
                             if (p1.isDaytime) {
                                 hi = p1.temperature;
                                 lo = (p2 && !p2.isDaytime) ? p2.temperature : '--';
-                                dIcon = getWeatherIcon(p1.shortForecast, true);
+                                dIconInfo = window.getWeatherIconInfo(p1.shortForecast, true);
                                 
                                 let dWinds = parseWinds(p1.windSpeed, p1.windGust);
                                 let dRh = p1.relativeHumidity?.value || null;
@@ -1983,7 +2069,7 @@
                             } else {
                                 hi = '--';
                                 lo = p1.temperature;
-                                dIcon = getWeatherIcon(p1.shortForecast, false);
+                                dIconInfo = window.getWeatherIconInfo(p1.shortForecast, false);
                                 
                                 let nWinds = parseWinds(p1.windSpeed, p1.windGust);
                                 let nRh = p1.relativeHumidity?.value || null;
@@ -2008,7 +2094,7 @@
                             dCols += `
                             <div class="lf-daily-col">
                                 <div style="font-weight: 800; font-size: 14px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; color:#fff;">${dayName}</div>
-                                <i class="ph-fill ${dIcon}" style="font-size: 36px; margin-bottom: 12px; color: #fff;"></i>
+                                <i class="ph-fill ${dIconInfo.icon}" style="font-size: 36px; margin-bottom: 12px; color: ${dIconInfo.color};"></i>
                                 
                                 <div style="margin-bottom: 10px; min-height: 45px;">
                                     <div style="font-size: 24px; font-weight: 900; color: #fff; line-height: 1;">${hi !== '--' ? hi+'°' : '--'}</div>
