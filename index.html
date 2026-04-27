@@ -1328,7 +1328,7 @@
                     else if (val >= 5)  { b = '#8b4726'; t = '#ffffff'; c = b; } // Brown
                 }
                 
-                if (isCig) c = '#ff00ff'; // Highlight border magenta for Significant Severe
+                // isCig styling removed to keep normal categorical color
                 
                 return { bg: b, text: t, border: c };
             };
@@ -1379,7 +1379,8 @@
                     else if (val >= 5) text = "Isolated large hail possible";
                     if (cigTag) {
                         let match = cigTag.match(/(\d+(?:\.\d+)?)/);
-                        let sizeNum = match ? match[1] : "2.0"; 
+                        // CIG1 translates to 2.0 inches (Hen Egg)
+                        let sizeNum = (match && match[1] !== "1") ? match[1] : "2.0"; 
                         let sizeStr = window.getHailTranslation ? window.getHailTranslation(sizeNum) : sizeNum + '"';
                         let objMatch = sizeStr.match(/\((.*?)\)/);
                         let objName = objMatch ? objMatch[1].toLowerCase() : sizeStr;
@@ -1420,6 +1421,54 @@
                 </div>
                 <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official Storm Prediction Center Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
         }
+
+        window.renderCircularGauge = function(value, label, color, isTextValue = false) {
+            let percentage = 0;
+            let displayVal = value;
+            if (isTextValue) {
+                if (value === "Low") percentage = 15;
+                else if (value === "Moderate") percentage = 50;
+                else if (value === "High") percentage = 90;
+            } else {
+                percentage = Math.min(100, (value / 200) * 100); 
+            }
+            
+            let radius = 36;
+            let circumference = 2 * Math.PI * radius;
+            let offset = circumference - (percentage / 100) * circumference;
+
+            return `
+                <div class="glass" style="padding:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; flex:1; min-width:150px; background: rgba(0,0,0,0.2);">
+                    <div style="font-size:14px; text-transform:uppercase; opacity:0.8; font-weight:900;">${label}</div>
+                    <div style="position:relative; width: 80px; height: 80px; margin: 0 auto;">
+                        <svg width="80" height="80" viewBox="0 0 80 80" style="transform: rotate(-90deg);">
+                            <circle cx="40" cy="40" r="${radius}" fill="transparent" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
+                            <circle cx="40" cy="40" r="${radius}" fill="transparent" stroke="${color}" stroke-width="8" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-out;" />
+                        </svg>
+                        <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:${isTextValue ? '14px' : '20px'}; color:${color};">${displayVal}</div>
+                    </div>
+                </div>`;
+        };
+
+        window.getHailTranslation = function(sizeInInches) {
+            const size = parseFloat(sizeInInches);
+            if (isNaN(size)) return "2\"+ (Hen Egg)";
+            if (size >= 4.5) return `${size}" (Softball)`;
+            if (size >= 4.0) return `${size}" (Grapefruit)`;
+            if (size >= 3.0) return `${size}" (Teacup)`;
+            if (size >= 2.75) return `${size}" (Baseball)`;
+            if (size >= 2.5) return `${size}" (Tennis Ball)`;
+            if (size >= 2.0) return `${size}" (Hen Egg)`;
+            if (size >= 1.75) return `${size}" (Golf Ball)`;
+            if (size >= 1.5) return `${size}" (Ping Pong Ball)`;
+            if (size >= 1.25) return `${size}" (Half Dollar)`;
+            if (size >= 1.0) return `${size}" (Quarter)`;
+            if (size >= 0.88) return `${size}" (Nickel)`;
+            if (size >= 0.75) return `${size}" (Penny)`;
+            if (size >= 0.5) return `${size}" (Mothball)`;
+            if (size >= 0.25) return `${size}" (Pea)`;
+            return `${size}"`;
+        };
 
         window.updateHomeSPC = function() {
             const lat = window.currentHomeLat || 42.03;
@@ -1817,14 +1866,25 @@
                 let envBox = document.getElementById('homeEnviroContainer');
                 if (!envBox) return;
                 
-                let aqiColor = env.aqi > 100 ? 'var(--danger)' : (env.aqi > 50 ? 'var(--warning)' : 'var(--success)');
-                let getPolColor = (lvl) => lvl === 'High' ? 'var(--danger)' : (lvl === 'Moderate' ? 'var(--warning)' : 'var(--success)');
+                envBox.className = "";
+                envBox.style.padding = "0";
+                envBox.style.background = "transparent";
+                envBox.style.border = "none";
+                envBox.style.boxShadow = "none";
+
+                let aqiColor = '#2ecc71'; // Green
+                if (env.aqi > 150) aqiColor = '#e74c3c'; // Red
+                else if (env.aqi > 100) aqiColor = '#e67e22'; // Orange
+                else if (env.aqi > 75) aqiColor = '#f1c40f'; // Yellow
+                else if (env.aqi > 50) aqiColor = '#a3cb38'; // Light Green/Yellow-Green
+
+                let getPolColor = (lvl) => lvl === 'High' ? '#e74c3c' : (lvl === 'Moderate' ? '#f1c40f' : '#2ecc71');
                 
                 envBox.innerHTML = `
-                    <div style="font-size:12px; font-weight:900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px; color:#fff;">
+                    <div style="font-size:14px; font-weight:900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px; color:#fff; width: 100%;">
                         <i class="ph-fill ph-leaf"></i> AIR QUALITY & ALLERGY INDEX
                     </div>
-                    <div style="display:flex; flex-wrap:wrap; justify-content:space-around; gap:15px; text-align:center;">
+                    <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:20px; text-align:center; width: 100%;">
                         ${window.renderCircularGauge(env.aqi, 'AQI', aqiColor, false)}
                         ${window.renderCircularGauge(env.pollen, 'Pollen', getPolColor(env.pollen), true)}
                         ${window.renderCircularGauge(env.trees, 'Trees', getPolColor(env.trees), true)}
@@ -2449,15 +2509,21 @@
             window.fetchEnvironmentalData(cityObj.lat, cityObj.lon).then(env => {
                 let envEl = document.getElementById('lf-enviro-container');
                 if (!envEl) return;
-                let aqiColor = env.aqi > 100 ? 'var(--danger)' : (env.aqi > 50 ? 'var(--warning)' : 'var(--success)');
-                let getPolColor = (lvl) => lvl === 'High' ? 'var(--danger)' : (lvl === 'Moderate' ? 'var(--warning)' : 'var(--success)');
+                
+                let aqiColor = '#2ecc71'; // Green
+                if (env.aqi > 150) aqiColor = '#e74c3c'; // Red
+                else if (env.aqi > 100) aqiColor = '#e67e22'; // Orange
+                else if (env.aqi > 75) aqiColor = '#f1c40f'; // Yellow
+                else if (env.aqi > 50) aqiColor = '#a3cb38'; // Light Green/Yellow-Green
+
+                let getPolColor = (lvl) => lvl === 'High' ? '#e74c3c' : (lvl === 'Moderate' ? '#f1c40f' : '#2ecc71');
                 
                 envEl.innerHTML = `
-                <div class="glass" style="padding: 25px; margin-bottom: 20px;">
-                    <div style="font-size:12px; font-weight:900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px; color:#fff;">
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size:14px; font-weight:900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px; color:#fff;">
                         <i class="ph-fill ph-leaf"></i> AIR QUALITY & ALLERGY INDEX
                     </div>
-                    <div style="display:flex; flex-wrap:wrap; justify-content:space-around; gap:15px; text-align:center;">
+                    <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:20px; text-align:center;">
                         ${window.renderCircularGauge(env.aqi, 'AQI', aqiColor, false)}
                         ${window.renderCircularGauge(env.pollen, 'Pollen', getPolColor(env.pollen), true)}
                         ${window.renderCircularGauge(env.trees, 'Trees', getPolColor(env.trees), true)}
