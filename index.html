@@ -2425,27 +2425,12 @@
                     <div style="font-size:12px; font-weight:900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px; color:#fff;">
                         <i class="ph-fill ph-leaf"></i> AIR QUALITY & ALLERGY INDEX
                     </div>
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:15px; text-align:center;">
-                        <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
-                            <div style="font-size:11px; text-transform:uppercase; opacity:0.7; margin-bottom:5px;">Air Quality (AQI)</div>
-                            <div style="font-size:22px; font-weight:900; color:${aqiColor};">${env.aqi}</div>
-                        </div>
-                        <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
-                            <div style="font-size:11px; text-transform:uppercase; opacity:0.7; margin-bottom:5px;">General Pollen</div>
-                            <div style="font-size:18px; font-weight:900; color:${getPolColor(env.pollen)};">${env.pollen}</div>
-                        </div>
-                        <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
-                            <div style="font-size:11px; text-transform:uppercase; opacity:0.7; margin-bottom:5px;">Tree Pollen</div>
-                            <div style="font-size:18px; font-weight:900; color:${getPolColor(env.trees)};">${env.trees}</div>
-                        </div>
-                        <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
-                            <div style="font-size:11px; text-transform:uppercase; opacity:0.7; margin-bottom:5px;">Ragweed</div>
-                            <div style="font-size:18px; font-weight:900; color:${getPolColor(env.ragweed)};">${env.ragweed}</div>
-                        </div>
-                        <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
-                            <div style="font-size:11px; text-transform:uppercase; opacity:0.7; margin-bottom:5px;">Mold</div>
-                            <div style="font-size:18px; font-weight:900; color:${getPolColor(env.mold)};">${env.mold}</div>
-                        </div>
+                    <div style="display:flex; flex-wrap:wrap; justify-content:space-around; gap:15px; text-align:center;">
+                        ${window.renderCircularGauge(env.aqi, 'AQI', aqiColor, false)}
+                        ${window.renderCircularGauge(env.pollen, 'Pollen', getPolColor(env.pollen), true)}
+                        ${window.renderCircularGauge(env.trees, 'Trees', getPolColor(env.trees), true)}
+                        ${window.renderCircularGauge(env.ragweed, 'Ragweed', getPolColor(env.ragweed), true)}
+                        ${window.renderCircularGauge(env.mold, 'Mold', getPolColor(env.mold), true)}
                     </div>
                 </div>`;
             });
@@ -2465,7 +2450,8 @@
                                      pCities.map(c => {
                                          let cAlerts = window.getCityAlerts(c.lat, c.lon);
                                          let alertHtml = cAlerts.length > 0 ? `<i class="ph-fill ph-warning" style="color:var(--danger); margin-left:auto;" title="Active Alerts"></i>` : '';
-                                         return `<div class="lf-city-item${c.id === window.lfSelectedCity ? ' selected' : ''}" style="display:flex; align-items:center;" onclick="window.selectLFCity('${c.id}', false)"><i class="ph-fill ph-push-pin" style="color:var(--accent); margin-right:6px;"></i> <span>${c.display}</span> ${alertHtml}</div>`;
+                                         let safeId = String(c.id).replace(/'/g, "\\'");
+                                         return `<div class="lf-city-item${c.id === window.lfSelectedCity ? ' selected' : ''}" style="display:flex; align-items:center;" onclick="window.selectLFCity('${safeId}', false)"><i class="ph-fill ph-push-pin" style="color:var(--accent); margin-right:6px;"></i> <span>${c.display}</span> ${alertHtml}</div>`;
                                      }).join('');
                         remainingCities = LF_CITIES.filter(c => !pIds.includes(c.id));
                     }
@@ -2473,7 +2459,10 @@
             }
 
             let filtered = remainingCities.filter(c => c.display.toLowerCase().includes((val||'').toLowerCase()));
-            let localHtml = filtered.map(c => `<div class="lf-city-item${c.id === window.lfSelectedCity ? ' selected' : ''}" onclick="window.selectLFCity('${c.id}', false)">${c.display}</div>`).join('');
+            let localHtml = filtered.map(c => {
+                let safeId = String(c.id).replace(/'/g, "\\'");
+                return `<div class="lf-city-item${c.id === window.lfSelectedCity ? ' selected' : ''}" onclick="window.selectLFCity('${safeId}', false)">${c.display}</div>`;
+            }).join('');
             
             if (!val || val.length < 2) {
                 el.innerHTML = pinnedHtml + (pinnedHtml ? `<div style="height:1px; background:var(--border); margin:8px 10px;"></div>` : '') + localHtml;
@@ -2494,7 +2483,9 @@
                             let display = `${loc.name}, ${stateOrCountry}`;
                             let newCityId = `${loc.name}_${stateOrCountry}`;
                             if (LF_CITIES.find(c => c.id === newCityId || c.display === display)) return '';
-                            return `<div class="lf-city-item" style="border-left: 2px solid var(--accent);" onclick="window.addAndSelectCity('${newCityId}', '${display}', ${loc.latitude}, ${loc.longitude})"><i class="ph ph-globe" style="margin-right:4px;"></i> ${display}</div>`;
+                            let safeId = String(newCityId).replace(/'/g, "\\'");
+                            let safeDisplay = String(display).replace(/'/g, "\\'");
+                            return `<div class="lf-city-item" style="border-left: 2px solid var(--accent);" onclick="window.addAndSelectCity('${safeId}', '${safeDisplay}', ${loc.latitude}, ${loc.longitude})"><i class="ph ph-globe" style="margin-right:4px;"></i> ${display}</div>`;
                         }).join('');
                     }
                     el.innerHTML = remoteHtml || localHtml ? localHtml + remoteHtml : `<div style="padding:10px; opacity:0.5; font-size:12px; text-align:center;">No results found.</div>`;
@@ -2505,7 +2496,9 @@
         window.buildLFCityList = function() { window.filterLFCities(''); }
 
         window.addAndSelectCity = function(id, display, lat, lon, preventPush = false) {
-            if(!LF_CITIES.find(c => c.id === id)) LF_CITIES.unshift({ id, display, lat: parseFloat(lat), lon: parseFloat(lon) });
+            if(!LF_CITIES.find(c => c.id === id)) {
+                LF_CITIES.unshift({ id, display, lat: parseFloat(lat), lon: parseFloat(lon), isDynamic: true });
+            }
             const searchInput = document.getElementById('lfSearchInput');
             if(searchInput) searchInput.value = '';
             window.selectLFCity(id, preventPush);
@@ -2583,12 +2576,14 @@
                 if (tab === 'localforecast' && cityParam) {
                     let existingCity = LF_CITIES.find(c => c.id === cityParam);
                     if (existingCity) {
-                        window.selectLFCity(cityParam, true);
+                        let safeId = String(cityParam).replace(/'/g, "\\'");
+                        window.selectLFCity(safeId, true);
                     } else {
                         window.triggerSearch(cityParam.replace(/_/g, ' '), true);
                     }
                 } else if (window.lfSelectedCity) {
-                    window.selectLFCity(window.lfSelectedCity, true);
+                    let safeId = String(window.lfSelectedCity).replace(/'/g, "\\'");
+                    window.selectLFCity(safeId, true);
                 }
             });
         };
