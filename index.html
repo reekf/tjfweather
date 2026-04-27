@@ -1777,30 +1777,25 @@
             let staticFile = (!isGeo && lat === 42.03 && lon === -93.62) ? 'Ames' : null;
 
             window.fetchEnvironmentalData(lat, lon).then(env => {
-                let alerts = [];
-                if (env.aqi > 100) alerts.push(`Unhealthy Air Quality (AQI: ${env.aqi})`);
-                else if (env.aqi > 50) alerts.push(`Moderate Air Quality (AQI: ${env.aqi})`);
-                if (env.pollen === "High") alerts.push("High General Pollen");
-                if (env.trees === "High") alerts.push("High Tree Pollen");
-                if (env.ragweed === "High") alerts.push("High Ragweed Levels");
-                if (env.mold === "High") alerts.push("High Mold Levels");
+                let envBox = document.getElementById('homeEnviroContainer');
+                if (!envBox) return;
                 
-                let envBox = document.getElementById('homeEnviroAlerts');
-                if (!envBox) {
-                    envBox = document.createElement('div');
-                    envBox.id = 'homeEnviroAlerts';
-                    envBox.style.width = '100%';
-                    envBox.style.order = '-1'; 
-                    const container = document.querySelector('.home-panels-container');
-                    if(container) container.insertBefore(envBox, container.firstChild);
-                }
+                let aqiColor = env.aqi > 100 ? 'var(--danger)' : (env.aqi > 50 ? 'var(--warning)' : 'var(--success)');
+                let getPolColor = (lvl) => lvl === 'High' ? 'var(--danger)' : (lvl === 'Moderate' ? 'var(--warning)' : 'var(--success)');
                 
-                if (alerts.length > 0) {
-                    envBox.innerHTML = alerts.map(a => `<div class="alert-badge alert-other animate-pop" style="border-color:var(--warning); color:var(--warning); background:rgba(255,165,0,0.1);"><i class="ph-fill ph-leaf" style="font-size:20px; margin-top:2px;"></i><div style="flex:1;"><div class="ab-title">Environmental Alert</div><div class="ab-area">${a}</div></div></div>`).join('');
-                    envBox.style.display = 'block';
-                } else {
-                    envBox.style.display = 'none';
-                }
+                envBox.innerHTML = `
+                    <div style="font-size:12px; font-weight:900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px; color:#fff;">
+                        <i class="ph-fill ph-leaf"></i> AIR QUALITY & ALLERGY INDEX
+                    </div>
+                    <div style="display:flex; flex-wrap:wrap; justify-content:space-around; gap:15px; text-align:center;">
+                        ${window.renderCircularGauge(env.aqi, 'AQI', aqiColor, false)}
+                        ${window.renderCircularGauge(env.pollen, 'Pollen', getPolColor(env.pollen), true)}
+                        ${window.renderCircularGauge(env.trees, 'Trees', getPolColor(env.trees), true)}
+                        ${window.renderCircularGauge(env.ragweed, 'Ragweed', getPolColor(env.ragweed), true)}
+                        ${window.renderCircularGauge(env.mold, 'Mold', getPolColor(env.mold), true)}
+                    </div>
+                `;
+                envBox.style.display = 'block';
             });
 
             if (staticFile) {
