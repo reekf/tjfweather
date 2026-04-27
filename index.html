@@ -534,6 +534,23 @@
             </div>
         </div>
     </div>
+
+    <!-- Support / Donate Modal UI -->
+    <div id="supportModal" class="bg-overlay" style="display:none; z-index: 99999; justify-content:center; align-items:center; pointer-events: auto;">
+        <div class="glass" style="padding: 30px; width: 90%; max-width: 400px; display:flex; flex-direction:column; gap: 15px; background: rgba(11, 14, 17, 0.95); border: 1px solid rgba(243, 156, 18, 0.5); text-align: center;">
+            <h2 style="margin:0; font-size: 22px; font-weight:900; color: #f39c12; display: flex; align-items: center; justify-content: center; gap: 8px;"><i class="ph-fill ph-coffee"></i> Support TJFWeather</h2>
+            <p style="font-size:14px; opacity:0.9; line-height:1.6; margin: 0;">
+                Thank you for considering supporting the development of TJFWeather!
+            </p>
+            <div style="background: rgba(243, 156, 18, 0.1); border: 1px solid rgba(243, 156, 18, 0.3); padding: 15px; border-radius: 12px; font-size: 12px; line-height: 1.5; color: #e0e0e0; text-align: left;">
+                <strong>Disclaimer:</strong> Any money you provide is <u>not</u> considered a tax-deductible donation. It is considered taxable income for the TJFWeather team.
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="glass-btn" style="flex:1; background:rgba(255,255,255,0.1)!important; border-color:var(--border)!important; color: #fff!important;" onclick="document.getElementById('supportModal').style.display='none'">Cancel</button>
+                <a href="https://www.buymeacoffee.com/tyreek" target="_blank" rel="noopener noreferrer" class="glass-btn" style="flex:1; text-decoration: none; background: rgba(243, 156, 18, 0.2)!important; color: #f39c12!important; border-color: rgba(243, 156, 18, 0.5)!important;" onclick="document.getElementById('supportModal').style.display='none'">Continue</a>
+            </div>
+        </div>
+    </div>
     
     <!-- System Message Modal UI -->
     <div id="sysModal" class="bg-overlay" style="display:none; z-index: 99999; justify-content:center; align-items:center; pointer-events: auto;">
