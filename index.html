@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TJFWeather</title>
+    <title>National Weather Service Dashboard | TJFWeather</title>
     
     <!-- PWA Meta Tags for iOS & Android -->
     <meta name="theme-color" content="#0b0e11">
@@ -899,19 +899,24 @@
 
         window.robustNWSFetch = async function(url) {
             try {
-                let res = await fetchWithTimeout(url, { headers: { 'Cache-Control': 'no-cache' }, timeout: 6000 });
-                if (res.ok) { let data = await res.json(); if (!data.status || data.status === 200) return data; }
+                let res = await fetchWithTimeout(url, { timeout: 8000 });
+                if (res.ok) { let data = await res.json(); if (data && data.properties) return data; }
             } catch (e) { }
             try {
-                let proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-                let pRes = await fetchWithTimeout(proxied, { timeout: 6000 });
-                if (pRes.ok) { let data = await pRes.json(); if (!data.status || data.status === 200) return data; }
+                let proxied = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+                let pRes = await fetchWithTimeout(proxied, { timeout: 8000 });
+                if (pRes.ok) { let data = await pRes.json(); if (data && data.properties) return data; }
+            } catch (e) { }
+            try {
+                let proxied2 = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                let pRes2 = await fetchWithTimeout(proxied2, { timeout: 8000 });
+                if (pRes2.ok) { let data = await pRes2.json(); if (data && data.properties) return data; }
             } catch (e) { }
             throw new Error("National Weather Service Fetch Failed");
         }
 
         async function fetchWithTimeout(resource, options = {}) {
-            const { timeout = 6000 } = options;
+            const { timeout = 8000 } = options;
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), timeout);
             const response = await fetch(resource, { ...options, signal: controller.signal });
@@ -1548,12 +1553,14 @@
         async function fetchLiveASOS(lat, lon, fallbackData) {
             let result = { temp: '--', wind: null, gust: null, dewp: null, wx: 'Loading...', icon: 'ph-cloud', rh: 50, interpolated: false };
             try {
-                let cacheKey = `nws_pt_${lat.toFixed(2)}_${lon.toFixed(2)}`;
+                let rLat = Number(lat).toFixed(4);
+                let rLon = Number(lon).toFixed(4);
+                let cacheKey = `nws_pt_${rLat}_${rLon}`;
                 let ptData = null;
                 try { ptData = JSON.parse(localStorage.getItem(cacheKey)); } catch(e){}
                 
                 if (!ptData) {
-                    ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
+                    ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${rLat},${rLon}`);
                     if (ptData) localStorage.setItem(cacheKey, JSON.stringify(ptData));
                 }
                 
@@ -1703,12 +1710,14 @@
                         document.getElementById('homeLocationName').innerText = `Official National Weather Service Forecast — Locating...`;
                         
                         try {
-                            let cacheKey = `nws_pt_${pos.coords.latitude.toFixed(2)}_${pos.coords.longitude.toFixed(2)}`;
+                            let rLat = Number(pos.coords.latitude).toFixed(4);
+                            let rLon = Number(pos.coords.longitude).toFixed(4);
+                            let cacheKey = `nws_pt_${rLat}_${rLon}`;
                             let ptData = null;
                             try { ptData = JSON.parse(localStorage.getItem(cacheKey)); } catch(e){}
                             
                             if (!ptData) {
-                                ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${pos.coords.latitude},${pos.coords.longitude}`);
+                                ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${rLat},${rLon}`);
                                 if (ptData) localStorage.setItem(cacheKey, JSON.stringify(ptData));
                             }
                             
@@ -1775,7 +1784,9 @@
             document.getElementById('homeWxVal').innerHTML = `${window.getWeatherSVG(wxStr, true, 42)} ${interpTag}`;
 
             try {
-                let cacheKey = `nws_pt_${lat.toFixed(2)}_${lon.toFixed(2)}`;
+                let rLat = Number(lat).toFixed(4);
+                let rLon = Number(lon).toFixed(4);
+                let cacheKey = `nws_pt_${rLat}_${rLon}`;
                 let ptData = null; let gridId = "NWS"; let nwsData = null; let cacheValid = false;
                 
                 if (staticFile) {
@@ -1794,7 +1805,7 @@
                 if (!cacheValid) {
                     try { ptData = JSON.parse(localStorage.getItem(cacheKey)); } catch(e){}
                     if (!ptData) {
-                        ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${lat},${lon}`);
+                        ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${rLat},${rLon}`);
                         if (ptData) localStorage.setItem(cacheKey, JSON.stringify(ptData));
                     }
                     
@@ -1903,9 +1914,13 @@
             
             let cityObj = LF_CITIES.find(c => c.id === cityId);
             if (!cityObj) return;
-            let cityAlerts = window.nwsAlerts ? window.nwsAlerts.filter(f => isPointInNWSFeature(dataCity.lon, dataCity.lat, f)) : [];
+
+            let rLat = Number(cityObj.lat).toFixed(4);
+            let rLon = Number(cityObj.lon).toFixed(4);
+
+            let cityAlerts = window.nwsAlerts ? window.nwsAlerts.filter(f => isPointInNWSFeature(cityObj.lon, cityObj.lat, f)) : [];
             let alertsHtml = "";
-            let bannerState = isPlaceholder ? "loading" : false;
+            let bannerState = false;
 
             if (cityAlerts.length > 0) {
                 alertsHtml = `
@@ -1984,11 +1999,11 @@
                 } catch(e) {}
                 
                 if (!cacheValid) {
-                    let cacheKey = `nws_pt_${cityObj.lat.toFixed(2)}_${cityObj.lon.toFixed(2)}`;
+                    let cacheKey = `nws_pt_${rLat}_${rLon}`;
                     let ptData = null;
                     try { ptData = JSON.parse(localStorage.getItem(cacheKey)); } catch(e){}
                     if (!ptData) {
-                        ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${cityObj.lat},${cityObj.lon}`);
+                        ptData = await window.robustNWSFetch(`https://api.weather.gov/points/${rLat},${rLon}`);
                         if (ptData) localStorage.setItem(cacheKey, JSON.stringify(ptData));
                     }
                     if(ptData && ptData.properties) {
@@ -2002,8 +2017,8 @@
                 }
 
                 if (!nwsData || !nwsData.daily || !nwsData.hourly) {
-                    let nearestInfo = window.getNearestPreloadedCity(dataCity.lat, dataCity.lon);
-                    if (nearestInfo && nearestInfo.distance <= 50 && nearestInfo.city.id !== dataCity.id) {
+                    let nearestInfo = window.getNearestPreloadedCity(cityObj.lat, cityObj.lon);
+                    if (nearestInfo && nearestInfo.distance <= 50 && nearestInfo.city.id !== cityObj.id) {
                         let safeFbName = nearestInfo.city.id.replace(/ /g, "_");
                         try {
                             let fbRes = await fetchWithTimeout(`static/nws/${safeFbName}.json?t=${Date.now()}`, { timeout: 3000 });
@@ -2309,16 +2324,7 @@
             let pinText = isPinned ? 'Pinned' : 'Pin City';
             
             let placeholderBanner = '';
-            if (bannerState === "loading") {
-                placeholderBanner = `
-                <div class="placeholder-banner glass" style="padding: 15px; margin-bottom: 20px; border: 1px solid var(--warning); display: flex; align-items: center; gap: 12px; color: #fff; background: rgba(255, 165, 0, 0.15);">
-                    <i class="ph ph-spinner ph-spin" style="font-size: 28px; color: var(--warning);"></i> 
-                    <div>
-                        <div style="font-size: 15px; font-weight: 900; color: var(--warning); text-transform: uppercase;">Precise Forecast Loading...</div>
-                        <div style="font-size: 13px; opacity: 0.9; margin-top: 2px;">Temporarily displaying lightning-fast cached data from nearby <strong>${dataCity.display}</strong>.</div>
-                    </div>
-                </div>`;
-            } else if (typeof bannerState === 'string' && bannerState.startsWith('fallback_')) {
+            if (typeof bannerState === 'string' && bannerState.startsWith('fallback_')) {
                 let fallbackName = bannerState.split('_')[1];
                 placeholderBanner = `
                 <div class="placeholder-banner glass" style="padding: 15px; margin-bottom: 20px; border: 1px solid var(--info); display: flex; align-items: center; gap: 12px; color: #fff; background: rgba(112, 161, 255, 0.15);">
@@ -2332,7 +2338,7 @@
 
             let headerHtml = `
                 <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 25px; flex-wrap:wrap; gap:10px;">
-                    <h2 style="font-size: 36px; font-weight: 900; margin: 0;">${displayCity.display}</h2>
+                    <h2 style="font-size: 36px; font-weight: 900; margin: 0;">${cityObj.display}</h2>
                     <button id="pinCityBtn" onclick="window.togglePinCity('${safeCityId}')" class="glass-btn" style="font-size:12px; padding:8px 16px;">
                         <i id="pinCityIcon" class="${pinIcon}" style="color:${pinColor}; font-size:16px;"></i> <span id="pinCityText">${pinText}</span>
                     </button>
