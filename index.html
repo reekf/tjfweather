@@ -404,7 +404,7 @@
             </label>
             <div style="display: flex; align-items: center; gap: 15px; border-left: 2px solid var(--border); padding-left: 15px;">
                 <span style="font-weight:800; font-size:12px; opacity:0.8; letter-spacing:1px;">LATEST LOOP</span>
-                <span id="radarTimeDisplay" style="font-family:'Roboto Condensed', sans-serif; font-size:18px; font-weight:900; color:var(--accent); min-width:85px; text-align: center;">--:--</span>
+                <span id="radarTimeDisplay" style="font-family:'Bitcount Single', 'Share Tech Mono', 'Roboto Condensed', monospace; font-size:18px; font-weight:900; color:var(--accent); min-width:85px; text-align: center;">--:--</span>
             </div>
         </div>
     </div>
@@ -757,21 +757,26 @@
             }
         };
 
-        window.fireNotification = function(title, body) {
+        window.fireNotification = async function(title, body) {
             const options = { body: body, vibrate: [200, 100, 200] };
-            
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.ready.then(function(reg) {
+            try {
+                if ('serviceWorker' in navigator) {
+                    let reg = await navigator.serviceWorker.getRegistration();
                     if (reg && reg.showNotification) {
-                        reg.showNotification(title, options);
-                    } else {
-                        try { new Notification(title, options); } catch(e) {}
+                        await reg.showNotification(title, options);
+                        return;
                     }
-                }).catch(function() {
-                    try { new Notification(title, options); } catch(e) {}
-                });
-            } else {
-                try { new Notification(title, options); } catch(e) {}
+                }
+                
+                // Fallback for browsers that allow native Notification API without a Service Worker
+                let n = new Notification(title, options);
+                n.onerror = function() {
+                    console.error("Native notification blocked by browser.");
+                    window.showSysMessage("Notifications Blocked.\n\nNote: iOS/Android Home Screen Apps strictly require a separate 'sw.js' file hosted on your server to fire background notifications.");
+                };
+            } catch(e) {
+                console.error("Notification failed", e);
+                window.showSysMessage("Notifications Blocked.\n\nNote: iOS/Android Home Screen Apps strictly require a separate 'sw.js' file hosted on your server to fire background notifications.");
             }
         };
 
