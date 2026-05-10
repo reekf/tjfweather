@@ -16,11 +16,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Workbench&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://d3js.org/topojson.v3.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -45,7 +41,7 @@
 
         html, body {
             margin: 0; padding: 0; height: 100vh; width: 100vw;
-            font-family: 'Bitcount Single', 'Share Tech Mono', 'Roboto Condensed', monospace; background-color: var(--bg);
+            font-family: 'Pixelify Sans', sans-serif; background-color: var(--bg);
             background-image: url('https://images.pexels.com/photos/1162251/pexels-photo-1162251.jpeg?auto=compress&cs=tinysrgb&w=2560');
             background-size: cover; background-position: center;
             background-repeat: no-repeat; background-attachment: fixed;
@@ -53,9 +49,8 @@
         }
 
         h1, h2, h3, h4, h5, h6, .logo {
-            font-family: 'Workbench', 'Black Ops One', 'Orbitron', 'Roboto Condensed', sans-serif !important;
-            font-weight: 400 !important;
-            font-variation-settings: "BLED" 0, "SCAN" 0 !important;
+            font-family: 'Pixelify Sans', sans-serif !important;
+            font-weight: 700 !important;
             letter-spacing: 1px;
         }
 
@@ -81,10 +76,10 @@
         .glass-btn {
             background: rgba(0, 210, 255, 0.2) !important; backdrop-filter: blur(12px) !important;
             border: 1px solid rgba(0, 210, 255, 0.5) !important; color: #fff !important;
-            padding: 10px 20px; border-radius: 12px; font-weight: 900; font-size: 14px;
+            padding: 10px 20px; border-radius: 12px; font-weight: 700; font-size: 14px;
             cursor: pointer; min-width: 100px; transition: all 0.3s ease;
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            font-family: 'Bitcount Single', 'Share Tech Mono', 'Roboto Condensed', monospace;
+            font-family: 'Pixelify Sans', sans-serif;
         }
 
         .glass-btn:hover {
@@ -124,7 +119,7 @@
 
         .tab-content.active { display: block; pointer-events: auto; animation: fadeInScale 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 
-        .logo { font-size: 24px; font-weight: 900; color: var(--text); letter-spacing: -0.5px; cursor: pointer; transition: 0.2s; z-index: 5100; }
+        .logo { font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; cursor: pointer; transition: 0.2s; z-index: 5100; }
         .logo:hover { transform: scale(1.05); }
 
         .mobile-menu-btn {
@@ -135,7 +130,7 @@
 
         .nav-links { display: flex; gap: 10px; align-items: center; margin-left: auto; }
         .nav-item {
-            cursor: pointer; font-weight: 800; font-size: 13px; letter-spacing: 0.5px;
+            cursor: pointer; font-weight: 700; font-size: 13px; letter-spacing: 0.5px;
             padding: 8px 16px; border-radius: 12px; transition: all 0.3s ease; opacity: 0.9;
             background: rgba(0, 210, 255, 0.08); border: 1px solid rgba(0, 210, 255, 0.2);
             color: var(--text); text-transform: uppercase;
@@ -155,7 +150,7 @@
 
         .map-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background-color: #0b0e11 !important; }
 
-        .city-label { font-size: 13px; font-weight: 900; color: #ffffff; text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000; text-align: center; line-height: 1.1; font-family: 'Bitcount Single', 'Share Tech Mono', 'Roboto Condensed', monospace; }
+        .city-label { font-size: 13px; font-weight: 700; color: #ffffff; text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000; text-align: center; line-height: 1.1; font-family: 'Pixelify Sans', sans-serif; }
         .city-name { font-size: 11px; }
 
         .lf-container { display: flex; height: 100%; overflow: hidden; }
@@ -163,8 +158,8 @@
         .lf-main { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
         
         .lf-search-wrap { display: flex; gap: 8px; }
-        .lf-search-wrap input { flex: 1; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text); padding: 10px 14px; border-radius: 12px; outline: none; font-weight: 500; font-family: 'Bitcount Single', 'Share Tech Mono', 'Roboto Condensed', monospace; }
-        .lf-search-wrap button { background: var(--accent); border: none; color: #000; font-weight: 900; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-family: 'Bitcount Single', 'Share Tech Mono', 'Roboto Condensed', monospace; }
+        .lf-search-wrap input { flex: 1; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text); padding: 10px 14px; border-radius: 12px; outline: none; font-weight: 500; font-family: 'Pixelify Sans', sans-serif; }
+        .lf-search-wrap button { background: var(--accent); border: none; color: #000; font-weight: 700; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-family: 'Pixelify Sans', sans-serif; }
         
         .lf-city-list { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
         .lf-city-item { padding: 10px 14px; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 600; border: 1px solid transparent; display: flex; align-items: center; }
@@ -172,14 +167,14 @@
 
         .lf-hourly-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: thin; }
         .lf-hour-col { min-width: 140px; text-align: center; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;}
-        .lf-hour-col .hr-label { opacity: 0.7; margin-bottom: 8px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
-        .lf-hour-col .hr-temp { font-size: 20px; font-weight: 900; color: #fff; margin-top: 8px; }
+        .lf-hour-col .hr-label { opacity: 0.7; margin-bottom: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .lf-hour-col .hr-temp { font-size: 20px; font-weight: 700; color: #fff; margin-top: 8px; }
 
         .lf-daily-col { min-width: 190px; text-align: center; background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(20, 30, 40, 0.6) 100%); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.2s; }
         .lf-daily-col:hover { background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(30, 45, 60, 0.8) 100%); border-color: var(--accent); transform: translateY(-2px); }
 
         .alert-badge { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.4; border-left: 4px solid currentColor; background: rgba(0, 0, 0, 0.5); word-wrap: break-word; white-space: normal; height: auto; min-height: min-content; }
-        .alert-badge .ab-title { font-weight: 900; font-size: 14px; text-transform: uppercase; word-break: break-word; }
+        .alert-badge .ab-title { font-weight: 700; font-size: 14px; text-transform: uppercase; word-break: break-word; }
         .alert-badge .ab-area { opacity: 0.8; font-size: 12px; margin-top: 4px; word-break: break-word; }
 
         .alert-tornado { color: var(--danger); border: 1px solid rgba(255, 0, 0, 0.4); box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.15); }
@@ -191,7 +186,7 @@
         .alert-other { color: #aaaaaa; border: 1px solid rgba(180, 180, 180, 0.4); }
 
         .home-weather-content { display: flex; gap: 20px; align-items: center; }
-        .home-temp-val { font-size: 54px; font-weight: 900; color: var(--text); line-height: 1; }
+        .home-temp-val { font-size: 54px; font-weight: 700; color: var(--text); line-height: 1; }
 
         /* Responsive Layouts for ASOS & NWS side-by-side */
         .current-detailed-wrapper { display: flex; gap: 20px; margin-bottom: 20px; align-items: stretch; flex-wrap: wrap; }
@@ -227,7 +222,7 @@
             .lf-main { padding: 15px 10px; width: 100%; overflow-x: hidden; }
             #radarAlertsPanel { position: fixed !important; top: 0 !important; left: 0 !important; transform: translateX(-105%) !important; width: 85% !important; max-width: 320px !important; height: 100vh !important; max-height: 100vh !important; background: rgba(11, 14, 17, 0.95) !important; z-index: 8000 !important; transition: transform 0.3s !important; display: block !important; border-radius: 0 24px 24px 0 !important; padding: 60px 20px 20px 20px !important; border: none !important; border-right: 1px solid var(--border) !important; }
             #radarAlertsPanel.open { transform: translateX(0) !important; }
-            #mobileSettingsBtn { display: block; position: fixed; top: 80px; right: 15px; z-index: 4000; background: rgba(0, 210, 255, 0.2) !important; border: 1px solid rgba(0, 210, 255, 0.5) !important; padding: 8px 16px; border-radius: 12px; font-weight: 900; font-size: 13px; text-transform: uppercase; color: #fff; display: flex; align-items: center; gap: 6px; }
+            #mobileSettingsBtn { display: block; position: fixed; top: 80px; right: 15px; z-index: 4000; background: rgba(0, 210, 255, 0.2) !important; border: 1px solid rgba(0, 210, 255, 0.5) !important; padding: 8px 16px; border-radius: 12px; font-weight: 700; font-size: 13px; text-transform: uppercase; color: #fff; display: flex; align-items: center; gap: 6px; }
             
             .home-weather-content { flex-direction: row; align-items: center; gap: 15px; flex-wrap: wrap; }
             .home-temp-val { font-size: 42px; }
@@ -262,11 +257,11 @@
     <!-- NEW HOME SPLASH PAGE -->
     <div id="home" class="tab-content active">
         <div class="splash-container">
-            <h1 class="animate-pop" style="font-size: 68px; font-weight: 900; margin: 0; color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,0.8); letter-spacing: -1px;">TJF<span style="color:var(--accent)">WEATHER</span></h1>
-            <p class="animate-pop delay-1" style="font-size: 22px; max-width: 650px; line-height: 1.6; opacity: 0.9; margin: 20px 0; font-weight: 300;">
+            <h1 class="animate-pop" style="font-size: 68px; font-weight: 700; margin: 0; color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,0.8); letter-spacing: -1px;">TJF<span style="color:var(--accent)">WEATHER</span></h1>
+            <p class="animate-pop delay-1" style="font-size: 22px; max-width: 650px; line-height: 1.6; opacity: 0.9; margin: 20px 0; font-weight: 400;">
                 A clean, accessible dashboard for viewing National Weather Service and Storm Prediction Center forecasts.
             </p>
-            <div class="animate-pop delay-2" style="font-size: 14px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; opacity: 0.8; margin-bottom: 40px; border: 1px solid rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 30px; display: inline-flex; align-items: center; gap: 8px;">
+            <div class="animate-pop delay-2" style="font-size: 14px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; opacity: 0.8; margin-bottom: 40px; border: 1px solid rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 30px; display: inline-flex; align-items: center; gap: 8px;">
                 <i class="ph-fill ph-device-mobile" style="font-size: 18px;"></i> Mobile Friendly
             </div>
             <button class="glass-btn animate-pop delay-3" style="font-size: 18px; padding: 15px 35px; border-radius: 30px;" onclick="window.showTab('dashboard', document.querySelector('.nav-item:nth-child(2)'));">
@@ -281,7 +276,7 @@
             <div class="home-panels-container" style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
 
                 <div class="glass home-alerts-panel" style="padding: 20px; display: flex; flex-direction: column; flex: 1; min-width: 300px; max-width: 400px; max-height: 400px; overflow-y: auto;">
-                    <h3 style="margin: 0 0 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--danger); font-weight: 900; display: flex; align-items: center; gap: 8px;">
+                    <h3 style="margin: 0 0 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--danger); font-weight: 700; display: flex; align-items: center; gap: 8px;">
                         <i class="ph-fill ph-warning-circle" style="font-size: 20px;"></i> ACTIVE WEATHER ALERTS
                     </h3>
                     <div id="homeAlertsList" style="flex:1;">
@@ -298,7 +293,7 @@
                         style="background: rgba(0,210,255,0.05); border: 1px solid var(--accent); padding: 20px; cursor:pointer; transition: transform 0.2s;"
                         onclick="window.showTab('localforecast', document.querySelector('.nav-item:nth-child(3)')); if(window.lfSelectedCity) window.selectLFCity(window.lfSelectedCity, true);"
                         onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                        <div id="homeLocationName" style="opacity:0.6; font-size:11px; font-weight: 800; letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; color: var(--accent); word-break: break-word; line-height: 1.4;">
+                        <div id="homeLocationName" style="opacity:0.6; font-size:11px; font-weight: 700; letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; color: var(--accent); word-break: break-word; line-height: 1.4;">
                             Official National Weather Service Forecast &mdash; Locating...
                         </div>
                         <div id="homeWeatherContent" class="home-weather-content">
@@ -309,7 +304,7 @@
                                 </div>
                                 <div id="homeWindVal" style="font-size:14px; opacity:0.8; font-weight:600; margin-top: 6px;">Wind: &mdash;</div>
                                 <div id="homeDewVal" style="font-size:13px; opacity:0.8; margin-top: 4px;">Dew Point: &mdash;</div>
-                                <div id="homeFeelsLikeVal" style="font-size:13px; font-weight:bold; color:#fff; opacity:0.9; margin-top: 4px;"></div>
+                                <div id="homeFeelsLikeVal" style="font-size:13px; font-weight:700; color:#fff; opacity:0.9; margin-top: 4px;"></div>
                                 <div id="homeQpfVal" style="font-size:13px; opacity:0.6; margin-top:6px;">Precipitation Forecast: &mdash;</div>
                             </div>
                         </div>
@@ -345,7 +340,7 @@
                         <h3 style="margin:0; color:var(--accent); font-size:12px; letter-spacing:1px; text-transform:uppercase; display: flex; align-items: center; gap: 6px;">
                             <i class="ph-fill ph-radar" style="font-size: 16px;"></i> Local Composite Radar
                         </h3>
-                        <span id="miniRadarTime" style="font-size:11px; opacity:0.6; font-family: 'Bitcount Single', 'Share Tech Mono', 'Roboto Condensed', monospace;"></span>
+                        <span id="miniRadarTime" style="font-size:11px; opacity:0.6; font-family: 'Pixelify Sans', sans-serif;"></span>
                     </div>
                     <div style="width:100%; height:220px; border-radius:12px; position:relative; overflow:hidden; border:1px solid var(--border);">
                         <div id="miniRadarMap" style="width:100%; height:100%; z-index:1;"></div>
@@ -360,7 +355,7 @@
         <div class="lf-container">
             <div class="lf-sidebar glass" style="border-radius: 0;">
                 <div>
-                    <div style="font-size:11px; font-weight: 800; text-transform:uppercase; letter-spacing:1px; opacity:0.5; margin-bottom:8px; display: flex; align-items: center; gap: 6px;">
+                    <div style="font-size:11px; font-weight: 700; text-transform:uppercase; letter-spacing:1px; opacity:0.5; margin-bottom:8px; display: flex; align-items: center; gap: 6px;">
                         <i class="ph-fill ph-magnifying-glass"></i> Search Location
                     </div>
                     <div class="lf-search-wrap">
@@ -371,7 +366,7 @@
                     </div>
                 </div>
                 <div style="flex: 1; display: flex; flex-direction: column; min-height: 0; margin-top: 15px;">
-                    <div style="font-size:11px; font-weight: 800; text-transform:uppercase; letter-spacing:1px; opacity:0.5; margin-bottom:8px; display: flex; align-items: center; gap: 6px;">
+                    <div style="font-size:11px; font-weight: 700; text-transform:uppercase; letter-spacing:1px; opacity:0.5; margin-bottom:8px; display: flex; align-items: center; gap: 6px;">
                         <i class="ph-fill ph-map-pin"></i> Saved Cities
                     </div>
                     <div class="lf-city-list" id="lfCityList" style="flex: 1;"></div>
@@ -391,7 +386,7 @@
         <div id="fullRadarMap" class="map-container"></div>
         <div id="radarAlertsPanel" class="glass" style="position:absolute; top:15px; right:15px; z-index:1600; padding:14px 16px; width:280px; max-height:65vh; overflow-y:auto; display:flex; flex-direction:column; background: rgba(11, 14, 17, 0.85);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; background: rgba(0,0,0,0.4); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-                <div style="font-size:12px; text-transform:uppercase; letter-spacing:1px; font-weight:900; color: var(--danger); display: flex; align-items: center; gap: 8px;">
+                <div style="font-size:12px; text-transform:uppercase; letter-spacing:1px; font-weight:700; color: var(--danger); display: flex; align-items: center; gap: 8px;">
                     <i class="ph-fill ph-warning-circle" style="font-size: 16px;"></i> Active Alerts
                 </div>
                 <button class="close-btn" style="display:block; background:none; border:none; color:#fff; font-size:24px; cursor:pointer;" onclick="window.toggleMobileSettings()">&times;</button>
@@ -400,22 +395,22 @@
                 <div style="opacity:0.4; font-size:12px;"><i class="ph ph-spinner ph-spin"></i> Loading...</div>
             </div>
             <div style="text-align:right; margin-top:12px; border-top:1px solid var(--border); padding-top:8px;">
-                <a href="https://mobile.weather.gov" target="_blank" rel="noopener noreferrer" style="color:var(--accent); text-decoration:none; font-size:10px; font-weight:bold; display: flex; align-items: center; justify-content: flex-end; gap: 4px;">
+                <a href="https://mobile.weather.gov" target="_blank" rel="noopener noreferrer" style="color:var(--accent); text-decoration:none; font-size:10px; font-weight:700; display: flex; align-items: center; justify-content: flex-end; gap: 4px;">
                     Source: National Weather Service <i class="ph ph-arrow-up-right"></i>
                 </a>
             </div>
         </div>
         <div class="radar-controls glass">
             <button id="radarPlayBtn" onclick="window.toggleRadarPlay()" class="glass-btn"><i class="ph-fill ph-pause"></i> PAUSE</button>
-            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 0; color: var(--text); font-size: 13px; font-weight: bold; border-left: 2px solid var(--border); padding-left: 15px;">
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 0; color: var(--text); font-size: 13px; font-weight: 700; border-left: 2px solid var(--border); padding-left: 15px;">
                 <input type="checkbox" id="nwsRadarToggle" checked onchange="window.toggleNWSLayer()" style="transform: scale(1.2); accent-color: var(--accent);"> Show National Weather Service Warnings
             </label>
-            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 0; color: var(--text); font-size: 13px; font-weight: bold; border-left: 2px solid var(--border); padding-left: 15px;">
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 0; color: var(--text); font-size: 13px; font-weight: 700; border-left: 2px solid var(--border); padding-left: 15px;">
                 <input type="checkbox" id="urgentRadarToggle" onchange="window.renderAlertPolygons()" style="transform: scale(1.2); accent-color: var(--accent);"> Urgent Only
             </label>
             <div style="display: flex; align-items: center; gap: 15px; border-left: 2px solid var(--border); padding-left: 15px;">
-                <span style="font-weight:800; font-size:12px; opacity:0.8; letter-spacing:1px;">LATEST LOOP</span>
-                <span id="radarTimeDisplay" style="font-family:'Bitcount Single', 'Share Tech Mono', 'Roboto Condensed', monospace; font-size:18px; font-weight:900; color:var(--accent); min-width:85px; text-align: center;">--:--</span>
+                <span style="font-weight:700; font-size:12px; opacity:0.8; letter-spacing:1px;">LATEST LOOP</span>
+                <span id="radarTimeDisplay" style="font-family:'Pixelify Sans', sans-serif; font-size:18px; font-weight:700; color:var(--accent); min-width:85px; text-align: center;">--:--</span>
             </div>
         </div>
     </div>
@@ -495,7 +490,7 @@
                     <i class="ph-fill ph-info"></i> About
                 </h1>
                 <p style="font-size: 15px; line-height: 1.6;">This website was created by:</p>
-                <p style="font-size: 18px; line-height: 1.6; font-weight: 900; color: var(--accent);">Tyreek Frazier</p>
+                <p style="font-size: 18px; line-height: 1.6; font-weight: 700; color: var(--accent);">Tyreek Frazier</p>
                 <p style="font-size: 15px; line-height: 1.6; opacity: 0.8;">PhD Candidate at Iowa State University</p>
                 <p style="font-size: 12px; opacity: 0.5; margin-top: 40px; font-family: monospace;">BUILD: Release v18.0 (Splash & UI Audit) | AMES, IA</p>
                 
@@ -516,11 +511,11 @@
                         
                         <div style="display:flex; gap:15px; margin-top:5px;">
                             <div style="flex:1;">
-                                <div style="font-size:11px; opacity:0.7; margin-bottom:4px; text-transform:uppercase; font-weight:bold;">Morning Brief</div>
+                                <div style="font-size:11px; opacity:0.7; margin-bottom:4px; text-transform:uppercase; font-weight:700;">Morning Brief</div>
                                 <input type="time" id="settingMorning" onchange="window.updateNotifSettings()" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--border); color:#fff; padding:10px; border-radius:8px; outline:none; font-family:inherit;">
                             </div>
                             <div style="flex:1;">
-                                <div style="font-size:11px; opacity:0.7; margin-bottom:4px; text-transform:uppercase; font-weight:bold;">Evening Brief</div>
+                                <div style="font-size:11px; opacity:0.7; margin-bottom:4px; text-transform:uppercase; font-weight:700;">Evening Brief</div>
                                 <input type="time" id="settingEvening" onchange="window.updateNotifSettings()" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--border); color:#fff; padding:10px; border-radius:8px; outline:none; font-family:inherit;">
                             </div>
                         </div>
@@ -549,7 +544,7 @@
     <!-- Support / Donate Modal UI -->
     <div id="supportModal" class="bg-overlay" style="display:none; z-index: 99999; justify-content:center; align-items:center; pointer-events: auto;">
         <div class="glass" style="padding: 30px; width: 90%; max-width: 400px; display:flex; flex-direction:column; gap: 15px; background: rgba(11, 14, 17, 0.95); border: 1px solid rgba(243, 156, 18, 0.5); text-align: center;">
-            <h2 style="margin:0; font-size: 22px; font-weight:900; color: #f39c12; display: flex; align-items: center; justify-content: center; gap: 8px;"><i class="ph-fill ph-coffee"></i> Support TJFWeather</h2>
+            <h2 style="margin:0; font-size: 22px; font-weight:700; color: #f39c12; display: flex; align-items: center; justify-content: center; gap: 8px;"><i class="ph-fill ph-coffee"></i> Support TJFWeather</h2>
             <p style="font-size:14px; opacity:0.9; line-height:1.6; margin: 0;">
                 Thank you for considering supporting the development of TJFWeather!
             </p>
@@ -566,7 +561,7 @@
     <!-- System Message Modal UI -->
     <div id="sysModal" class="bg-overlay" style="display:none; z-index: 99999; justify-content:center; align-items:center; pointer-events: auto;">
         <div class="glass" style="padding: 25px; width: 90%; max-width: 320px; display:flex; flex-direction:column; gap: 15px; background: rgba(11, 14, 17, 0.95); border: 1px solid var(--info); text-align: center;">
-            <h2 style="margin:0; font-size: 18px; font-weight:900; color: var(--info);">System Message</h2>
+            <h2 style="margin:0; font-size: 18px; font-weight:700; color: var(--info);">System Message</h2>
             <div id="sysModalText" style="font-size:14px; opacity:0.9; line-height:1.5;"></div>
             <button class="glass-btn" style="width: 100%; margin-top: 10px; background: rgba(112, 161, 255, 0.2)!important; color: #fff!important; border-color: var(--info)!important;" onclick="document.getElementById('sysModal').style.display='none'">OK</button>
         </div>
@@ -576,7 +571,7 @@
     <div id="authModal" class="bg-overlay" style="display:none; z-index: 9999; justify-content:center; align-items:center; pointer-events: auto;">
         <div class="glass" style="padding: 30px; width: 90%; max-width: 350px; display:flex; flex-direction:column; gap: 15px; background: rgba(11, 14, 17, 0.95); border: 1px solid var(--accent);">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2 id="authModalTitle" style="margin:0; font-size: 20px; font-weight:900;">Login</h2>
+                <h2 id="authModalTitle" style="margin:0; font-size: 20px; font-weight:700;">Login</h2>
                 <button style="background:none; border:none; color:#fff; font-size:28px; cursor:pointer; padding:0; line-height:1;" onclick="window.closeAuthModal()">&times;</button>
             </div>
             
@@ -595,7 +590,7 @@
                 </button>
                 <div style="text-align:center; margin-top:10px; font-size: 13px; display:flex; flex-direction:column; gap: 8px;">
                     <a href="#" id="authForgotLink" style="color: var(--text); opacity:0.7; text-decoration: none;" onclick="window.toggleAuthMode('forgot', event)">Forgot Password?</a>
-                    <a href="#" id="authToggleLink" style="color: var(--accent); text-decoration: none; font-weight: bold;" onclick="window.toggleAuthMode('register', event)">Don't have an account? Register here</a>
+                    <a href="#" id="authToggleLink" style="color: var(--accent); text-decoration: none; font-weight: 700;" onclick="window.toggleAuthMode('register', event)">Don't have an account? Register here</a>
                 </div>
             </div>
         </div>
@@ -994,13 +989,13 @@
 
             return `
                 <div class="glass" style="padding:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; flex:1; min-width:150px; background: rgba(0,0,0,0.2);">
-                    <div style="font-size:14px; text-transform:uppercase; opacity:0.8; font-weight:900;">${label}</div>
+                    <div style="font-size:14px; text-transform:uppercase; opacity:0.8; font-weight:700;">${label}</div>
                     <div style="position:relative; width: 80px; height: 80px; margin: 0 auto;">
                         <svg width="80" height="80" viewBox="0 0 80 80" style="transform: rotate(-90deg);">
                             <circle cx="40" cy="40" r="${radius}" fill="transparent" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
                             <circle cx="40" cy="40" r="${radius}" fill="transparent" stroke="${color}" stroke-width="8" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-out;" />
                         </svg>
-                        <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:${isTextValue ? '14px' : '20px'}; color:${color};">${displayVal}</div>
+                        <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:${isTextValue ? '14px' : '20px'}; color:${color};">${displayVal}</div>
                     </div>
                 </div>`;
         };
@@ -1356,7 +1351,7 @@
                 <div style="padding: 10px 14px; background: rgba(255,255,255,0.05); border-radius: 8px; font-size: 15px; opacity: 0.7; font-weight: 500; margin-bottom: 12px; color:#fff;">No Severe Weather Expected</div>
                 <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official Storm Prediction Center Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
             
-            let riskBadge = spc.rawLvl === 1 ? "Thunderstorm" : `<span style="font-size: 2.5em; font-weight: 900; line-height: 0.8;">${spc.level}</span><span style="font-size: 1.2em; opacity: 0.7; margin-left: 2px;">/5</span>`;
+            let riskBadge = spc.rawLvl === 1 ? "Thunderstorm" : `<span style="font-size: 2.5em; font-weight: 700; line-height: 0.8;">${spc.level}</span><span style="font-size: 1.2em; opacity: 0.7; margin-left: 2px;">/5</span>`;
             
             let getRiskStyle = (val, isCig, type) => {
                 let b = 'transparent', t = '#ffffff', c = 'rgba(255,255,255,0.1)';
@@ -1415,12 +1410,12 @@
                     if (val >= 15) text = "Numerous tornadoes possible";
                     else if (val >= 5) text = "A few tornadoes possible";
                     else if (val >= 2) text = "Isolated tornado possible";
-                    if (cigTag) text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:900; display:flex; text-align:center; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: Up to EF2+ tornadoes possible</span>`;
+                    if (cigTag) text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:700; display:flex; text-align:center; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: Up to EF2+ tornadoes possible</span>`;
                 } else if (type === 'wind') {
                     if (val >= 30) text = "Widespread damaging winds possible";
                     else if (val >= 15) text = "Scattered damaging winds possible";
                     else if (val >= 5) text = "Isolated damaging winds possible";
-                    if (cigTag) text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:900; display:flex; text-align:center; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: Up to 75+ mph winds possible</span>`;
+                    if (cigTag) text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:700; display:flex; text-align:center; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: Up to 75+ mph winds possible</span>`;
                 } else if (type === 'hail') {
                     if (val >= 30) text = "Widespread large hail possible";
                     else if (val >= 15) text = "Scattered large hail possible";
@@ -1432,7 +1427,7 @@
                         let sizeStr = window.getHailTranslation ? window.getHailTranslation(sizeNum) : sizeNum + '"';
                         let objMatch = sizeStr.match(/\((.*?)\)/);
                         let objName = objMatch ? objMatch[1].toLowerCase() : sizeStr;
-                        text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:900; display:flex; text-align:center; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: Up to ${objName} sized hail possible</span>`;
+                        text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:700; display:flex; text-align:center; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: Up to ${objName} sized hail possible</span>`;
                     }
                 }
                 if (!text && !cigTag) text = "<span style='opacity:0.4'>No significant risk</span>";
@@ -1446,23 +1441,23 @@
             return `
                 <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 12px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="background: ${spc.bgColor}; color: ${spc.textColor}; padding: 8px 14px; border-radius: 8px; font-weight: 900; font-size: 15px; display: flex; align-items: baseline; gap: 2px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);">${riskBadge}</div>
-                        <div style="font-weight: 900; font-size: 16px; color: ${spc.bgColor}; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">${spc.name}</div>
+                        <div style="background: ${spc.bgColor}; color: ${spc.textColor}; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 15px; display: flex; align-items: baseline; gap: 2px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);">${riskBadge}</div>
+                        <div style="font-weight: 700; font-size: 16px; color: ${spc.bgColor}; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">${spc.name}</div>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px;">
                         <div style="background: rgba(0,0,0,0.2); border: 1px solid ${torStyle.border}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${torNum > 0 || torCig ? 'inset 0 0 15px '+torStyle.border+'33' : 'none'};">
                             <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Tornado</div>
-                            <div style="font-size: 24px; font-weight: 900; background: ${torStyle.bg}; color: ${torStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${displayString(torVal)}</div>
+                            <div style="font-size: 24px; font-weight: 700; background: ${torStyle.bg}; color: ${torStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${displayString(torVal)}</div>
                             <div style="font-size: 11px; line-height: 1.4; color: #fff;">${torDesc}</div>
                         </div>
                         <div style="background: rgba(0,0,0,0.2); border: 1px solid ${windStyle.border}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${windNum > 0 || windCig ? 'inset 0 0 15px '+windStyle.border+'33' : 'none'};">
                             <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Wind</div>
-                            <div style="font-size: 24px; font-weight: 900; background: ${windStyle.bg}; color: ${windStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${displayString(windVal)}</div>
+                            <div style="font-size: 24px; font-weight: 700; background: ${windStyle.bg}; color: ${windStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${displayString(windVal)}</div>
                             <div style="font-size: 11px; line-height: 1.4; color: #fff;">${windDesc}</div>
                         </div>
                         <div style="background: rgba(0,0,0,0.2); border: 1px solid ${hailStyle.border}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${hailNum > 0 || hailCig ? 'inset 0 0 15px '+hailStyle.border+'33' : 'none'};">
                             <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Hail</div>
-                            <div style="font-size: 24px; font-weight: 900; background: ${hailStyle.bg}; color: ${hailStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${displayString(hailVal)}</div>
+                            <div style="font-size: 24px; font-weight: 700; background: ${hailStyle.bg}; color: ${hailStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${displayString(hailVal)}</div>
                             <div style="font-size: 11px; line-height: 1.4; color: #fff;">${hailDesc}</div>
                         </div>
                     </div>
@@ -1508,7 +1503,7 @@
             let expText = '';
             if (f.properties.expires) {
                 let expDate = new Date(f.properties.expires);
-                expText = `<div style="font-size:10px; margin-top:6px; opacity:0.8; font-weight:800; text-transform:uppercase;">Expires: ${expDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })}</div>`;
+                expText = `<div style="font-size:10px; margin-top:6px; opacity:0.8; font-weight:700; text-transform:uppercase;">Expires: ${expDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })}</div>`;
             }
             let icon = "ph-warning";
             if(cls === 'alert-tornado') icon = "ph-wind"; else if(cls === 'alert-thunderstorm') icon = "ph-cloud-lightning"; else if(cls === 'alert-winter') icon = "ph-snowflake";
@@ -1769,7 +1764,7 @@
 
                 html += `<div id="pinned-card-${pc.id}" class="glass" style="min-width: 240px; padding: 20px; cursor: pointer; display: flex; flex-direction: column; gap: 10px; transition:0.2s;" onclick="window.showTab('localforecast'); window.selectLFCity('${pc.id}', false);" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div style="font-size:13px; font-weight:800; color:#fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform:uppercase;">${pc.display}</div>
+                        <div style="font-size:13px; font-weight:700; color:#fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform:uppercase;">${pc.display}</div>
                         ${alertIconHtml}
                     </div>
                     <div style="display:flex; align-items:center; gap:12px; margin-top:5px;">
@@ -1799,13 +1794,13 @@
                     
                     card.innerHTML = `
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div style="font-size:13px; font-weight:800; color:#fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform:uppercase;">${pc.display}</div>
+                            <div style="font-size:13px; font-weight:700; color:#fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform:uppercase;">${pc.display}</div>
                             ${alertIconHtml}
                         </div>
                         <div style="display:flex; align-items:center; gap:15px; margin-top:5px;">
                             ${window.getWeatherSVG(liveASOS.wx, true, 36)}
                             <div>
-                                <div style="font-size:26px; font-weight:900; line-height:1; color:#fff;">${liveASOS.temp !== '--' ? liveASOS.temp+'°F' : '--'}</div>
+                                <div style="font-size:26px; font-weight:700; line-height:1; color:#fff;">${liveASOS.temp !== '--' ? liveASOS.temp+'°F' : '--'}</div>
                                 <div style="font-size:12px; opacity:0.8; margin-top:4px; font-weight:600;">${liveASOS.wx}</div>
                             </div>
                         </div>
@@ -1881,7 +1876,7 @@
                 let getPolColor = (lvl) => lvl === 'High' ? '#e74c3c' : (lvl === 'Moderate' ? '#f1c40f' : '#2ecc71');
                 
                 envBox.innerHTML = `
-                    <div style="font-size:14px; font-weight:900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px; color:#fff; width: 100%;">
+                    <div style="font-size:14px; font-weight:700; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px; color:#fff; width: 100%;">
                         <i class="ph-fill ph-leaf"></i> AIR QUALITY & ALLERGY INDEX
                     </div>
                     <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:20px; text-align:center; width: 100%;">
@@ -2012,11 +2007,11 @@
                             let hWinds = parseWinds(p.windSpeed, p.windGust);
                             let hRh = p.relativeHumidity?.value || null;
                             let hFl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
-                            let flHtml = `<div style="font-size:12px; font-weight:bold; color:#fff; opacity:0.9; margin-top:6px;">Feels Like: ${hFl}&deg;</div>`;
+                            let flHtml = `<div style="font-size:12px; font-weight:700; color:#fff; opacity:0.9; margin-top:6px;">Feels Like: ${hFl}&deg;</div>`;
 
                             if (hWinds.gust > hWinds.sustained && p.temperature <= 50) {
                                 let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
-                                if (mc < hFl) flHtml += `<div style="font-size:12px; font-weight:bold; color:#fff; opacity:0.8; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
+                                if (mc < hFl) flHtml += `<div style="font-size:12px; font-weight:700; color:#fff; opacity:0.8; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
                                 else flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
                             } else if (hWinds.gust > hWinds.sustained) {
                                 flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
@@ -2028,10 +2023,10 @@
                             let qpfStr = '';
                             if (qpfVal > 0) {
                                 let inches = (qpfVal / 25.4).toFixed(2);
-                                qpfStr = `<div style="color:#fff; opacity:0.9; font-size:11px; font-weight:900; margin-top:8px;">${inches}"</div>`;
+                                qpfStr = `<div style="color:#fff; opacity:0.9; font-size:11px; font-weight:700; margin-top:8px;">${inches}"</div>`;
                             } else {
                                 let pop = p.probabilityOfPrecipitation?.value || 0;
-                                if (pop > 0) qpfStr = `<div style="color:#fff; opacity:0.8; font-size:12px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
+                                if (pop > 0) qpfStr = `<div style="color:#fff; opacity:0.8; font-size:12px; font-weight:700; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
                                 else qpfStr = `<div style="color:transparent; font-size:12px; margin-top:8px;">0%</div>`;
                             }
                             tempsHtml += `<div class="lf-hour-col" style="min-width: 140px; padding: 16px 12px;">
@@ -2079,7 +2074,7 @@
             // Immediate Progressive Skeleton Render
             main.innerHTML = `
                 <div class="animate-pop" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 25px; flex-wrap:wrap; gap:10px;">
-                    <h2 style="font-size: 36px; font-weight: 900; margin: 0;">${cityObj.display}</h2>
+                    <h2 style="font-size: 36px; font-weight: 700; margin: 0;">${cityObj.display}</h2>
                     <button id="pinCityBtn" onclick="window.togglePinCity('${safeCityId}')" class="glass-btn" style="font-size:12px; padding:8px 16px;">
                         <i id="pinCityIcon" class="${pinIcon}" style="color:${pinColor}; font-size:16px;"></i> <span id="pinCityText">${pinText}</span>
                     </button>
@@ -2127,7 +2122,7 @@
                     let alertsEl = document.getElementById('lf-alerts-container');
                     if (alertsEl) alertsEl.innerHTML = `
                     <div class="glass" style="padding: 25px; margin-bottom: 20px; border: 2px solid #fff; background: rgba(255, 255, 255, 0.1); height: auto; min-height: fit-content; overflow: visible;">
-                        <h3 style="margin: 0 0 16px; font-size: 14px; text-transform: uppercase; color: #fff; font-weight: 900; display: flex; align-items: center; gap: 8px;">
+                        <h3 style="margin: 0 0 16px; font-size: 14px; text-transform: uppercase; color: #fff; font-weight: 700; display: flex; align-items: center; gap: 8px;">
                             <i class="ph-fill ph-warning-circle" style="font-size: 20px;"></i> ACTIVE WEATHER ALERTS
                         </h3>
                         ${cityAlerts.map(alertBadgeHTML).join('')}
@@ -2152,7 +2147,7 @@
                     let minChillHtml = "";
                     if (liveASOS.gust && liveASOS.gust > liveASOS.wind && liveASOS.temp <= 50) {
                         let mc = getFeelsLike(liveASOS.temp, liveASOS.gust, liveASOS.rh);
-                        if (mc < fl) minChillHtml = `<div style="color:#fff; opacity:0.8; font-size:14px; margin-top:2px; font-weight:bold;"><i class="ph-fill ph-wind"></i> Min Chill (Gusts): ${mc}°F <a href="#datasources" onclick="window.showTab('datasources')" style="color:#fff; text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a></div>`;
+                        if (mc < fl) minChillHtml = `<div style="color:#fff; opacity:0.8; font-size:14px; margin-top:2px; font-weight:700;"><i class="ph-fill ph-wind"></i> Min Chill (Gusts): ${mc}°F <a href="#datasources" onclick="window.showTab('datasources')" style="color:#fff; text-decoration:none; cursor:pointer;" title="Learn about Wind Chill"><i class="ph-fill ph-info"></i></a></div>`;
                         else minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:2px; font-style:italic;"><i class="ph ph-wind"></i> Gusts don't lower perceived temp</div>`;
                     } else if (liveASOS.gust && liveASOS.gust > liveASOS.wind) {
                         minChillHtml = `<div style="color:var(--text); opacity:0.6; font-size:12px; margin-top:2px; font-style:italic;"><i class="ph ph-wind"></i> Gusts don't lower perceived temp</div>`;
@@ -2168,15 +2163,15 @@
 
                     asosEl.outerHTML = `
                     <div id="lf-asos-container" class="glass asos-panel" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(20, 30, 40, 0.6) 100%); border-color: rgba(255,255,255,0.3); padding: 25px;">
-                        <div style="font-size:12px; font-weight: 900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase; color:#fff;">
+                        <div style="font-size:12px; font-weight: 700; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase; color:#fff;">
                             ${titleHtml}
                         </div>
                         <div style="margin-bottom: 12px;">${window.getWeatherSVG(liveASOS.wx, true, 60)}</div>
-                        <div style="font-size:42px; font-weight:900; color:#fff; line-height:1; margin-bottom:15px;">${liveASOS.temp}°F</div>
+                        <div style="font-size:42px; font-weight:700; color:#fff; line-height:1; margin-bottom:15px;">${liveASOS.temp}°F</div>
                         <div style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; color:#fff;">
                             <div style="font-size: 14px; font-weight: 600; opacity: 0.85;">Wind: ${liveASOS.wind !== null ? liveASOS.wind + ' mph' : '--'}${liveASOS.gust ? ` (Gusts: ${liveASOS.gust} mph)` : ''}</div>
                             <div style="font-size: 14px; font-weight: 600; opacity: 0.85;">Dew Point: ${dewpStr}</div>
-                            <div style="font-size: 14px; font-weight: bold; color: #fff; opacity: 0.9;">Feels Like: ${fl}°F</div>
+                            <div style="font-size: 14px; font-weight: 700; color: #fff; opacity: 0.9;">Feels Like: ${fl}°F</div>
                             ${minChillHtml}
                         </div>
                     </div>`;
@@ -2251,7 +2246,7 @@
                     <div class="placeholder-banner glass" style="padding: 15px; margin-bottom: 20px; border: 1px solid var(--info); display: flex; align-items: center; gap: 12px; color: #fff; background: rgba(112, 161, 255, 0.15);">
                         <i class="ph-fill ph-info" style="font-size: 28px; color: var(--info);"></i> 
                         <div>
-                            <div style="font-size: 15px; font-weight: 900; color: var(--info); text-transform: uppercase;">Live NWS Data Unavailable</div>
+                            <div style="font-size: 15px; font-weight: 700; color: var(--info); text-transform: uppercase;">Live NWS Data Unavailable</div>
                             <div style="font-size: 13px; opacity: 0.9; margin-top: 2px;">Falling back to the nearest active forecast from <strong>${fallbackName}</strong>.</div>
                         </div>
                     </div>`;
@@ -2267,7 +2262,7 @@
                         let period = dailyPeriods[0];
                         nwsEl.outerHTML = `
                         <div id="lf-nws-container" class="glass nws-panel" style="background: rgba(0, 210, 255, 0.05); padding: 25px;">
-                            <div style="font-size:22px; font-weight:900; margin-bottom: 15px; color:#fff;">${period.name}: ${period.temperature}°F</div>
+                            <div style="font-size:22px; font-weight:700; margin-bottom: 15px; color:#fff;">${period.name}: ${period.temperature}°F</div>
                             <div style="font-size:15px; opacity:0.9; line-height: 1.6; color:#fff;">${period.detailedForecast}</div>
                             ${buildMeteorologistCreditHTML(gridId, cityObj.lat, cityObj.lon)}
                         </div>`;
@@ -2285,11 +2280,11 @@
                         let hWinds = parseWinds(p.windSpeed, p.windGust);
                         let hRh = p.relativeHumidity?.value || null;
                         let fl = getFeelsLike(p.temperature, hWinds.sustained, hRh);
-                        let flHtml = `<div style="font-size:12px; font-weight:bold; color:#fff; opacity:0.9; margin-top:6px;">Feels Like: ${fl}&deg;</div>`;
+                        let flHtml = `<div style="font-size:12px; font-weight:700; color:#fff; opacity:0.9; margin-top:6px;">Feels Like: ${fl}&deg;</div>`;
 
                         if (hWinds.gust > hWinds.sustained && p.temperature <= 50) {
                             let mc = getFeelsLike(p.temperature, hWinds.gust, hRh);
-                            if (mc < fl) flHtml += `<div style="font-size:12px; font-weight:bold; color:#fff; opacity:0.8; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
+                            if (mc < fl) flHtml += `<div style="font-size:12px; font-weight:700; color:#fff; opacity:0.8; margin-top:2px;">Min Chill: ${mc}&deg;</div>`;
                             else flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
                         } else if (hWinds.gust > hWinds.sustained) {
                             flHtml += `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px; line-height:1.1;">Gusts don't<br>lower temp</div>`;
@@ -2301,10 +2296,10 @@
                         let qpfStr = '';
                         if (qpfVal > 0) {
                             let inches = (qpfVal / 25.4).toFixed(2);
-                            qpfStr = `<div style="color:#fff; opacity:0.9; font-size:11px; font-weight:900; margin-top:8px;">${inches}"</div>`;
+                            qpfStr = `<div style="color:#fff; opacity:0.9; font-size:11px; font-weight:700; margin-top:8px;">${inches}"</div>`;
                         } else {
                             let pop = p.probabilityOfPrecipitation?.value || 0;
-                            if (pop > 0) qpfStr = `<div style="color:#fff; opacity:0.8; font-size:12px; font-weight:bold; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
+                            if (pop > 0) qpfStr = `<div style="color:#fff; opacity:0.8; font-size:12px; font-weight:700; margin-top:8px;"><i class="ph-fill ph-drop"></i> ${pop}%</div>`;
                             else qpfStr = `<div style="color:transparent; font-size:12px; margin-top:8px;">0%</div>`;
                         }
                         return `<div class="lf-hour-col">
@@ -2317,7 +2312,7 @@
                     }).join('');
                     hrEl.innerHTML = `
                     <div class="glass" style="padding: 25px; margin-bottom: 20px;">
-                        <div style="font-size:12px; font-weight:900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px; color:#fff;">
+                        <div style="font-size:12px; font-weight:700; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px; color:#fff;">
                             <i class="ph-fill ph-clock"></i> 24-HOUR FORECAST
                         </div>
                         <div class="lf-hourly-scroll">${hCols}</div>
@@ -2343,17 +2338,17 @@
                             let dWinds = parseWinds(p1.windSpeed, p1.windGust);
                             let dRh = p1.relativeHumidity?.value || null;
                             let dFl = getFeelsLike(hi, dWinds.sustained, dRh);
-                            if (hi !== '--' && dFl !== hi && !isNaN(dFl)) dayFlHtml = `<div style="font-size:12px; color:#fff; opacity:0.9; margin-top:6px; font-weight:bold;">Day Feels Like: ${dFl}°</div>`;
+                            if (hi !== '--' && dFl !== hi && !isNaN(dFl)) dayFlHtml = `<div style="font-size:12px; color:#fff; opacity:0.9; margin-top:6px; font-weight:700;">Day Feels Like: ${dFl}°</div>`;
 
                             if (p2 && !p2.isDaytime && lo !== '--') {
                                 let nWinds = parseWinds(p2.windSpeed, p2.windGust);
                                 let nRh = p2.relativeHumidity?.value || null;
                                 let nFl = getFeelsLike(lo, nWinds.sustained, nRh);
-                                if (nFl !== lo && !isNaN(nFl)) eveFlHtml = `<div style="font-size:12px; color:#fff; opacity:0.9; margin-top:6px; font-weight:bold;">Eve Feels Like: ${nFl}°</div>`;
+                                if (nFl !== lo && !isNaN(nFl)) eveFlHtml = `<div style="font-size:12px; color:#fff; opacity:0.9; margin-top:6px; font-weight:700;">Eve Feels Like: ${nFl}°</div>`;
 
                                 if (nWinds.gust > nWinds.sustained && lo <= 50) {
                                     let nMc = getFeelsLike(lo, nWinds.gust, nRh);
-                                    if (nMc < nFl && !isNaN(nMc)) nightMcHtml = `<div style="font-size:12px; color:#fff; opacity:0.8; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
+                                    if (nMc < nFl && !isNaN(nMc)) nightMcHtml = `<div style="font-size:12px; color:#fff; opacity:0.8; margin-top:2px; font-weight:700;">Min Chill: ${nMc}°</div>`;
                                     else nightMcHtml = `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px;">Gusts don't lower temp</div>`;
                                 } else if (nWinds.gust > nWinds.sustained) {
                                     nightMcHtml = `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px;">Gusts don't lower temp</div>`;
@@ -2368,11 +2363,11 @@
                             let nWinds = parseWinds(p1.windSpeed, p1.windGust);
                             let nRh = p1.relativeHumidity?.value || null;
                             let nFl = getFeelsLike(lo, nWinds.sustained, nRh);
-                            if (lo !== '--' && nFl !== lo && !isNaN(nFl)) eveFlHtml = `<div style="font-size:12px; color:#fff; opacity:0.9; margin-top:6px; font-weight:bold;">Eve Feels Like: ${nFl}°</div>`;
+                            if (lo !== '--' && nFl !== lo && !isNaN(nFl)) eveFlHtml = `<div style="font-size:12px; color:#fff; opacity:0.9; margin-top:6px; font-weight:700;">Eve Feels Like: ${nFl}°</div>`;
                             
                             if (nWinds.gust > nWinds.sustained && lo <= 50) {
                                 let nMc = getFeelsLike(lo, nWinds.gust, nRh);
-                                if (nMc < nFl && !isNaN(nMc)) nightMcHtml = `<div style="font-size:12px; color:#fff; opacity:0.8; margin-top:2px; font-weight:bold;">Min Chill: ${nMc}°</div>`;
+                                if (nMc < nFl && !isNaN(nMc)) nightMcHtml = `<div style="font-size:12px; color:#fff; opacity:0.8; margin-top:2px; font-weight:700;">Min Chill: ${nMc}°</div>`;
                                 else nightMcHtml = `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px;">Gusts don't lower temp</div>`;
                             } else if (nWinds.gust > nWinds.sustained) {
                                 nightMcHtml = `<div style="font-size:10px; opacity:0.8; font-style:italic; margin-top:2px;">Gusts don't lower temp</div>`;
@@ -2384,14 +2379,14 @@
                         
                         dCols += `
                         <div class="lf-daily-col">
-                            <div style="font-weight: 800; font-size: 14px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; color:#fff;">${dayName}</div>
+                            <div style="font-weight: 700; font-size: 14px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; color:#fff;">${dayName}</div>
                             <div style="margin-bottom: 12px;">${window.getWeatherSVG(p1.shortForecast, p1.isDaytime, 42)}</div>
                             <div style="margin-bottom: 10px; min-height: 45px;">
-                                <div style="font-size: 24px; font-weight: 900; color: #fff; line-height: 1;">${hi !== '--' ? hi+'°' : '--'}</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #fff; line-height: 1;">${hi !== '--' ? hi+'°' : '--'}</div>
                                 ${dayFlHtml}
                             </div>
                             <div style="margin-top: 4px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; min-height: 65px;">
-                                <div style="font-size: 18px; font-weight: 900; color: #fff; opacity: 0.8; line-height: 1;">${lo !== '--' ? lo+'°' : '--'}</div>
+                                <div style="font-size: 18px; font-weight: 700; color: #fff; opacity: 0.8; line-height: 1;">${lo !== '--' ? lo+'°' : '--'}</div>
                                 ${eveFlHtml}
                                 ${nightMcHtml}
                             </div>
@@ -2399,7 +2394,7 @@
                     }
                     dyEl.innerHTML = `
                     <div class="glass" style="padding: 25px; margin-bottom: 20px;">
-                        <div style="font-size:12px; font-weight:900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px; color:#fff;">
+                        <div style="font-size:12px; font-weight:700; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px; color:#fff;">
                             <i class="ph-fill ph-calendar-blank"></i> 7-DAY FORECAST
                         </div>
                         <div class="lf-hourly-scroll">${dCols}</div>
@@ -2414,13 +2409,13 @@
                 let spcEl = document.getElementById('lf-spc-container');
                 if (spcEl) spcEl.innerHTML = `
                     <div class="glass" style="flex:1; min-width:280px; padding: 25px;">
-                        <div style="font-size:11px; opacity:0.8; font-weight: 800; letter-spacing:1px; margin-bottom:12px; display: flex; align-items: center; gap: 6px; color:#fff;">
+                        <div style="font-size:11px; opacity:0.8; font-weight: 700; letter-spacing:1px; margin-bottom:12px; display: flex; align-items: center; gap: 6px; color:#fff;">
                             <i class="ph-fill ph-calendar-blank"></i> TODAY'S STORM PREDICTION CENTER OUTLOOK
                         </div>
                         <div>${spcData.day1 && spcData.day1.cat ? renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 0)) : '<span style="opacity:0.5;">Unavailable</span>'}</div>
                     </div>
                     <div class="glass" style="flex:1; min-width:280px; padding: 25px;">
-                        <div style="font-size:11px; opacity:0.8; font-weight: 800; letter-spacing:1px; margin-bottom:12px; display: flex; align-items: center; gap: 6px; color:#fff;">
+                        <div style="font-size:11px; opacity:0.8; font-weight: 700; letter-spacing:1px; margin-bottom:12px; display: flex; align-items: center; gap: 6px; color:#fff;">
                             <i class="ph-fill ph-calendar-plus"></i> TOMORROW'S STORM PREDICTION CENTER OUTLOOK
                         </div>
                         <div>${spcData.day2 && spcData.day2.cat ? renderSPCHTML(getRealSPCOutlook(cityObj.lat, cityObj.lon, 1)) : '<span style="opacity:0.5;">Unavailable</span>'}</div>
@@ -2457,12 +2452,12 @@
 
                     mosEl.innerHTML = `
                     <div class="glass" style="padding: 25px; margin-bottom: 20px;">
-                        <div style="display:flex; align-items:center; gap:8px; font-size:15px; font-weight:900; margin-bottom: 10px; color: #fff;">
+                        <div style="display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; margin-bottom: 10px; color: #fff;">
                             <i class="ph-fill ph-chart-line-up" style="font-size: 24px;"></i> 7-DAY STATISTICAL UNCERTAINTY (MODEL OUTPUT STATISTICS)
                         </div>
                         <div style="font-size:13px; opacity:0.8; margin-bottom: 20px; line-height: 1.6; color:#fff;">
                             Plotting the daily High and Low temperature spread between the official National Blend of Models consensus, Global Forecast System Model Output Statistics, and North American Mesoscale Model Output Statistics models.
-                            <span style="color:#fff; opacity:0.9; font-weight:bold;">Wider gaps = lower confidence in the forecast.</span>
+                            <span style="color:#fff; opacity:0.9; font-weight:700;">Wider gaps = lower confidence in the forecast.</span>
                         </div>
                         <div style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 10px;">
                             <div style="min-width: 900px; height: 350px; position: relative;">
@@ -2487,8 +2482,8 @@
                                 },
                                 options: {
                                     responsive: true, maintainAspectRatio: false,
-                                    plugins: { legend: { labels: { color: '#fff', font: { family: "'Bitcount Single', 'Share Tech Mono', monospace", size: 11 } } }, tooltip: { mode: 'index', intersect: false }, datalabels: { color: function(context) { return context.dataset.borderColor; }, font: { weight: 'bold', size: 11 }, align: function(context) { return context.dataIndex % 2 === 0 ? 'top' : 'bottom'; }, offset: 4, formatter: function(value) { return value !== null ? value + '°' : ''; } } },
-                                    scales: { x: { ticks: { color: '#aaa', font: { size: 11, family: "'Bitcount Single', 'Share Tech Mono', monospace" } }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#aaa', font: { family: "'Bitcount Single', 'Share Tech Mono', monospace" }, callback: function(value){ return value + '°'; } }, grid: { color: 'rgba(255,255,255,0.05)' } } },
+                                    plugins: { legend: { labels: { color: '#fff', font: { family: "'Pixelify Sans', sans-serif", size: 11 } } }, tooltip: { mode: 'index', intersect: false }, datalabels: { color: function(context) { return context.dataset.borderColor; }, font: { weight: 'bold', size: 11 }, align: function(context) { return context.dataIndex % 2 === 0 ? 'top' : 'bottom'; }, offset: 4, formatter: function(value) { return value !== null ? value + '°' : ''; } } },
+                                    scales: { x: { ticks: { color: '#aaa', font: { size: 11, family: "'Pixelify Sans', sans-serif" } }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#aaa', font: { family: "'Pixelify Sans', sans-serif" }, callback: function(value){ return value + '°'; } }, grid: { color: 'rgba(255,255,255,0.05)' } } },
                                     interaction: { mode: 'nearest', axis: 'x', intersect: false }
                                 }
                             });
@@ -2497,7 +2492,7 @@
                 } else {
                     mosEl.innerHTML = `
                     <div class="glass" style="padding: 25px; margin-bottom: 20px;">
-                        <div style="display:flex; align-items:center; gap:8px; font-size:15px; font-weight:900; margin-bottom: 10px; color: #fff;">
+                        <div style="display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; margin-bottom: 10px; color: #fff;">
                             <i class="ph-fill ph-chart-bar" style="font-size: 24px;"></i> DAILY STATISTICAL UNCERTAINTY (MODEL OUTPUT STATISTICS)
                         </div>
                         <div style="opacity: 0.8; font-style: italic; color: #fff;"><i class="ph-fill ph-warning"></i> Model Output Statistics data is actively generating or unavailable for this location.</div>
@@ -2520,7 +2515,7 @@
                 
                 envEl.innerHTML = `
                 <div style="margin-bottom: 20px;">
-                    <div style="font-size:14px; font-weight:900; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px; color:#fff;">
+                    <div style="font-size:14px; font-weight:700; opacity:0.8; letter-spacing:1px; margin-bottom:15px; display: flex; align-items: center; gap: 6px; color:#fff;">
                         <i class="ph-fill ph-leaf"></i> AIR QUALITY & ALLERGY INDEX
                     </div>
                     <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:20px; text-align:center;">
@@ -2544,7 +2539,7 @@
                     let pIds = window.pinnedCities.map(p => p.id);
                     let pCities = LF_CITIES.filter(c => pIds.includes(c.id));
                     if(pCities.length > 0) {
-                        pinnedHtml = `<div style="font-size:10px; opacity:0.5; margin: 10px 0 4px 10px; text-transform:uppercase; font-weight:800; letter-spacing:1px;">Pinned Cities</div>` + 
+                        pinnedHtml = `<div style="font-size:10px; opacity:0.5; margin: 10px 0 4px 10px; text-transform:uppercase; font-weight:700; letter-spacing:1px;">Pinned Cities</div>` + 
                                      pCities.map(c => {
                                          let cAlerts = window.getCityAlerts(c.lat, c.lon);
                                          let alertHtml = cAlerts.length > 0 ? `<i class="ph-fill ph-warning" style="color:var(--danger); margin-left:auto;" title="Active Alerts"></i>` : '';
