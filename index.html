@@ -2482,8 +2482,8 @@
                                 },
                                 options: {
                                     responsive: true, maintainAspectRatio: false,
-                                    plugins: { legend: { labels: { color: '#fff', font: { family: "'Pixelify Sans', sans-serif", size: 11 } } }, tooltip: { mode: 'index', intersect: false }, datalabels: { color: function(context) { return context.dataset.borderColor; }, font: { weight: 'bold', size: 11 }, align: function(context) { return context.dataIndex % 2 === 0 ? 'top' : 'bottom'; }, offset: 4, formatter: function(value) { return value !== null ? value + '°' : ''; } } },
-                                    scales: { x: { ticks: { color: '#aaa', font: { size: 11, family: "'Pixelify Sans', sans-serif" } }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#aaa', font: { family: "'Pixelify Sans', sans-serif" }, callback: function(value){ return value + '°'; } }, grid: { color: 'rgba(255,255,255,0.05)' } } },
+                                    plugins: { legend: { labels: { color: '#fff', font: { family: "'Share Tech Mono', monospace", size: 11 } } }, tooltip: { mode: 'index', intersect: false }, datalabels: { color: function(context) { return context.dataset.borderColor; }, font: { weight: 'bold', size: 11 }, align: function(context) { return context.dataIndex % 2 === 0 ? 'top' : 'bottom'; }, offset: 4, formatter: function(value) { return value !== null ? value + '°' : ''; } } },
+                                    scales: { x: { ticks: { color: '#aaa', font: { size: 11, family: "'Share Tech Mono', monospace" } }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#aaa', font: { family: "'Share Tech Mono', monospace" }, callback: function(value){ return value + '°'; } }, grid: { color: 'rgba(255,255,255,0.05)' } } },
                                     interaction: { mode: 'nearest', axis: 'x', intersect: false }
                                 }
                             });
