@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=Workbench&family=Roboto+Condensed:wght@300;400;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://d3js.org/topojson.v3.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -41,11 +41,17 @@
 
         html, body {
             margin: 0; padding: 0; height: 100vh; width: 100vw;
-            font-family: 'Roboto Condensed', sans-serif; background-color: var(--bg);
+            font-family: 'Bitcount Single', 'Share Tech Mono', 'Roboto Condensed', monospace; background-color: var(--bg);
             background-image: url('https://images.pexels.com/photos/1162251/pexels-photo-1162251.jpeg?auto=compress&cs=tinysrgb&w=2560');
             background-size: cover; background-position: center;
             background-repeat: no-repeat; background-attachment: fixed;
             color: var(--text); overflow: hidden; position: fixed;
+        }
+
+        h1, h2, h3, h4, h5, h6, .logo {
+            font-family: 'Workbench', 'Orbitron', 'Roboto Condensed', sans-serif !important;
+            font-weight: 700 !important;
+            letter-spacing: 1px;
         }
 
         .bg-overlay {
@@ -73,7 +79,7 @@
             padding: 10px 20px; border-radius: 12px; font-weight: 900; font-size: 14px;
             cursor: pointer; min-width: 100px; transition: all 0.3s ease;
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            font-family: 'Roboto Condensed', sans-serif;
+            font-family: 'Bitcount Single', 'Share Tech Mono', 'Roboto Condensed', monospace;
         }
 
         .glass-btn:hover {
@@ -144,7 +150,7 @@
 
         .map-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background-color: #0b0e11 !important; }
 
-        .city-label { font-size: 13px; font-weight: 900; color: #ffffff; text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000; text-align: center; line-height: 1.1; font-family: 'Roboto Condensed', sans-serif; }
+        .city-label { font-size: 13px; font-weight: 900; color: #ffffff; text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000; text-align: center; line-height: 1.1; font-family: 'Bitcount Single', 'Share Tech Mono', 'Roboto Condensed', monospace; }
         .city-name { font-size: 11px; }
 
         .lf-container { display: flex; height: 100%; overflow: hidden; }
@@ -152,8 +158,8 @@
         .lf-main { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
         
         .lf-search-wrap { display: flex; gap: 8px; }
-        .lf-search-wrap input { flex: 1; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text); padding: 10px 14px; border-radius: 12px; outline: none; font-weight: 500; font-family: 'Roboto Condensed', sans-serif; }
-        .lf-search-wrap button { background: var(--accent); border: none; color: #000; font-weight: 900; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-family: 'Roboto Condensed', sans-serif; }
+        .lf-search-wrap input { flex: 1; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text); padding: 10px 14px; border-radius: 12px; outline: none; font-weight: 500; font-family: 'Bitcount Single', 'Share Tech Mono', 'Roboto Condensed', monospace; }
+        .lf-search-wrap button { background: var(--accent); border: none; color: #000; font-weight: 900; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-family: 'Bitcount Single', 'Share Tech Mono', 'Roboto Condensed', monospace; }
         
         .lf-city-list { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
         .lf-city-item { padding: 10px 14px; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 600; border: 1px solid transparent; display: flex; align-items: center; }
@@ -334,7 +340,7 @@
                         <h3 style="margin:0; color:var(--accent); font-size:12px; letter-spacing:1px; text-transform:uppercase; display: flex; align-items: center; gap: 6px;">
                             <i class="ph-fill ph-radar" style="font-size: 16px;"></i> Local Composite Radar
                         </h3>
-                        <span id="miniRadarTime" style="font-size:11px; opacity:0.6; font-family: 'Roboto Condensed', sans-serif;"></span>
+                        <span id="miniRadarTime" style="font-size:11px; opacity:0.6; font-family: 'Bitcount Single', 'Share Tech Mono', 'Roboto Condensed', monospace;"></span>
                     </div>
                     <div style="width:100%; height:220px; border-radius:12px; position:relative; overflow:hidden; border:1px solid var(--border);">
                         <div id="miniRadarMap" style="width:100%; height:100%; z-index:1;"></div>
@@ -977,19 +983,19 @@
                 percentage = Math.min(100, (value / 200) * 100); 
             }
             
-            let radius = 24;
+            let radius = 36;
             let circumference = 2 * Math.PI * radius;
             let offset = circumference - (percentage / 100) * circumference;
 
             return `
-                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
-                    <div style="font-size:11px; text-transform:uppercase; opacity:0.7; font-weight:bold;">${label}</div>
-                    <div style="position:relative; width: 64px; height: 64px; margin: 0 auto;">
-                        <svg width="64" height="64" viewBox="0 0 64 64" style="transform: rotate(-90deg);">
-                            <circle cx="32" cy="32" r="${radius}" fill="transparent" stroke="rgba(255,255,255,0.1)" stroke-width="6" />
-                            <circle cx="32" cy="32" r="${radius}" fill="transparent" stroke="${color}" stroke-width="6" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-out;" />
+                <div class="glass" style="padding:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; flex:1; min-width:150px; background: rgba(0,0,0,0.2);">
+                    <div style="font-size:14px; text-transform:uppercase; opacity:0.8; font-weight:900;">${label}</div>
+                    <div style="position:relative; width: 80px; height: 80px; margin: 0 auto;">
+                        <svg width="80" height="80" viewBox="0 0 80 80" style="transform: rotate(-90deg);">
+                            <circle cx="40" cy="40" r="${radius}" fill="transparent" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
+                            <circle cx="40" cy="40" r="${radius}" fill="transparent" stroke="${color}" stroke-width="8" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-out;" />
                         </svg>
-                        <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:${isTextValue ? '11px' : '16px'}; color:${color};">${displayVal}</div>
+                        <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:${isTextValue ? '14px' : '20px'}; color:${color};">${displayVal}</div>
                     </div>
                 </div>`;
         };
@@ -1105,6 +1111,14 @@
 
             const targetTab = document.getElementById(id) || document.getElementById('home');
             targetTab.classList.add('active'); targetTab.style.display = 'block'; targetTab.style.pointerEvents = 'auto';
+
+            targetTab.querySelectorAll('.glass, .lf-sidebar, .animate-pop').forEach((el, index) => {
+                el.style.animation = 'none';
+                el.offsetHeight; 
+                el.style.animation = null; 
+                el.classList.remove('delay-1', 'delay-2', 'delay-3');
+                el.classList.add('animate-pop', `delay-${(index % 3) + 1}`);
+            });
 
             if (element) {
                 element.classList.add('active');
@@ -1450,54 +1464,6 @@
                 </div>
                 <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official Storm Prediction Center Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
         }
-
-        window.renderCircularGauge = function(value, label, color, isTextValue = false) {
-            let percentage = 0;
-            let displayVal = value;
-            if (isTextValue) {
-                if (value === "Low") percentage = 15;
-                else if (value === "Moderate") percentage = 50;
-                else if (value === "High") percentage = 90;
-            } else {
-                percentage = Math.min(100, (value / 200) * 100); 
-            }
-            
-            let radius = 36;
-            let circumference = 2 * Math.PI * radius;
-            let offset = circumference - (percentage / 100) * circumference;
-
-            return `
-                <div class="glass" style="padding:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; flex:1; min-width:150px; background: rgba(0,0,0,0.2);">
-                    <div style="font-size:14px; text-transform:uppercase; opacity:0.8; font-weight:900;">${label}</div>
-                    <div style="position:relative; width: 80px; height: 80px; margin: 0 auto;">
-                        <svg width="80" height="80" viewBox="0 0 80 80" style="transform: rotate(-90deg);">
-                            <circle cx="40" cy="40" r="${radius}" fill="transparent" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
-                            <circle cx="40" cy="40" r="${radius}" fill="transparent" stroke="${color}" stroke-width="8" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-out;" />
-                        </svg>
-                        <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:${isTextValue ? '14px' : '20px'}; color:${color};">${displayVal}</div>
-                    </div>
-                </div>`;
-        };
-
-        window.getHailTranslation = function(sizeInInches) {
-            const size = parseFloat(sizeInInches);
-            if (isNaN(size)) return "2\"+ (Hen Egg)";
-            if (size >= 4.5) return `${size}" (Softball)`;
-            if (size >= 4.0) return `${size}" (Grapefruit)`;
-            if (size >= 3.0) return `${size}" (Teacup)`;
-            if (size >= 2.75) return `${size}" (Baseball)`;
-            if (size >= 2.5) return `${size}" (Tennis Ball)`;
-            if (size >= 2.0) return `${size}" (Hen Egg)`;
-            if (size >= 1.75) return `${size}" (Golf Ball)`;
-            if (size >= 1.5) return `${size}" (Ping Pong Ball)`;
-            if (size >= 1.25) return `${size}" (Half Dollar)`;
-            if (size >= 1.0) return `${size}" (Quarter)`;
-            if (size >= 0.88) return `${size}" (Nickel)`;
-            if (size >= 0.75) return `${size}" (Penny)`;
-            if (size >= 0.5) return `${size}" (Mothball)`;
-            if (size >= 0.25) return `${size}" (Pea)`;
-            return `${size}"`;
-        };
 
         window.updateHomeSPC = function() {
             const lat = window.currentHomeLat || 42.03;
@@ -2516,8 +2482,8 @@
                                 },
                                 options: {
                                     responsive: true, maintainAspectRatio: false,
-                                    plugins: { legend: { labels: { color: '#fff', font: { family: 'Roboto Condensed', size: 11 } } }, tooltip: { mode: 'index', intersect: false }, datalabels: { color: function(context) { return context.dataset.borderColor; }, font: { weight: 'bold', size: 11 }, align: function(context) { return context.dataIndex % 2 === 0 ? 'top' : 'bottom'; }, offset: 4, formatter: function(value) { return value !== null ? value + '°' : ''; } } },
-                                    scales: { x: { ticks: { color: '#aaa', font: { size: 11, family: 'Roboto Condensed' } }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#aaa', font: { family: 'Roboto Condensed' }, callback: function(value){ return value + '°'; } }, grid: { color: 'rgba(255,255,255,0.05)' } } },
+                                    plugins: { legend: { labels: { color: '#fff', font: { family: "'Bitcount Single', 'Share Tech Mono', monospace", size: 11 } } }, tooltip: { mode: 'index', intersect: false }, datalabels: { color: function(context) { return context.dataset.borderColor; }, font: { weight: 'bold', size: 11 }, align: function(context) { return context.dataIndex % 2 === 0 ? 'top' : 'bottom'; }, offset: 4, formatter: function(value) { return value !== null ? value + '°' : ''; } } },
+                                    scales: { x: { ticks: { color: '#aaa', font: { size: 11, family: "'Bitcount Single', 'Share Tech Mono', monospace" } }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#aaa', font: { family: "'Bitcount Single', 'Share Tech Mono', monospace" }, callback: function(value){ return value + '°'; } }, grid: { color: 'rgba(255,255,255,0.05)' } } },
                                     interaction: { mode: 'nearest', axis: 'x', intersect: false }
                                 }
                             });
