@@ -11,12 +11,14 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="TJFWeather">
-    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsbD0iIzBiMGUxMSIvPjx0ZXh0IHg9IjEyMCIgeT0iMTQwIiBmaWxsPSIjMDBkMmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRKRjwvdGV4dD48L3N2Zz4=">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="icon-192.png">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://d3js.org/topojson.v3.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -37,11 +39,13 @@
             --warning: #ffa502;
             --success: #2ecc71;
             --info: #70a1ff;
+            --font-display: 'Pixelify Sans', sans-serif;
+            --font-body: 'VT323', 'Pixelify Sans', monospace;
         }
 
         html, body {
             margin: 0; padding: 0; height: 100vh; width: 100vw;
-            font-family: 'Pixelify Sans', sans-serif; background-color: var(--bg);
+            font-family: var(--font-body); font-size: 19px; letter-spacing: 0.2px; background-color: var(--bg);
             background-image: url('https://images.pexels.com/photos/1162251/pexels-photo-1162251.jpeg?auto=compress&cs=tinysrgb&w=2560');
             background-size: cover; background-position: center;
             background-repeat: no-repeat; background-attachment: fixed;
@@ -49,9 +53,17 @@
         }
 
         h1, h2, h3, h4, h5, h6, .logo {
-            font-family: 'Pixelify Sans', sans-serif !important;
+            font-family: var(--font-display) !important;
             font-weight: 700 !important;
             letter-spacing: 1px;
+        }
+
+        p, li, .alert-badge, .lf-city-item, input, textarea, select {
+            font-family: var(--font-body);
+        }
+
+        .glass-btn, .nav-item, .mobile-menu-btn, .lf-search-wrap button, .city-label {
+            font-family: var(--font-display);
         }
 
         .bg-overlay {
@@ -79,7 +91,7 @@
             padding: 10px 20px; border-radius: 12px; font-weight: 700; font-size: 14px;
             cursor: pointer; min-width: 100px; transition: all 0.3s ease;
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            font-family: 'Pixelify Sans', sans-serif;
+            font-family: var(--font-display);
         }
 
         .glass-btn:hover {
@@ -150,7 +162,7 @@
 
         .map-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background-color: #0b0e11 !important; }
 
-        .city-label { font-size: 13px; font-weight: 700; color: #ffffff; text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000; text-align: center; line-height: 1.1; font-family: 'Pixelify Sans', sans-serif; }
+        .city-label { font-size: 13px; font-weight: 700; color: #ffffff; text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000; text-align: center; line-height: 1.1; font-family: var(--font-display); }
         .city-name { font-size: 11px; }
 
         .lf-container { display: flex; height: 100%; overflow: hidden; }
@@ -158,8 +170,8 @@
         .lf-main { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
         
         .lf-search-wrap { display: flex; gap: 8px; }
-        .lf-search-wrap input { flex: 1; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text); padding: 10px 14px; border-radius: 12px; outline: none; font-weight: 500; font-family: 'Pixelify Sans', sans-serif; }
-        .lf-search-wrap button { background: var(--accent); border: none; color: #000; font-weight: 700; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-family: 'Pixelify Sans', sans-serif; }
+        .lf-search-wrap input { flex: 1; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text); padding: 10px 14px; border-radius: 12px; outline: none; font-weight: 500; font-family: var(--font-display); }
+        .lf-search-wrap button { background: var(--accent); border: none; color: #000; font-weight: 700; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-family: var(--font-display); }
         
         .lf-city-list { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
         .lf-city-item { padding: 10px 14px; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 600; border: 1px solid transparent; display: flex; align-items: center; }
@@ -340,7 +352,7 @@
                         <h3 style="margin:0; color:var(--accent); font-size:12px; letter-spacing:1px; text-transform:uppercase; display: flex; align-items: center; gap: 6px;">
                             <i class="ph-fill ph-radar" style="font-size: 16px;"></i> Local Composite Radar
                         </h3>
-                        <span id="miniRadarTime" style="font-size:11px; opacity:0.6; font-family: 'Pixelify Sans', sans-serif;"></span>
+                        <span id="miniRadarTime" style="font-size:11px; opacity:0.6; font-family: var(--font-display);"></span>
                     </div>
                     <div style="width:100%; height:220px; border-radius:12px; position:relative; overflow:hidden; border:1px solid var(--border);">
                         <div id="miniRadarMap" style="width:100%; height:100%; z-index:1;"></div>
@@ -410,7 +422,7 @@
             </label>
             <div style="display: flex; align-items: center; gap: 15px; border-left: 2px solid var(--border); padding-left: 15px;">
                 <span style="font-weight:700; font-size:12px; opacity:0.8; letter-spacing:1px;">LATEST LOOP</span>
-                <span id="radarTimeDisplay" style="font-family:'Pixelify Sans', sans-serif; font-size:18px; font-weight:700; color:var(--accent); min-width:85px; text-align: center;">--:--</span>
+                <span id="radarTimeDisplay" style="font-family:var(--font-display); font-size:18px; font-weight:700; color:var(--accent); min-width:85px; text-align: center;">--:--</span>
             </div>
         </div>
     </div>
@@ -496,7 +508,7 @@
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <h3 style="font-size: 16px; color: var(--info); margin-top: 0;">App Features & Notifications</h3>
-                    <p style="font-size: 14px; opacity: 0.8; margin-bottom: 15px;">Configure daily briefings and severe weather alerts. (Note: Due to browser sandbox limitations, local notifications will only fire while the app is active or running as an installed PWA).</p>
+                    <p style="font-size: 14px; opacity: 0.8; margin-bottom: 15px;">Configure daily briefings and severe weather alerts. On iPhone/iPad, add TJFWeather to your Home Screen first, then open the installed app and grant notification permission. Local reminders run while the app is open or recently active; true background severe-weather push requires a push backend such as Firebase Cloud Messaging.</p>
                     
                     <div style="display:flex; flex-direction:column; gap:12px; max-width: 400px;">
                         <label style="display:flex; align-items:center; gap:10px; font-size:14px; cursor:pointer;">
@@ -522,10 +534,10 @@
                         
                         <div style="display:flex; gap:10px; margin-top:10px;">
                             <button class="glass-btn" style="flex:1;" onclick="window.requestNotificationPermission()">
-                                <i class="ph-fill ph-bell-ringing"></i> Grant Permission
+                                <i class="ph-fill ph-bell-ringing"></i> Enable Background Alerts
                             </button>
                             <button class="glass-btn" style="flex:1; background:rgba(255,255,255,0.1)!important; border-color:var(--border)!important;" onclick="window.testNotification()">
-                                <i class="ph-fill ph-paper-plane-tilt"></i> Test (5s Delay)
+                                <i class="ph-fill ph-paper-plane-tilt"></i> Test Device
                             </button>
                         </div>
                     </div>
@@ -645,6 +657,12 @@
             window.notifSettings.morningTime = document.getElementById('settingMorning').value || '07:00';
             window.notifSettings.eveningTime = document.getElementById('settingEvening').value || '18:00';
             localStorage.setItem('tjf_notif_settings', JSON.stringify(window.notifSettings));
+
+            // The Firebase module defines this after it loads. When present, it mirrors
+            // this local preference to the server-side push token record.
+            if (window.syncBackgroundAlertPreference) {
+                window.syncBackgroundAlertPreference();
+            }
         };
         
         window.toggleAuthMode = function(mode, e) {
@@ -763,26 +781,62 @@
             }
         };
 
-        window.fireNotification = async function(title, body) {
-            const options = { body: body, vibrate: [200, 100, 200] };
+        window.isIOSDevice = function() {
+            return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        };
+
+        window.isStandalonePWA = function() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        };
+
+        window.registerServiceWorker = async function() {
+            if (!('serviceWorker' in navigator)) return null;
+            if (!window.isSecureContext && location.hostname !== 'localhost') return null;
             try {
-                if ('serviceWorker' in navigator) {
-                    let reg = await navigator.serviceWorker.getRegistration();
-                    if (reg && reg.showNotification) {
-                        await reg.showNotification(title, options);
-                        return;
-                    }
+                const reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+                await navigator.serviceWorker.ready;
+                return reg;
+            } catch (e) {
+                console.error('Service worker registration failed:', e);
+                return null;
+            }
+        };
+
+        window.fireNotification = async function(title, body) {
+            if (!('Notification' in window)) {
+                window.showSysMessage("This browser doesn't support web notifications.");
+                return false;
+            }
+            if (Notification.permission !== 'granted') {
+                window.showSysMessage("Please grant notification permission first.");
+                return false;
+            }
+
+            const options = {
+                body: body,
+                icon: 'icon-192.png',
+                badge: 'icon-192.png',
+                tag: 'tjfweather-alert',
+                renotify: true,
+                vibrate: [200, 100, 200],
+                data: { url: location.href }
+            };
+
+            try {
+                const reg = await window.registerServiceWorker();
+                if (reg && reg.showNotification) {
+                    await reg.showNotification(title, options);
+                    return true;
                 }
-                
-                // Fallback for browsers that allow native Notification API without a Service Worker
-                let n = new Notification(title, options);
-                n.onerror = function() {
-                    console.error("Native notification blocked by browser.");
-                    window.showSysMessage("Notifications Blocked.\n\nNote: iOS/Android Home Screen Apps strictly require a separate 'sw.js' file hosted on your server to fire background notifications.");
-                };
+
+                // Desktop fallback only. Mobile PWAs should use ServiceWorkerRegistration.showNotification().
+                const n = new Notification(title, options);
+                n.onclick = () => window.focus();
+                return true;
             } catch(e) {
                 console.error("Notification failed", e);
-                window.showSysMessage("Notifications Blocked.\n\nNote: iOS/Android Home Screen Apps strictly require a separate 'sw.js' file hosted on your server to fire background notifications.");
+                window.showSysMessage("Notifications are blocked or unavailable. On iPhone/iPad, install TJFWeather to the Home Screen, reopen it from the Home Screen icon, then grant permission again.");
+                return false;
             }
         };
 
@@ -791,6 +845,21 @@
                 window.showSysMessage("Your browser doesn't support notifications.");
                 return;
             }
+            if (!window.isSecureContext && location.hostname !== 'localhost') {
+                window.showSysMessage("Notifications require HTTPS. GitHub Pages is OK as long as your site is loaded with https://");
+                return;
+            }
+            if (window.isIOSDevice() && !window.isStandalonePWA()) {
+                window.showSysMessage("iPhone/iPad setup:\n\n1) Open this site in Safari.\n2) Tap Share.\n3) Tap Add to Home Screen.\n4) Open TJFWeather from the Home Screen icon.\n5) Come back here and tap Grant Permission.");
+                return;
+            }
+
+            const reg = await window.registerServiceWorker();
+            if (!reg && 'serviceWorker' in navigator) {
+                window.showSysMessage("The service worker could not be registered. Make sure sw.js is committed next to index.html on GitHub Pages.");
+                return;
+            }
+
             if (Notification.permission === 'granted') {
                 window.showSysMessage("Notifications are already enabled!");
                 return;
@@ -798,16 +867,13 @@
             try {
                 const permission = await Notification.requestPermission();
                 if (permission === 'granted') {
-                    window.showSysMessage("Awesome! You will now receive notifications.");
+                    window.showSysMessage("Notifications are enabled. Tap the test button to verify mobile delivery.");
                 } else {
-                    window.showSysMessage("Permission was denied by the browser.");
+                    window.showSysMessage("Permission was denied by the browser. You may need to enable TJFWeather notifications in system settings.");
                 }
             } catch(e) {
-                Notification.requestPermission(function (permission) {
-                    if (permission === 'granted') {
-                        window.showSysMessage("Awesome! You will now receive notifications.");
-                    }
-                });
+                console.error('Notification permission request failed:', e);
+                window.showSysMessage("The browser blocked the permission prompt. Try again from a direct button tap inside the installed app.");
             }
         };
 
@@ -816,7 +882,7 @@
                 window.showSysMessage("Please grant notification permission first by clicking the button.");
                 return;
             }
-            window.showSysMessage("Test notification scheduled in 3 seconds!\n(Please keep the app open to see it)");
+            window.showSysMessage("Test notification scheduled in 3 seconds!\nThis verifies this device can display notifications.");
             setTimeout(() => {
                 window.fireNotification('TJFWeather Test', 'Notifications are working perfectly!');
             }, 3000);
@@ -2646,6 +2712,7 @@
         };
 
         window.onload = () => {
+            if(window.registerServiceWorker) window.registerServiceWorker();
             if(window.loadNotifSettingsUI) window.loadNotifSettingsUI();
             
             const hashStr = window.location.hash.replace('#', '');
@@ -2687,7 +2754,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getMessaging, getToken, onMessage, isSupported as isMessagingSupported } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-messaging.js";
 
         let myFirebaseConfig = {
             apiKey: "AIzaSyDGujuIMmbcaxTVf2NOHBoR7Swzg2D2VUA",
@@ -2699,11 +2767,143 @@
             measurementId: "G-MLFVBH7KDH"
         };
 
-        let app, auth, db;
+        let app, auth, db, messaging;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'tjf-weather-app';
+
+        // REQUIRED FOR FULLY BACKGROUND ALERTS:
+        // Firebase Console -> Project Settings -> Cloud Messaging -> Web Push certificates -> Generate key pair.
+        // Paste the PUBLIC key below. This is not a secret.
+        const FCM_VAPID_PUBLIC_KEY = "REPLACE_WITH_FIREBASE_WEB_PUSH_CERTIFICATE_KEY_PAIR_PUBLIC_KEY";
+
         let firebaseConfig = Object.keys(myFirebaseConfig).length > 0 ? myFirebaseConfig : null;
         
         try { if (!firebaseConfig && typeof __firebase_config !== 'undefined') firebaseConfig = JSON.parse(__firebase_config); } catch(e) {}
+
+        function tokenDocId(token) {
+            return btoa(token).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+        }
+
+        async function getFCMMessaging() {
+            if (!app) return null;
+            const supported = await isMessagingSupported().catch(() => false);
+            if (!supported) return null;
+            if (!messaging) messaging = getMessaging(app);
+            return messaging;
+        }
+
+        async function getCurrentPushToken() {
+            if (!auth || !auth.currentUser || auth.currentUser.isAnonymous) return null;
+            if (!FCM_VAPID_PUBLIC_KEY || FCM_VAPID_PUBLIC_KEY.startsWith('REPLACE_')) {
+                return null;
+            }
+            const msg = await getFCMMessaging();
+            if (!msg) return null;
+            const reg = await window.registerServiceWorker();
+            if (!reg) return null;
+            return await getToken(msg, { vapidKey: FCM_VAPID_PUBLIC_KEY, serviceWorkerRegistration: reg });
+        }
+
+        async function savePushToken(token, alertsEnabled = true) {
+            if (!auth || !auth.currentUser || auth.currentUser.isAnonymous || !token) return;
+            const uid = auth.currentUser.uid;
+            const tokenRef = doc(db, 'artifacts', appId, 'users', uid, 'pushTokens', tokenDocId(token));
+            await setDoc(tokenRef, {
+                token,
+                alertsEnabled,
+                userAgent: navigator.userAgent,
+                standalonePWA: window.isStandalonePWA ? window.isStandalonePWA() : false,
+                platform: navigator.platform || 'unknown',
+                updatedAt: serverTimestamp()
+            }, { merge: true });
+            localStorage.setItem('tjf_fcm_token', token);
+        }
+
+        window.enableBackgroundAlerts = async function(options = {}) {
+            const silent = !!options.silent;
+            if (!('Notification' in window)) {
+                if (!silent) window.showSysMessage("This browser does not support notifications.");
+                return false;
+            }
+            if (!window.isSecureContext && location.hostname !== 'localhost') {
+                if (!silent) window.showSysMessage("Background alerts require HTTPS. GitHub Pages is OK when loaded with https://");
+                return false;
+            }
+            if (window.isIOSDevice && window.isIOSDevice() && window.isStandalonePWA && !window.isStandalonePWA()) {
+                if (!silent) window.showSysMessage("iPhone/iPad setup:\n\n1) Open this site in Safari.\n2) Tap Share.\n3) Tap Add to Home Screen.\n4) Open TJFWeather from the Home Screen icon.\n5) Log in and tap Enable Background Alerts again.");
+                return false;
+            }
+            if (!auth || !auth.currentUser || auth.currentUser.isAnonymous) {
+                if (!silent) window.openAuthModal("Please log in or register before enabling background alerts. The server needs your pinned cities to know where to send alerts.");
+                return false;
+            }
+            if (!FCM_VAPID_PUBLIC_KEY || FCM_VAPID_PUBLIC_KEY.startsWith('REPLACE_')) {
+                if (!silent) window.showSysMessage("Firebase Cloud Messaging is not fully configured yet. Replace FCM_VAPID_PUBLIC_KEY in index.html with your Firebase Web Push certificate public key.");
+                return false;
+            }
+
+            const reg = await window.registerServiceWorker();
+            if (!reg) {
+                if (!silent) window.showSysMessage("The service worker could not be registered. Make sure sw.js is committed next to index.html.");
+                return false;
+            }
+
+            let permission = Notification.permission;
+            if (permission !== 'granted') {
+                permission = await Notification.requestPermission();
+            }
+            if (permission !== 'granted') {
+                if (!silent) window.showSysMessage("Notification permission was not granted. You can enable it later in browser/system settings.");
+                return false;
+            }
+
+            try {
+                const token = await getCurrentPushToken();
+                if (!token) throw new Error('No FCM token returned.');
+                await savePushToken(token, true);
+                window.notifSettings.alertsEnabled = true;
+                localStorage.setItem('tjf_notif_settings', JSON.stringify(window.notifSettings));
+                if (window.loadNotifSettingsUI) window.loadNotifSettingsUI();
+                if (!silent) window.showSysMessage("Background severe weather alerts are enabled for your pinned cities. You can close the app and alerts can still arrive through Firebase Cloud Messaging.");
+                return true;
+            } catch (e) {
+                console.error('Background alert enrollment failed:', e);
+                if (!silent) window.showSysMessage("Background alert setup failed. Check your Firebase Web Push certificate key, Firestore rules, and service worker file.");
+                return false;
+            }
+        };
+
+        window.disableBackgroundAlerts = async function(options = {}) {
+            const silent = !!options.silent;
+            try {
+                const token = localStorage.getItem('tjf_fcm_token');
+                if (auth && auth.currentUser && !auth.currentUser.isAnonymous && token) {
+                    const uid = auth.currentUser.uid;
+                    const tokenRef = doc(db, 'artifacts', appId, 'users', uid, 'pushTokens', tokenDocId(token));
+                    await setDoc(tokenRef, { alertsEnabled: false, updatedAt: serverTimestamp() }, { merge: true });
+                }
+                window.notifSettings.alertsEnabled = false;
+                localStorage.setItem('tjf_notif_settings', JSON.stringify(window.notifSettings));
+                if (window.loadNotifSettingsUI) window.loadNotifSettingsUI();
+                if (!silent) window.showSysMessage("Background alerts are disabled on this device.");
+            } catch(e) {
+                console.error('Failed to disable background alerts:', e);
+                if (!silent) window.showSysMessage("Could not disable alerts on the server, but local alerts have been turned off.");
+            }
+        };
+
+        window.syncBackgroundAlertPreference = async function() {
+            if (!auth || !auth.currentUser || auth.currentUser.isAnonymous) return;
+            if (window.notifSettings.alertsEnabled) {
+                await window.enableBackgroundAlerts({ silent: true });
+            } else {
+                await window.disableBackgroundAlerts({ silent: true });
+            }
+        };
+
+        // The old button now means true Web Push enrollment, not only local Notification permission.
+        window.requestNotificationPermission = function() {
+            return window.enableBackgroundAlerts({ silent: false });
+        };
 
         if (firebaseConfig) {
             app = initializeApp(firebaseConfig);
@@ -2712,12 +2912,25 @@
             
             window._firebaseAuth = auth;
             window._firebaseDb = db;
+
+            getFCMMessaging().then((msg) => {
+                if (!msg) return;
+                onMessage(msg, (payload) => {
+                    const data = payload.data || {};
+                    const title = data.title || payload.notification?.title || 'TJFWeather Alert';
+                    const body = data.body || payload.notification?.body || 'New weather alert for one of your pinned cities.';
+                    window.fireNotification(title, body);
+                });
+            }).catch(console.error);
             
             setPersistence(auth, browserLocalPersistence).then(() => {
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         if (!user.isAnonymous) {
                             document.getElementById('authNavBtn').innerHTML = `<i class="ph ph-sign-out"></i> LOGOUT`;
+                            if (window.notifSettings && window.notifSettings.alertsEnabled && Notification.permission === 'granted') {
+                                setTimeout(() => window.enableBackgroundAlerts({ silent: true }), 500);
+                            }
                         } else {
                             document.getElementById('authNavBtn').innerHTML = `<i class="ph ph-user"></i> LOGIN / REGISTER`;
                         }
@@ -2809,6 +3022,7 @@
         }
 
         window.doLogout = async function() {
+            if (window.disableBackgroundAlerts) await window.disableBackgroundAlerts({ silent: true });
             await signOut(auth);
             await signInAnonymously(auth);
         }
