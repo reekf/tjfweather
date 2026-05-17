@@ -243,6 +243,214 @@
             .current-detailed-wrapper { flex-direction: column; gap: 15px; }
             .asos-panel, .nws-panel { width: 100%; min-width: 0 !important; flex: none !important; }
         }
+
+        /* === TJF PIXEL SOLID THEME OVERRIDES START === */
+/* TJFWeather Pixel Solid Theme v2: midnight-blue solid panels, no glass blur. */
+:root {
+    --bg: #050a18 !important;
+    --panel: #0d1834 !important;
+    --panel-2: #101f42 !important;
+    --panel-3: #152a56 !important;
+    --text: #f4f8ff !important;
+    --muted: #a8b7d8 !important;
+    --accent: #35d8ff !important;
+    --accent-2: #7c5cff !important;
+    --border: #2d4b82 !important;
+    --border-bright: #4c78c8 !important;
+    --shadow-pixel: rgba(0, 0, 0, 0.55) !important;
+    --danger: #ff4d6d !important;
+    --warning: #ffd166 !important;
+    --success: #54e39f !important;
+    --info: #73b7ff !important;
+}
+
+html, body {
+    font-family: 'VT323', 'Pixelify Sans', monospace !important;
+    font-size: 20px !important;
+    letter-spacing: 0.2px !important;
+    background-color: var(--bg) !important;
+    background-image:
+        linear-gradient(rgba(53, 216, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(53, 216, 255, 0.045) 1px, transparent 1px),
+        radial-gradient(circle at 20% 0%, rgba(53, 216, 255, 0.16), transparent 30%),
+        radial-gradient(circle at 80% 15%, rgba(124, 92, 255, 0.14), transparent 34%),
+        linear-gradient(180deg, #050a18 0%, #071126 46%, #030716 100%) !important;
+    background-size: 18px 18px, 18px 18px, auto, auto, auto !important;
+    background-attachment: fixed !important;
+    color: var(--text) !important;
+    text-rendering: geometricPrecision !important;
+}
+
+p, li, input, button, select, textarea, label, .alert-badge, .lf-city-item, .nav-item {
+    font-family: 'VT323', 'Pixelify Sans', monospace !important;
+    letter-spacing: 0.35px !important;
+}
+
+h1, h2, h3, h4, h5, h6, .logo,
+.glass-btn, .nav-item,
+.hr-label, .hr-temp,
+.ab-title,
+#radarTimeDisplay,
+#miniRadarTime,
+.home-temp-val {
+    font-family: 'Pixelify Sans', 'VT323', monospace !important;
+}
+
+.bg-overlay {
+    background: rgba(2, 6, 18, 0.18) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.glass,
+.glass[style],
+.lf-sidebar.glass,
+#radarAlertsPanel.glass,
+#homeLocalWeather.glass,
+.placeholder-banner.glass,
+.home-alerts-panel.glass {
+    background: var(--panel) !important;
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(0,0,0,0.075)) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 8px !important;
+    box-shadow: 7px 7px 0 var(--shadow-pixel) !important;
+}
+
+.glass:hover {
+    border-color: var(--border-bright) !important;
+}
+
+nav,
+nav[style] {
+    background: #071126 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-bottom: 3px solid var(--border-bright) !important;
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.5) !important;
+}
+
+.logo {
+    color: var(--text) !important;
+    text-shadow: 3px 3px 0 #000 !important;
+}
+
+.nav-links,
+.nav-links[style] {
+    background: #08142d !important;
+}
+
+.nav-item,
+.nav-item[style] {
+    background: #101f42 !important;
+    border: 2px solid #2d4b82 !important;
+    color: var(--text) !important;
+    border-radius: 5px !important;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.55) !important;
+    text-shadow: 2px 2px 0 #000 !important;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    background: #153066 !important;
+    color: #ffffff !important;
+    border-color: var(--accent) !important;
+    transform: translate(-1px, -1px) !important;
+}
+
+.glass-btn,
+.glass-btn[style],
+.lf-search-wrap button,
+.lf-search-wrap button[style] {
+    background: #12306c !important;
+    color: #ffffff !important;
+    border: 2px solid var(--accent) !important;
+    border-radius: 5px !important;
+    box-shadow: 5px 5px 0 #02040d !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    text-shadow: 2px 2px 0 #000 !important;
+    text-transform: uppercase !important;
+}
+
+.glass-btn:hover,
+.lf-search-wrap button:hover {
+    background: #17418d !important;
+    box-shadow: 3px 3px 0 #02040d !important;
+    transform: translate(2px, 2px) !important;
+}
+
+input,
+textarea,
+select,
+.lf-search-wrap input,
+.lf-search-wrap input[style] {
+    background: #050a18 !important;
+    color: var(--text) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 4px !important;
+    box-shadow: inset 3px 3px 0 rgba(0,0,0,0.55) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+.lf-search-wrap input:focus {
+    border-color: var(--accent) !important;
+    outline: none !important;
+}
+
+.lf-hour-col,
+.lf-hour-col[style],
+.lf-daily-col,
+.lf-daily-col[style],
+.alert-badge,
+.alert-badge[style] {
+    background: #091633 !important;
+    border-radius: 6px !important;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.45) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.alert-badge {
+    border-width: 2px !important;
+    border-left-width: 6px !important;
+}
+
+.map-container,
+.leaflet-container {
+    background: #050a18 !important;
+}
+
+.radar-controls,
+.radar-controls[style] {
+    background: #08142d !important;
+    border: 2px solid var(--border-bright) !important;
+    box-shadow: 7px 7px 0 rgba(0,0,0,0.55) !important;
+}
+
+#supportModal,
+#sysModal,
+#authModal {
+    background: rgba(2, 6, 18, 0.82) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+::-webkit-scrollbar { width: 14px; height: 14px; }
+::-webkit-scrollbar-track { background: #050a18; }
+::-webkit-scrollbar-thumb { background: #1d3d7e; border: 2px solid #050a18; }
+::-webkit-scrollbar-thumb:hover { background: #35d8ff; }
+
+@media (max-width: 768px) {
+    html, body { font-size: 19px !important; }
+    .glass, .glass[style] { box-shadow: 5px 5px 0 rgba(0,0,0,0.55) !important; }
+    .splash-container h1 { font-size: 52px !important; }
+}
+
+        /* === TJF PIXEL SOLID THEME OVERRIDES END === */
     </style>
 </head>
 
@@ -508,7 +716,7 @@
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <h3 style="font-size: 16px; color: var(--info); margin-top: 0;">App Features & Notifications</h3>
-                    <p style="font-size: 14px; opacity: 0.8; margin-bottom: 15px;">Configure daily briefings and severe weather alerts. On iPhone/iPad, add TJFWeather to your Home Screen first, then open the installed app and grant notification permission. Local reminders run while the app is open or recently active; true background severe-weather push requires a push backend such as Firebase Cloud Messaging.</p>
+                    <p style="font-size: 14px; opacity: 0.8; margin-bottom: 15px;">Configure true background push notifications for pinned-city NWS watches/warnings/advisories and daily forecast briefings. On iPhone/iPad, install TJFWeather to the Home Screen first, then open the installed app, log in, choose your settings, and grant notification permission.</p>
                     
                     <div style="display:flex; flex-direction:column; gap:12px; max-width: 400px;">
                         <label style="display:flex; align-items:center; gap:10px; font-size:14px; cursor:pointer;">
@@ -652,16 +860,13 @@
         };
 
         window.updateNotifSettings = function() {
-            window.notifSettings.alertsEnabled = document.getElementById('settingAlerts').checked;
-            window.notifSettings.briefsEnabled = document.getElementById('settingBriefs').checked;
-            window.notifSettings.morningTime = document.getElementById('settingMorning').value || '07:00';
-            window.notifSettings.eveningTime = document.getElementById('settingEvening').value || '18:00';
+            window.notifSettings.alertsEnabled = !!document.getElementById('settingAlerts')?.checked;
+            window.notifSettings.briefsEnabled = !!document.getElementById('settingBriefs')?.checked;
+            window.notifSettings.morningTime = document.getElementById('settingMorning')?.value || '07:00';
+            window.notifSettings.eveningTime = document.getElementById('settingEvening')?.value || '18:00';
             localStorage.setItem('tjf_notif_settings', JSON.stringify(window.notifSettings));
-
-            // The Firebase module defines this after it loads. When present, it mirrors
-            // this local preference to the server-side push token record.
-            if (window.syncBackgroundAlertPreference) {
-                window.syncBackgroundAlertPreference();
+            if (window.syncPushSettingsToServer) {
+                window.syncPushSettingsToServer({ silent: false, requestIfNeeded: true });
             }
         };
         
@@ -2773,7 +2978,7 @@
         // REQUIRED FOR FULLY BACKGROUND ALERTS:
         // Firebase Console -> Project Settings -> Cloud Messaging -> Web Push certificates -> Generate key pair.
         // Paste the PUBLIC key below. This is not a secret.
-        const FCM_VAPID_PUBLIC_KEY = "BAivtsZBFQ-lH4pntR3ooI1SEvuuH25UxK8pCnw10vtnQnzfQNkZxHKcaYkJQgS2RcrGIpcO0ULXiBif3Cem6zg";
+        const FCM_VAPID_PUBLIC_KEY = "REPLACE_WITH_FIREBASE_WEB_PUSH_CERTIFICATE_KEY_PAIR_PUBLIC_KEY";
 
         let firebaseConfig = Object.keys(myFirebaseConfig).length > 0 ? myFirebaseConfig : null;
         
@@ -2803,37 +3008,81 @@
             return await getToken(msg, { vapidKey: FCM_VAPID_PUBLIC_KEY, serviceWorkerRegistration: reg });
         }
 
-        async function savePushToken(token, alertsEnabled = true) {
+        async function savePushToken(token, alertsEnabled = null) {
             if (!auth || !auth.currentUser || auth.currentUser.isAnonymous || !token) return;
             const uid = auth.currentUser.uid;
             const tokenRef = doc(db, 'artifacts', appId, 'users', uid, 'pushTokens', tokenDocId(token));
-            await setDoc(tokenRef, {
+            const settings = window.notifSettings || {};
+            const homeLabelEl = document.getElementById('homeLocationName');
+            const homeDisplay = (homeLabelEl ? homeLabelEl.innerText : '')
+                .replace('Official National Weather Service Forecast — ', '')
+                .replace('Official National Weather Service Forecast - ', '')
+                .trim() || 'Current Location';
+            const homeLat = Number(window.currentHomeLat || 42.03);
+            const homeLon = Number(window.currentHomeLon || -93.62);
+            const payload = {
                 token,
-                alertsEnabled,
+                alertsEnabled: alertsEnabled === null ? !!settings.alertsEnabled : !!alertsEnabled,
+                briefsEnabled: !!settings.briefsEnabled,
+                morningTime: settings.morningTime || '07:00',
+                eveningTime: settings.eveningTime || '18:00',
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Chicago',
+                homeLocation: { display: homeDisplay, lat: homeLat, lon: homeLon },
                 userAgent: navigator.userAgent,
                 standalonePWA: window.isStandalonePWA ? window.isStandalonePWA() : false,
                 platform: navigator.platform || 'unknown',
                 updatedAt: serverTimestamp()
-            }, { merge: true });
+            };
+            await setDoc(tokenRef, payload, { merge: true });
             localStorage.setItem('tjf_fcm_token', token);
         }
 
-        window.enableBackgroundAlerts = async function(options = {}) {
+        window.syncPushSettingsToServer = async function(options = {}) {
+            const silent = !!options.silent;
+            const requestIfNeeded = !!options.requestIfNeeded;
+            if (!auth || !auth.currentUser || auth.currentUser.isAnonymous) {
+                if (!silent && (window.notifSettings?.alertsEnabled || window.notifSettings?.briefsEnabled)) {
+                    window.openAuthModal('Please log in or register before enabling background alerts or briefings.');
+                }
+                return false;
+            }
+
+            let token = localStorage.getItem('tjf_fcm_token');
+            const wantsPush = !!(window.notifSettings?.alertsEnabled || window.notifSettings?.briefsEnabled);
+            if (!token) {
+                if (requestIfNeeded && wantsPush) {
+                    return window.enablePushNotifications({ silent });
+                }
+                return false;
+            }
+
+            try {
+                await savePushToken(token, null);
+                if (!silent && wantsPush) window.showSysMessage('Background notification settings saved for this device.');
+                return true;
+            } catch (e) {
+                console.error('Failed to sync push settings:', e);
+                if (!silent) window.showSysMessage('Could not save background notification settings. Check Firestore rules and sign-in status.');
+                return false;
+            }
+        };
+
+        window.enablePushNotifications = async function(options = {}) {
             const silent = !!options.silent;
             if (!('Notification' in window)) {
                 if (!silent) window.showSysMessage("This browser does not support notifications.");
                 return false;
             }
             if (!window.isSecureContext && location.hostname !== 'localhost') {
-                if (!silent) window.showSysMessage("Background alerts require HTTPS. GitHub Pages is OK when loaded with https://");
+                if (!silent) window.showSysMessage("Background notifications require HTTPS. GitHub Pages is OK when loaded with https://");
                 return false;
             }
             if (window.isIOSDevice && window.isIOSDevice() && window.isStandalonePWA && !window.isStandalonePWA()) {
-                if (!silent) window.showSysMessage("iPhone/iPad setup:\n\n1) Open this site in Safari.\n2) Tap Share.\n3) Tap Add to Home Screen.\n4) Open TJFWeather from the Home Screen icon.\n5) Log in and tap Enable Background Alerts again.");
+                if (!silent) window.showSysMessage("iPhone/iPad setup:\n\n1) Open this site in Safari.\n2) Tap Share.\n3) Tap Add to Home Screen.\n4) Open TJFWeather from the Home Screen icon.\n5) Log in, choose notification settings, and tap Grant Permission again.");
                 return false;
             }
             if (!auth || !auth.currentUser || auth.currentUser.isAnonymous) {
-                if (!silent) window.openAuthModal("Please log in or register before enabling background alerts. The server needs your pinned cities to know where to send alerts.");
+                if (!silent) window.openAuthModal("Please log in or register before enabling background notifications. The server needs your saved cities and device token.");
                 return false;
             }
             if (!FCM_VAPID_PUBLIC_KEY || FCM_VAPID_PUBLIC_KEY.startsWith('REPLACE_')) {
@@ -2848,9 +3097,7 @@
             }
 
             let permission = Notification.permission;
-            if (permission !== 'granted') {
-                permission = await Notification.requestPermission();
-            }
+            if (permission !== 'granted') permission = await Notification.requestPermission();
             if (permission !== 'granted') {
                 if (!silent) window.showSysMessage("Notification permission was not granted. You can enable it later in browser/system settings.");
                 return false;
@@ -2859,17 +3106,72 @@
             try {
                 const token = await getCurrentPushToken();
                 if (!token) throw new Error('No FCM token returned.');
-                await savePushToken(token, true);
-                window.notifSettings.alertsEnabled = true;
-                localStorage.setItem('tjf_notif_settings', JSON.stringify(window.notifSettings));
+                await savePushToken(token, null);
                 if (window.loadNotifSettingsUI) window.loadNotifSettingsUI();
-                if (!silent) window.showSysMessage("Background severe weather alerts are enabled for your pinned cities. You can close the app and alerts can still arrive through Firebase Cloud Messaging.");
+                if (!silent) window.showSysMessage("This device is enrolled for TJFWeather background push. The Alerts and Daily Briefing checkboxes control what gets sent.");
                 return true;
             } catch (e) {
-                console.error('Background alert enrollment failed:', e);
-                if (!silent) window.showSysMessage("Background alert setup failed. Check your Firebase Web Push certificate key, Firestore rules, and service worker file.");
+                console.error('Background notification enrollment failed:', e);
+                if (!silent) window.showSysMessage("Background notification setup failed. Check the VAPID key, FCM Registration API, Firestore rules, and service worker file.");
                 return false;
             }
+        };
+
+        window.enablePushNotifications = async function(options = {}) {
+            const silent = !!options.silent;
+            if (!('Notification' in window)) {
+                if (!silent) window.showSysMessage("This browser does not support notifications.");
+                return false;
+            }
+            if (!window.isSecureContext && location.hostname !== 'localhost') {
+                if (!silent) window.showSysMessage("Background notifications require HTTPS. GitHub Pages is OK when loaded with https://");
+                return false;
+            }
+            if (window.isIOSDevice && window.isIOSDevice() && window.isStandalonePWA && !window.isStandalonePWA()) {
+                if (!silent) window.showSysMessage("iPhone/iPad setup:\n\n1) Open this site in Safari.\n2) Tap Share.\n3) Tap Add to Home Screen.\n4) Open TJFWeather from the Home Screen icon.\n5) Log in, choose notification settings, and tap Grant Permission again.");
+                return false;
+            }
+            if (!auth || !auth.currentUser || auth.currentUser.isAnonymous) {
+                if (!silent) window.openAuthModal("Please log in or register before enabling background notifications. The server needs your saved cities and device token.");
+                return false;
+            }
+            if (!FCM_VAPID_PUBLIC_KEY || FCM_VAPID_PUBLIC_KEY.startsWith('REPLACE_')) {
+                if (!silent) window.showSysMessage("Firebase Cloud Messaging is not fully configured yet. Replace FCM_VAPID_PUBLIC_KEY in index.html with your Firebase Web Push certificate public key.");
+                return false;
+            }
+
+            const reg = await window.registerServiceWorker();
+            if (!reg) {
+                if (!silent) window.showSysMessage("The service worker could not be registered. Make sure sw.js is committed next to index.html.");
+                return false;
+            }
+
+            let permission = Notification.permission;
+            if (permission !== 'granted') permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                if (!silent) window.showSysMessage("Notification permission was not granted. You can enable it later in browser/system settings.");
+                return false;
+            }
+
+            try {
+                const token = await getCurrentPushToken();
+                if (!token) throw new Error('No FCM token returned.');
+                await savePushToken(token, null);
+                if (window.loadNotifSettingsUI) window.loadNotifSettingsUI();
+                if (!silent) window.showSysMessage("This device is enrolled for TJFWeather background push. The Alerts and Daily Briefing checkboxes control what gets sent.");
+                return true;
+            } catch (e) {
+                console.error('Background notification enrollment failed:', e);
+                if (!silent) window.showSysMessage("Background notification setup failed. Check the VAPID key, FCM Registration API, Firestore rules, and service worker file.");
+                return false;
+            }
+        };
+
+        window.enableBackgroundAlerts = async function(options = {}) {
+            window.notifSettings.alertsEnabled = true;
+            localStorage.setItem('tjf_notif_settings', JSON.stringify(window.notifSettings));
+            if (window.loadNotifSettingsUI) window.loadNotifSettingsUI();
+            return window.enablePushNotifications(options);
         };
 
         window.disableBackgroundAlerts = async function(options = {}) {
@@ -2900,9 +3202,9 @@
             }
         };
 
-        // The old button now means true Web Push enrollment, not only local Notification permission.
+        // The Grant Permission button enrolls the device; checkboxes decide alert/briefing types.
         window.requestNotificationPermission = function() {
-            return window.enableBackgroundAlerts({ silent: false });
+            return window.enablePushNotifications({ silent: false });
         };
 
         if (firebaseConfig) {
@@ -2929,7 +3231,7 @@
                         if (!user.isAnonymous) {
                             document.getElementById('authNavBtn').innerHTML = `<i class="ph ph-sign-out"></i> LOGOUT`;
                             if (window.notifSettings && window.notifSettings.alertsEnabled && Notification.permission === 'granted') {
-                                setTimeout(() => window.enableBackgroundAlerts({ silent: true }), 500);
+                                setTimeout(() => window.syncPushSettingsToServer({ silent: true, requestIfNeeded: false }), 500);
                             }
                         } else {
                             document.getElementById('authNavBtn').innerHTML = `<i class="ph ph-user"></i> LOGIN / REGISTER`;

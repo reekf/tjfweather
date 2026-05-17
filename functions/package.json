@@ -1,6 +1,6 @@
 {
   "name": "tjfweather-background-alerts",
-  "description": "Scheduled Firebase Cloud Function that sends TJFWeather pinned-city Web Push alerts.",
+  "description": "Scheduled Firebase Cloud Functions for TJFWeather background alerts and daily briefings.",
   "engines": {
     "node": "20"
   },

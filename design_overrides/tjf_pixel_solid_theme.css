@@ -1,0 +1,204 @@
+/* TJFWeather Pixel Solid Theme v2: midnight-blue solid panels, no glass blur. */
+:root {
+    --bg: #050a18 !important;
+    --panel: #0d1834 !important;
+    --panel-2: #101f42 !important;
+    --panel-3: #152a56 !important;
+    --text: #f4f8ff !important;
+    --muted: #a8b7d8 !important;
+    --accent: #35d8ff !important;
+    --accent-2: #7c5cff !important;
+    --border: #2d4b82 !important;
+    --border-bright: #4c78c8 !important;
+    --shadow-pixel: rgba(0, 0, 0, 0.55) !important;
+    --danger: #ff4d6d !important;
+    --warning: #ffd166 !important;
+    --success: #54e39f !important;
+    --info: #73b7ff !important;
+}
+
+html, body {
+    font-family: 'VT323', 'Pixelify Sans', monospace !important;
+    font-size: 20px !important;
+    letter-spacing: 0.2px !important;
+    background-color: var(--bg) !important;
+    background-image:
+        linear-gradient(rgba(53, 216, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(53, 216, 255, 0.045) 1px, transparent 1px),
+        radial-gradient(circle at 20% 0%, rgba(53, 216, 255, 0.16), transparent 30%),
+        radial-gradient(circle at 80% 15%, rgba(124, 92, 255, 0.14), transparent 34%),
+        linear-gradient(180deg, #050a18 0%, #071126 46%, #030716 100%) !important;
+    background-size: 18px 18px, 18px 18px, auto, auto, auto !important;
+    background-attachment: fixed !important;
+    color: var(--text) !important;
+    text-rendering: geometricPrecision !important;
+}
+
+p, li, input, button, select, textarea, label, .alert-badge, .lf-city-item, .nav-item {
+    font-family: 'VT323', 'Pixelify Sans', monospace !important;
+    letter-spacing: 0.35px !important;
+}
+
+h1, h2, h3, h4, h5, h6, .logo,
+.glass-btn, .nav-item,
+.hr-label, .hr-temp,
+.ab-title,
+#radarTimeDisplay,
+#miniRadarTime,
+.home-temp-val {
+    font-family: 'Pixelify Sans', 'VT323', monospace !important;
+}
+
+.bg-overlay {
+    background: rgba(2, 6, 18, 0.18) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.glass,
+.glass[style],
+.lf-sidebar.glass,
+#radarAlertsPanel.glass,
+#homeLocalWeather.glass,
+.placeholder-banner.glass,
+.home-alerts-panel.glass {
+    background: var(--panel) !important;
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(0,0,0,0.075)) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 8px !important;
+    box-shadow: 7px 7px 0 var(--shadow-pixel) !important;
+}
+
+.glass:hover {
+    border-color: var(--border-bright) !important;
+}
+
+nav,
+nav[style] {
+    background: #071126 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-bottom: 3px solid var(--border-bright) !important;
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.5) !important;
+}
+
+.logo {
+    color: var(--text) !important;
+    text-shadow: 3px 3px 0 #000 !important;
+}
+
+.nav-links,
+.nav-links[style] {
+    background: #08142d !important;
+}
+
+.nav-item,
+.nav-item[style] {
+    background: #101f42 !important;
+    border: 2px solid #2d4b82 !important;
+    color: var(--text) !important;
+    border-radius: 5px !important;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.55) !important;
+    text-shadow: 2px 2px 0 #000 !important;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    background: #153066 !important;
+    color: #ffffff !important;
+    border-color: var(--accent) !important;
+    transform: translate(-1px, -1px) !important;
+}
+
+.glass-btn,
+.glass-btn[style],
+.lf-search-wrap button,
+.lf-search-wrap button[style] {
+    background: #12306c !important;
+    color: #ffffff !important;
+    border: 2px solid var(--accent) !important;
+    border-radius: 5px !important;
+    box-shadow: 5px 5px 0 #02040d !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    text-shadow: 2px 2px 0 #000 !important;
+    text-transform: uppercase !important;
+}
+
+.glass-btn:hover,
+.lf-search-wrap button:hover {
+    background: #17418d !important;
+    box-shadow: 3px 3px 0 #02040d !important;
+    transform: translate(2px, 2px) !important;
+}
+
+input,
+textarea,
+select,
+.lf-search-wrap input,
+.lf-search-wrap input[style] {
+    background: #050a18 !important;
+    color: var(--text) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 4px !important;
+    box-shadow: inset 3px 3px 0 rgba(0,0,0,0.55) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+.lf-search-wrap input:focus {
+    border-color: var(--accent) !important;
+    outline: none !important;
+}
+
+.lf-hour-col,
+.lf-hour-col[style],
+.lf-daily-col,
+.lf-daily-col[style],
+.alert-badge,
+.alert-badge[style] {
+    background: #091633 !important;
+    border-radius: 6px !important;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.45) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.alert-badge {
+    border-width: 2px !important;
+    border-left-width: 6px !important;
+}
+
+.map-container,
+.leaflet-container {
+    background: #050a18 !important;
+}
+
+.radar-controls,
+.radar-controls[style] {
+    background: #08142d !important;
+    border: 2px solid var(--border-bright) !important;
+    box-shadow: 7px 7px 0 rgba(0,0,0,0.55) !important;
+}
+
+#supportModal,
+#sysModal,
+#authModal {
+    background: rgba(2, 6, 18, 0.82) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+::-webkit-scrollbar { width: 14px; height: 14px; }
+::-webkit-scrollbar-track { background: #050a18; }
+::-webkit-scrollbar-thumb { background: #1d3d7e; border: 2px solid #050a18; }
+::-webkit-scrollbar-thumb:hover { background: #35d8ff; }
+
+@media (max-width: 768px) {
+    html, body { font-size: 19px !important; }
+    .glass, .glass[style] { box-shadow: 5px 5px 0 rgba(0,0,0,0.55) !important; }
+    .splash-container h1 { font-size: 52px !important; }
+}
