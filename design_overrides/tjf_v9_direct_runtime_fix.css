@@ -1,0 +1,49 @@
+/* TJF V9 DIRECT RUNTIME FIX: hard solid-panel/mobile/radar overrides */
+:root {
+  --bg: #102a4d !important;
+  --panel: #173d68 !important;
+  --panel2: #1f4f82 !important;
+  --panel3: #2a659e !important;
+  --text: #f8fbff !important;
+  --muted: #c8d9ef !important;
+  --accent: #45d7ff !important;
+  --border: #75c7ff !important;
+  --block-shadow: 6px 6px 0 rgba(3, 12, 28, 0.85) !important;
+}
+html, body { background-color: var(--bg) !important; color: var(--text) !important; }
+.bg-overlay { background: #102a4d !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.glass, .alert-badge, .lf-hour-col, .lf-daily-col, #radarAlertsPanel, .radar-controls, #radarAlertsList, #homeLocalWeather, #supportModal .glass, #sysModal .glass, #authModal .glass {
+  background: var(--panel) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; border: 2px solid var(--border) !important; border-radius: 10px !important; box-shadow: var(--block-shadow) !important;
+}
+.glass .glass, .glass .lf-hour-col, .glass .lf-daily-col, .current-detailed-wrapper > .glass, #homeAlertsList > .alert-badge, #radarAlertsList > .alert-badge, #lf-alerts-container .alert-badge { background: var(--panel2) !important; border-color: #9bd9ff !important; }
+#fullRadarMap, #miniRadarMap, .map-container, .leaflet-container { background: #112d52 !important; }
+.radar-controls { background: #1e5187 !important; color: #fff !important; }
+#radarAlertsPanel, #radarAlertsList { background: #163c67 !important; }
+.nav-links .donate-btn { justify-content: center !important; text-align: center !important; }
+#dashboard > div { padding: 18px !important; padding-bottom: 88px !important; }
+.home-panels-container { display: grid !important; grid-template-columns: minmax(310px, 1.15fr) minmax(300px, 0.85fr) !important; grid-auto-flow: dense !important; align-items: start !important; gap: 18px !important; width: 100% !important; }
+.home-panels-container > .glass, .home-panels-container > div { min-width: 0 !important; max-width: none !important; width: 100% !important; align-self: start !important; }
+.home-alerts-panel { grid-column: 2 !important; grid-row: 1 !important; max-height: 360px !important; overflow-y: auto !important; }
+.home-panels-container > .glass:nth-of-type(2) { grid-column: 1 !important; grid-row: 1 !important; }
+#homePinnedSection { grid-column: 1 / -1 !important; order: 99 !important; margin-bottom: 0 !important; }
+#homePinnedCards { align-items: stretch !important; }
+.tjf-warning-clickable { cursor: pointer !important; }
+.tjf-warning-clickable:hover { filter: brightness(1.14) !important; }
+.tjf-spc-filled-card { box-shadow: 4px 4px 0 rgba(0,0,0,0.65) !important; border-width: 2px !important; }
+@media (max-width: 1000px) {
+  .nav-links .donate-btn, .nav-links .nav-item { justify-content: center !important; text-align: center !important; align-items: center !important; }
+}
+@media (max-width: 768px) {
+  #dashboard > div { padding: 12px !important; padding-bottom: 120px !important; }
+  .home-panels-container { display: flex !important; flex-direction: column !important; gap: 14px !important; }
+  .home-alerts-panel { max-height: none !important; }
+  #radar .radar-controls, .radar-controls {
+    position: fixed !important; left: 50% !important; right: auto !important; bottom: max(10px, env(safe-area-inset-bottom)) !important; transform: translateX(-50%) !important; width: calc(100vw - 18px) !important; max-width: calc(100vw - 18px) !important; max-height: 44vh !important; overflow-y: auto !important; flex-direction: column !important; align-items: stretch !important; gap: 8px !important; padding: 10px !important; z-index: 8500 !important;
+  }
+  .radar-controls label, .radar-controls > div, .radar-controls button { width: 100% !important; justify-content: center !important; border-left: 0 !important; padding-left: 0 !important; text-align: center !important; }
+  #radarAlertsPanel {
+    position: fixed !important; top: 0 !important; left: 0 !important; right: auto !important; bottom: 0 !important; width: min(88vw, 350px) !important; max-width: min(88vw, 350px) !important; height: 100vh !important; max-height: 100vh !important; overflow-y: auto !important; transform: translateX(-105%) !important; z-index: 9000 !important; padding: 64px 14px 120px 14px !important; border-radius: 0 10px 10px 0 !important;
+  }
+  #radarAlertsPanel.open { transform: translateX(0) !important; }
+  #mobileSettingsBtn { display: flex; right: 12px !important; top: 78px !important; z-index: 9100 !important; }
+}

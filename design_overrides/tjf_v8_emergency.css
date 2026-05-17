@@ -1,0 +1,194 @@
+/* TJF V8 EMERGENCY FIX: solid panels, mobile radar controls, centered mobile nav */
+:root {
+  --tjf-v8-bg: #112f57;
+  --tjf-v8-panel: #18406d;
+  --tjf-v8-panel-2: #21517f;
+  --tjf-v8-panel-3: #2a6395;
+  --tjf-v8-ink: #f4fbff;
+  --tjf-v8-muted: #c8deef;
+  --tjf-v8-accent: #48d8ff;
+  --tjf-v8-border: #79dfff;
+  --tjf-v8-shadow: rgba(3, 12, 27, 0.65);
+}
+
+html, body {
+  background-color: var(--tjf-v8-bg) !important;
+}
+
+.bg-overlay {
+  background: #102c52 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.glass,
+.lf-sidebar,
+#radarAlertsPanel,
+.radar-controls,
+#radarAlertsList,
+#homeAlertsList,
+.alert-badge,
+.lf-hour-col,
+.lf-daily-col,
+#homeLocalWeather,
+#homePinnedCards > *,
+#spcTodayHome > *,
+#spcTomHome > *,
+#lf-spc-container .glass,
+#lf-asos-container,
+#lf-nws-container {
+  background: var(--tjf-v8-panel) !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 2px solid var(--tjf-v8-border) !important;
+  box-shadow: 6px 6px 0 var(--tjf-v8-shadow) !important;
+  color: var(--tjf-v8-ink) !important;
+}
+
+/* Nested panels should read as blocks on blocks, not transparent outlines. */
+.glass .glass,
+.glass .lf-hour-col,
+.glass .lf-daily-col,
+.glass [style*="background: rgba"],
+.glass [style*="background:rgba"],
+#dashboard [style*="background: rgba"],
+#dashboard [style*="background:rgba"],
+#localforecast [style*="background: rgba"],
+#localforecast [style*="background:rgba"],
+#datasources [style*="background: rgba"],
+#datasources [style*="background:rgba"],
+#about [style*="background: rgba"],
+#about [style*="background:rgba"] {
+  background: var(--tjf-v8-panel-2) !important;
+  background-image: none !important;
+  border-color: #8de7ff !important;
+}
+
+/* Dashboard: reduce dead space and prevent awkward stretched cards. */
+#dashboard > div {
+  padding: 18px !important;
+  padding-bottom: 42px !important;
+}
+#dashboard .home-panels-container {
+  display: grid !important;
+  grid-template-columns: minmax(280px, 0.95fr) minmax(340px, 1.35fr) !important;
+  gap: 16px !important;
+  align-items: start !important;
+}
+#dashboard .home-panels-container > .glass {
+  min-width: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+  height: auto !important;
+  align-self: start !important;
+  margin: 0 !important;
+}
+#dashboard .home-alerts-panel {
+  max-height: none !important;
+}
+#dashboard #homePinnedSection,
+#dashboard .home-panels-container > [style*="width:100%"],
+#dashboard .home-panels-container > [style*="width: 100%"] {
+  grid-column: 1 / -1 !important;
+}
+#miniRadarMap,
+#fullRadarMap,
+.map-container,
+.leaflet-container {
+  background: #14345d !important;
+}
+
+/* Filled alert badges. */
+.alert-badge.alert-tornado { background: #bd2436 !important; color: #fff !important; border-color: #ff9aaa !important; }
+.alert-badge.alert-thunderstorm { background: #b96b13 !important; color: #fff !important; border-color: #ffd08a !important; }
+.alert-badge.alert-flash-flood { background: #0b7f46 !important; color: #fff !important; border-color: #77ffc0 !important; }
+.alert-badge.alert-flood { background: #176c8a !important; color: #fff !important; border-color: #84e5ff !important; }
+.alert-badge.alert-winter { background: #5357a7 !important; color: #fff !important; border-color: #c7c9ff !important; }
+.alert-badge.alert-wind { background: #8a7a13 !important; color: #fff !important; border-color: #fff08a !important; }
+.alert-badge.alert-other { background: #526477 !important; color: #fff !important; border-color: #d3e4f4 !important; }
+
+/* SPC dynamic blocks: JS fills exact colors; CSS makes sure no transparent fallback remains. */
+#spcTodayHome div[style*="border-radius"],
+#spcTomHome div[style*="border-radius"],
+#lf-spc-container div[style*="border-radius"] {
+  background-color: var(--tjf-v8-panel-2) !important;
+  background-image: none !important;
+  color: #fff !important;
+}
+.tjf-spc-filled {
+  background-color: var(--tjf-spc-bg, var(--tjf-v8-panel-2)) !important;
+  color: var(--tjf-spc-fg, #fff) !important;
+  border: 2px solid var(--tjf-spc-border, #ffffff) !important;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.45) !important;
+}
+.tjf-spc-filled * { color: inherit !important; }
+
+/* Mobile radar: keep controls and warning pane on screen. */
+@media (max-width: 768px) {
+  nav .nav-links .donate-btn,
+  .nav-links .donate-btn {
+    justify-content: center !important;
+    text-align: center !important;
+    align-items: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  #dashboard .home-panels-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+  }
+
+  #radarAlertsPanel {
+    top: 70px !important;
+    left: 8px !important;
+    right: auto !important;
+    width: calc(100vw - 16px) !important;
+    max-width: none !important;
+    height: auto !important;
+    max-height: calc(100vh - 245px) !important;
+    transform: translateX(-110%) !important;
+    padding: 14px !important;
+    border-radius: 14px !important;
+    overflow-y: auto !important;
+    z-index: 8000 !important;
+  }
+  #radarAlertsPanel.open {
+    transform: translateX(0) !important;
+  }
+
+  .radar-controls {
+    position: fixed !important;
+    left: 8px !important;
+    right: 8px !important;
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    transform: none !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    padding: 10px !important;
+    border-radius: 14px !important;
+    z-index: 7800 !important;
+  }
+  .radar-controls label,
+  .radar-controls > div,
+  .radar-controls button {
+    width: 100% !important;
+    min-width: 0 !important;
+    justify-content: center !important;
+    text-align: center !important;
+    border-left: 0 !important;
+    padding-left: 0 !important;
+    font-size: 12px !important;
+    flex-wrap: wrap !important;
+  }
+  #mobileSettingsBtn {
+    top: 72px !important;
+    right: 10px !important;
+    z-index: 8100 !important;
+  }
+}
