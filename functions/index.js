@@ -8,7 +8,7 @@ const db = admin.firestore();
 // Match the appId used in index.html.
 const APP_ID = process.env.TJF_APP_ID || 'tjf-weather-app';
 const SITE_URL = (process.env.TJF_SITE_URL || 'https://tjfweather.com').replace(/\/$/, '');
-const NWS_USER_AGENT = process.env.NWS_USER_AGENT || 'TJFWeather/1.0 (contact@example.com)';
+const NWS_USER_AGENT = process.env.NWS_USER_AGENT || 'TJFWeather/1.0 (contact@tjfweather.com)';
 const DEFAULT_TZ = process.env.TJF_DEFAULT_TZ || 'America/Chicago';
 
 function sleep(ms) {
