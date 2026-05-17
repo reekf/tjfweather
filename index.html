@@ -1531,6 +1531,226 @@ html, body {
         }
         /* === TJF PANEL BALANCE FIXES END === */
 
+
+        /* === TJF SIMPLIFIED PANEL PASS START === */
+        /* Final visual pass: fewer nested boxes, darker panels, stronger categorical SPC emphasis. */
+        .glass .tjf-panel-depth-1,
+        .glass .tjf-panel-depth-1[style],
+        .glass .tjf-panel-depth-2,
+        .glass .tjf-panel-depth-2[style],
+        #lf-alerts-container > .glass,
+        #lf-banner-container > .glass,
+        #lf-spc-container > .glass,
+        #lf-daily-container > .glass,
+        #lf-hourly-container > .glass,
+        #lf-mos-container > .glass,
+        #lf-enviro-container > .glass,
+        .current-detailed-wrapper > .glass,
+        .current-detailed-wrapper > div,
+        #homeLocalWeather,
+        #homeLocalWeather[style] {
+            background: var(--tjf-panel-1) !important;
+            border-color: var(--tjf-border-1) !important;
+        }
+
+        .glass .tjf-panel-depth-2,
+        .glass .tjf-panel-depth-2[style],
+        .lf-hour-col,
+        .lf-hour-col[style],
+        .lf-daily-col,
+        .lf-daily-col[style],
+        #homeNextTemps .lf-hour-col,
+        #homeNextTemps .lf-hour-col[style] {
+            background: var(--tjf-panel-2) !important;
+            border: 1px solid var(--tjf-border-1) !important;
+            box-shadow: none !important;
+        }
+
+        #homeForecastFootnote > div,
+        #homeForecastFootnote > div[style],
+        #homeNextTemps > div,
+        #homeNextTemps > div[style],
+        #homeWeatherContent,
+        #homeWeatherContent[style] {
+            background: transparent !important;
+            border: 0 !important;
+            box-shadow: none !important;
+        }
+
+        .spc-risk-card,
+        .spc-risk-card[style],
+        .spc-no-severe-card,
+        .spc-no-severe-card[style] {
+            background: var(--tjf-panel-1) !important;
+            color: #f5fbff !important;
+            border: 3px solid var(--spc-risk-fill, var(--tjf-border-2)) !important;
+            border-radius: 0 !important;
+            box-shadow: 5px 5px 0 var(--tjf-shadow) !important;
+            padding: 16px !important;
+        }
+
+        .spc-risk-summary,
+        .spc-risk-summary[style] {
+            background: transparent !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            display: grid !important;
+            grid-template-columns: auto minmax(0, 1fr) !important;
+            align-items: center !important;
+            gap: 14px !important;
+            color: #f5fbff !important;
+        }
+
+        .spc-risk-badge {
+            background: var(--spc-risk-fill, #444) !important;
+            color: var(--spc-risk-text, #fff) !important;
+            border: 3px solid rgba(255,255,255,0.78) !important;
+            box-shadow: 4px 4px 0 var(--tjf-shadow) !important;
+            padding: 10px 12px !important;
+            min-width: 72px !important;
+            text-align: center !important;
+            font-size: 34px !important;
+            line-height: 0.95 !important;
+            font-weight: 700 !important;
+        }
+
+        .spc-risk-copy { min-width: 0 !important; }
+        .spc-risk-label {
+            color: var(--muted) !important;
+            font-size: 11px !important;
+            letter-spacing: 1.4px !important;
+            text-transform: uppercase !important;
+            opacity: 0.82 !important;
+            margin-bottom: 4px !important;
+        }
+        .spc-risk-name {
+            color: #fff !important;
+            font-size: 24px !important;
+            line-height: 1.08 !important;
+            font-weight: 700 !important;
+        }
+
+        .spc-hazard-list {
+            display: grid !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 8px !important;
+            margin-top: 14px !important;
+            padding-top: 12px !important;
+            border-top: 1px solid var(--tjf-border-1) !important;
+        }
+
+        .spc-hazard-card,
+        .spc-hazard-card[style],
+        .spc-hazard-card.tjf-panel-depth-1,
+        .spc-hazard-card.tjf-panel-depth-2,
+        .spc-hazard-card[style].tjf-panel-depth-1,
+        .spc-hazard-card[style].tjf-panel-depth-2 {
+            background: transparent !important;
+            color: #f5fbff !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            text-align: left !important;
+            display: grid !important;
+            grid-template-columns: 1fr auto !important;
+            grid-template-areas: "label chip" "desc desc" !important;
+            column-gap: 8px !important;
+            row-gap: 4px !important;
+            align-items: center !important;
+        }
+
+        .spc-hazard-label {
+            grid-area: label !important;
+            color: var(--muted) !important;
+            font-size: 11px !important;
+            letter-spacing: 1px !important;
+            text-transform: uppercase !important;
+            font-weight: 700 !important;
+        }
+
+        .spc-hazard-chip,
+        .spc-hazard-chip[style],
+        .spc-hazard-chip.tjf-panel-depth-1,
+        .spc-hazard-chip.tjf-panel-depth-2,
+        .spc-hazard-chip[style].tjf-panel-depth-1,
+        .spc-hazard-chip[style].tjf-panel-depth-2 {
+            grid-area: chip !important;
+            background: transparent !important;
+            color: #f5fbff !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            font-size: 15px !important;
+            line-height: 1 !important;
+            font-weight: 700 !important;
+            padding: 0 !important;
+        }
+
+        .spc-hazard-desc {
+            grid-area: desc !important;
+            color: var(--muted) !important;
+            font-size: 10px !important;
+            line-height: 1.25 !important;
+            opacity: 0.8 !important;
+        }
+
+        .spc-outlook-row,
+        .spc-outlook-row[style],
+        .tjf-panel-depth-1.spc-outlook-row,
+        .tjf-panel-depth-2.spc-outlook-row {
+            margin-top: 10px !important;
+            background: transparent !important;
+            border: 0 !important;
+            box-shadow: none !important;
+        }
+
+        #homeLocalWeather,
+        #homeLocalWeather[style] {
+            min-height: 360px !important;
+            max-width: none !important;
+            width: 100% !important;
+            padding: 30px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+        }
+
+        #homeWeatherContent.home-weather-content {
+            grid-template-columns: minmax(190px, auto) minmax(300px, 1fr) !important;
+            gap: 28px !important;
+        }
+
+        #homeWeatherContent .home-temp-val {
+            font-size: clamp(58px, 7vw, 82px) !important;
+        }
+
+        #homeWxVal,
+        #homeWindVal,
+        #homeDewVal,
+        #homeFeelsLikeVal,
+        #homeQpfVal {
+            font-size: 16px !important;
+            line-height: 1.35 !important;
+        }
+
+        @media (max-width: 760px) {
+            .spc-risk-summary,
+            .spc-risk-summary[style],
+            #homeWeatherContent.home-weather-content {
+                grid-template-columns: 1fr !important;
+            }
+
+            .spc-hazard-list {
+                grid-template-columns: 1fr !important;
+            }
+
+            #homeLocalWeather,
+            #homeLocalWeather[style] {
+                min-height: 300px !important;
+            }
+        }
+        /* === TJF SIMPLIFIED PANEL PASS END === */
+
         /* === TJF V10 DARK SPC PATCH END === */
 
     </style>
@@ -2703,10 +2923,18 @@ html, body {
             const outlookLink = `<div class="spc-outlook-row"><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="spc-outlook-link">View SPC Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
 
             if (spc.rawLvl === 0) return `
-                <div class="spc-no-severe-card" style="padding: 12px 14px; font-size: 16px; font-weight: 700; margin-bottom: 8px;">No Severe Weather Expected</div>
+                <div class="spc-risk-card spc-no-severe-card" style="--spc-risk-fill:${spc.bgColor}; --spc-risk-text:${spc.textColor};">
+                    <div class="spc-risk-summary">
+                        <div class="spc-risk-badge">0/5</div>
+                        <div class="spc-risk-copy">
+                            <div class="spc-risk-label">Categorical Risk</div>
+                            <div class="spc-risk-name">No Severe Weather Expected</div>
+                        </div>
+                    </div>
+                </div>
                 ${outlookLink}`;
             
-            let riskBadge = spc.rawLvl === 1 ? "Thunderstorm" : `<span style="font-size: 2.5em; font-weight: 700; line-height: 0.8;">${spc.level}</span><span style="font-size: 1.2em; opacity: 0.7; margin-left: 2px;">/5</span>`;
+            let riskBadge = spc.rawLvl === 1 ? "TSTM" : `${spc.level}/5`;
             
             let getRiskStyle = (val, isCig, type) => {
                 let b = '#0d2342', t = '#ffffff', c = '#3476ad';
@@ -2791,19 +3019,22 @@ html, body {
             let hailDesc = getDescText('hail', hailNum, hailCig);
 
             const hazardCard = (label, val, num, cig, style, desc) => `
-                <div class="spc-hazard-card" style="--spc-hazard-fill:${style.bg}; --spc-hazard-text:${style.text}; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start;">
-                    <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.95; margin-bottom: 8px; font-weight: bold; color: inherit;">${label}</div>
-                    <div class="spc-hazard-chip" style="font-size: 24px; font-weight: 700; padding: 4px 8px; display: inline-block; margin: 0 auto 8px auto;">${displayString(val)}</div>
-                    <div style="font-size: 11px; line-height: 1.4; color: inherit;">${desc}</div>
+                <div class="spc-hazard-card" style="--spc-hazard-fill:${style.bg}; --spc-hazard-text:${style.text};">
+                    <div class="spc-hazard-label">${label}</div>
+                    <div class="spc-hazard-chip">${displayString(val)}</div>
+                    <div class="spc-hazard-desc">${desc}</div>
                 </div>`;
 
             return `
                 <div class="spc-risk-card" style="--spc-risk-fill:${spc.bgColor}; --spc-risk-text:${spc.textColor};">
-                    <div class="spc-risk-summary" style="display: flex; align-items: center; gap: 12px;">
-                        <div style="font-weight: 700; font-size: 15px; display: flex; align-items: baseline; gap: 2px;">${riskBadge}</div>
-                        <div style="font-weight: 700; font-size: 16px; color: inherit;">${spc.name}</div>
+                    <div class="spc-risk-summary">
+                        <div class="spc-risk-badge">${riskBadge}</div>
+                        <div class="spc-risk-copy">
+                            <div class="spc-risk-label">Categorical Risk</div>
+                            <div class="spc-risk-name">${spc.name}</div>
+                        </div>
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 10px; margin-top: 10px;">
+                    <div class="spc-hazard-list" aria-label="Individual severe weather probabilities">
                         ${hazardCard('Tornado', torVal, torNum, torCig, torStyle, torDesc)}
                         ${hazardCard('Wind', windVal, windNum, windCig, windStyle, windDesc)}
                         ${hazardCard('Hail', hailVal, hailNum, hailCig, hailStyle, hailDesc)}
