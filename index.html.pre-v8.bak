@@ -960,6 +960,285 @@ html, body {
 
         /* === TJF PIXEL SOLID THEME V5 END === */
     </style>
+
+    <!-- TJF V6 FORCE SOLID THEME START -->
+    <style id="tjf-v6-force-solid-theme">
+/* TJFWeather Pixel Solid Theme v5: filled SPC cards, tighter dashboard, radar interaction fixes. */
+:root {
+    --bg: #2f6fab !important;
+    --bg-deep: #244f83 !important;
+    --panel: #397bb8 !important;
+    --panel-2: #4a8dcc !important;
+    --panel-3: #5b9fe0 !important;
+    --panel-4: #72b4f4 !important;
+    --panel-dark: #2a5f97 !important;
+    --panel-inset: #214f83 !important;
+    --text: #f8fcff !important;
+    --muted: #e2f0ff !important;
+    --accent: #8df7ff !important;
+    --accent-2: #c7d7ff !important;
+    --border: #c3efff !important;
+    --border-soft: #9cd3ff !important;
+    --border-bright: #ecfbff !important;
+    --shadow-pixel: rgba(9, 28, 68, 0.68) !important;
+}
+
+html, body {
+    background-color: var(--bg) !important;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.075) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.075) 1px, transparent 1px),
+        radial-gradient(circle at 14% 6%, rgba(141, 247, 255, 0.26), transparent 34%),
+        radial-gradient(circle at 86% 10%, rgba(199, 215, 255, 0.22), transparent 36%),
+        linear-gradient(180deg, #4d91cc 0%, #3575b2 48%, #244f83 100%) !important;
+}
+
+/* Stronger solid panel fill for every panelish surface. */
+.glass,
+.glass[style],
+.tjf-panel-depth-1,
+.tjf-panel-depth-1[style],
+.tjf-panel-depth-2,
+.tjf-panel-depth-2[style],
+.lf-hour-col,
+.lf-daily-col,
+.alert-badge,
+#radarAlertsList,
+#homeLocalWeather,
+#homeForecastFootnote > div,
+#homeNextTemps .lf-hour-col,
+#homePinnedCards > .glass,
+.current-detailed-wrapper > .glass {
+    opacity: 1 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Filled SPC category rows and hazard cards. Runtime JS adds these classes to dynamic SPC HTML. */
+.spc-category-filled,
+.spc-category-filled[style] {
+    background: var(--tjf-spc-fill, var(--panel-3)) !important;
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(0,0,0,0.10)) !important;
+    color: var(--tjf-spc-text, #ffffff) !important;
+    border: 3px solid rgba(255,255,255,0.88) !important;
+    border-radius: 6px !important;
+    padding: 12px !important;
+    box-shadow: 5px 5px 0 rgba(9,28,68,0.62) !important;
+}
+
+.spc-category-filled > div:first-child,
+.spc-category-filled > div:first-child[style] {
+    border: 2px solid rgba(255,255,255,0.70) !important;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.32) !important;
+}
+
+.spc-hazard-filled,
+.spc-hazard-filled[style] {
+    background: var(--tjf-spc-fill, var(--panel-3)) !important;
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.13), rgba(0,0,0,0.14)) !important;
+    color: var(--tjf-spc-text, #ffffff) !important;
+    border: 3px solid rgba(255,255,255,0.82) !important;
+    border-radius: 6px !important;
+    box-shadow: 5px 5px 0 rgba(9,28,68,0.58) !important;
+    min-height: 148px !important;
+}
+
+.spc-hazard-filled *:not(a):not(button),
+.spc-category-filled *:not(a):not(button) {
+    color: inherit !important;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.35) !important;
+}
+
+.spc-hazard-chip-filled,
+.spc-hazard-chip-filled[style] {
+    background: rgba(255,255,255,0.22) !important;
+    color: inherit !important;
+    border: 2px solid rgba(255,255,255,0.75) !important;
+    box-shadow: inset 2px 2px 0 rgba(255,255,255,0.15), 3px 3px 0 rgba(0,0,0,0.28) !important;
+}
+
+.spc-no-severe-card,
+.spc-no-severe-card[style] {
+    background: #537fab !important;
+    color: #ffffff !important;
+    border: 3px solid rgba(255,255,255,0.70) !important;
+    opacity: 1 !important;
+}
+
+/* Dashboard v5: compact two-column layout with no forced stretch/blank panel height. */
+#dashboard > div {
+    padding: 16px !important;
+    max-width: 1280px !important;
+    margin: 0 auto !important;
+    gap: 16px !important;
+}
+
+.home-panels-container {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.28fr) minmax(320px, 0.72fr) !important;
+    gap: 16px !important;
+    align-items: start !important;
+    align-content: start !important;
+    width: 100% !important;
+}
+
+.home-panels-container > .glass {
+    height: auto !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    align-self: start !important;
+}
+
+.dashboard-main-panel { grid-column: 1 !important; grid-row: 1 !important; padding: 22px !important; }
+.home-alerts-panel { grid-column: 2 !important; grid-row: 1 !important; max-height: 430px !important; overflow-y: auto !important; }
+.dashboard-spc-panel { grid-column: 1 !important; grid-row: 2 !important; }
+.dashboard-radar-panel { grid-column: 2 !important; grid-row: 2 !important; }
+#homePinnedSection { grid-column: 1 / -1 !important; grid-row: 3 !important; margin: 0 !important; width: 100% !important; }
+
+.dashboard-main-panel,
+.dashboard-spc-panel,
+.dashboard-radar-panel,
+.home-alerts-panel {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+#homeLocalWeather,
+#homeLocalWeather[style] {
+    flex: 0 0 auto !important;
+    margin-top: 10px !important;
+}
+
+#homeNextTemps > div,
+#homePinnedCards {
+    gap: 10px !important;
+}
+
+#homeNextTemps > div {
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+}
+
+#homeNextTemps .lf-hour-col {
+    min-width: 118px !important;
+    flex: 1 1 118px !important;
+    padding: 12px 10px !important;
+}
+
+.dashboard-spc-panel > div + div {
+    padding-top: 12px !important;
+    margin-top: 12px !important;
+}
+
+.dashboard-radar-panel > div:last-child,
+.dashboard-radar-panel #miniRadarMap {
+    min-height: 230px !important;
+}
+
+/* Radar zoom UX: tiles upscale after RainViewer's native limit instead of disappearing. */
+#fullRadarMap .leaflet-tile-pane img,
+#miniRadarMap .leaflet-tile-pane img {
+    image-rendering: pixelated !important;
+}
+
+.alert-badge[role="button"] {
+    cursor: pointer !important;
+}
+.alert-badge[role="button"]:hover,
+.alert-badge[role="button"]:focus {
+    outline: 3px solid var(--border-bright) !important;
+    transform: translate(-1px, -1px) !important;
+}
+
+/* Mobile dropdown centering fix for Support Me. */
+@media (max-width: 1000px) {
+    .nav-links .donate-btn,
+    .nav-links .donate-btn[style] {
+        justify-content: center !important;
+        align-items: center !important;
+        text-align: center !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        width: 90% !important;
+    }
+}
+
+@media (max-width: 980px) {
+    .home-panels-container {
+        grid-template-columns: 1fr !important;
+    }
+    .dashboard-main-panel,
+    .home-alerts-panel,
+    .dashboard-spc-panel,
+    .dashboard-radar-panel,
+    #homePinnedSection {
+        grid-column: 1 !important;
+        grid-row: auto !important;
+    }
+    .home-alerts-panel { max-height: none !important; }
+}
+
+
+/* Extra v6 force overrides: make nested cards solid even when generated from inline JS. */
+#radarAlertsPanel,
+#radarAlertsList,
+.radar-controls,
+#homeLocalWeather,
+#homeNextTemps .lf-hour-col,
+#lf-hourly-container .lf-hour-col,
+#lf-daily-container .lf-daily-col,
+#lf-asos-container,
+#lf-nws-container,
+#lf-enviro-container .glass,
+#lf-mos-container .glass,
+#lf-spc-container .glass,
+#homePinnedCards .glass {
+  background-color: #174d83 !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-color: #6bb7ff !important;
+}
+#dashboard .home-panels-container {
+  display: grid !important;
+  grid-template-columns: minmax(320px, 1.45fr) minmax(280px, .8fr) !important;
+  grid-auto-flow: dense !important;
+  align-items: start !important;
+  gap: 18px !important;
+}
+#dashboard .home-panels-container > * {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+#dashboard .home-alerts-panel { grid-column: 2 !important; grid-row: 1 !important; max-height: 360px !important; }
+#dashboard .dashboard-main-panel { grid-column: 1 !important; grid-row: 1 / span 2 !important; }
+#dashboard .dashboard-spc-panel { grid-column: 1 !important; grid-row: 3 !important; }
+#dashboard .dashboard-radar-panel { grid-column: 2 !important; grid-row: 2 / span 2 !important; }
+#homePinnedSection { grid-column: 1 / -1 !important; order: 99 !important; }
+@media (max-width: 900px) {
+  #dashboard .home-panels-container { grid-template-columns: 1fr !important; }
+  #dashboard .home-panels-container > * { grid-column: auto !important; grid-row: auto !important; }
+}
+.spc-category-filled,
+.spc-hazard-filled {
+  background: var(--tjf-spc-fill, #3283c7) !important;
+  color: var(--tjf-spc-text, #fff) !important;
+  border-color: color-mix(in srgb, var(--tjf-spc-fill, #3283c7), #fff 28%) !important;
+  box-shadow: 6px 6px 0 #061a33 !important;
+}
+.spc-category-filled *,
+.spc-hazard-filled * { color: inherit !important; }
+.spc-hazard-chip-filled {
+  background: rgba(255,255,255,0.22) !important;
+  border: 2px solid rgba(255,255,255,0.35) !important;
+}
+    </style>
+    <!-- TJF V6 FORCE SOLID THEME END -->
+
 </head>
 
 <body>
@@ -4061,6 +4340,89 @@ html, body {
     })();
     </script>
     <!-- TJF V5 DYNAMIC VISUAL FIXES END -->
+
+
+    <!-- TJF V6 FORCE DYNAMIC VISUAL FIXES START -->
+    <script>
+    (function tjfV6ForceDynamicVisualFixes() {
+        function isTransparent(color) {
+            if (!color) return true;
+            const c = String(color).trim().toLowerCase();
+            return c === 'transparent' || c === 'rgba(0, 0, 0, 0)' || c === 'rgba(0,0,0,0)';
+        }
+        function children(el) { return [...(el?.children || [])].filter(x => x instanceof HTMLElement && x.tagName === 'DIV'); }
+        function tagDashboardCards() {
+            const container = document.querySelector('.home-panels-container');
+            if (!container) return;
+            [...container.children].forEach(el => {
+                if (!(el instanceof HTMLElement)) return;
+                const text = (el.textContent || '').toLowerCase();
+                if (el.classList.contains('home-alerts-panel') || text.includes('active weather alerts')) return;
+                if (el.querySelector('#homeLocalWeather') || text.includes('national weather service dashboard')) el.classList.add('dashboard-main-panel');
+                if (text.includes('storm prediction center outlook') || el.querySelector('#spcTodayHome') || el.querySelector('#spcTomHome')) el.classList.add('dashboard-spc-panel');
+                if (el.querySelector('#miniRadarMap') || text.includes('local composite radar')) el.classList.add('dashboard-radar-panel');
+            });
+        }
+        function fillSPC(root) {
+            if (!root) return;
+            root.querySelectorAll('div').forEach(row => {
+                if (!(row instanceof HTMLElement)) return;
+                const kids = children(row);
+                if (kids.length < 2) return;
+                const text = (row.textContent || '').toLowerCase();
+                const looksCategory = /marginal|slight|enhanced|moderate|high risk|general thunderstorm|no severe/.test(text) && !/tornado\s*wind\s*hail/.test(text);
+                if (!looksCategory) return;
+                const badge = kids[0];
+                let fill = getComputedStyle(badge).backgroundColor;
+                let textColor = getComputedStyle(badge).color || '#fff';
+                if (isTransparent(fill)) fill = '#3f8ed0';
+                row.classList.add('spc-category-filled');
+                row.style.setProperty('--tjf-spc-fill', fill);
+                row.style.setProperty('--tjf-spc-text', textColor);
+            });
+            root.querySelectorAll('div').forEach(card => {
+                if (!(card instanceof HTMLElement)) return;
+                const kids = children(card);
+                if (kids.length < 2) return;
+                const label = (kids[0].textContent || '').trim().toLowerCase();
+                if (!['tornado', 'wind', 'hail'].includes(label)) return;
+                const chip = kids.find(k => /^(\d+%|sig|0%)$/i.test((k.textContent || '').trim())) || kids[1];
+                let fill = getComputedStyle(chip).backgroundColor;
+                let textColor = getComputedStyle(chip).color || '#fff';
+                if (isTransparent(fill)) { fill = label === 'tornado' ? '#328158' : '#4d8fc8'; textColor = '#fff'; }
+                card.classList.add('spc-hazard-filled', `spc-hazard-${label}`);
+                chip.classList.add('spc-hazard-chip-filled');
+                card.style.setProperty('--tjf-spc-fill', fill);
+                card.style.setProperty('--tjf-spc-text', textColor);
+            });
+        }
+        function run() {
+            tagDashboardCards();
+            ['#spcTodayHome', '#spcTomHome', '#lfSpcToday', '#lfSpcTom', '#lf-spc-container'].forEach(sel => document.querySelectorAll(sel).forEach(fillSPC));
+        }
+        let scheduled = false;
+        function schedule() {
+            if (scheduled) return;
+            scheduled = true;
+            requestAnimationFrame(() => { scheduled = false; run(); });
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedule); else schedule();
+        new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true });
+    })();
+    </script>
+    <!-- TJF V6 FORCE DYNAMIC VISUAL FIXES END -->
+
+
+<!-- TJF V7 HARD FIX START -->
+<link rel="stylesheet" href="design_overrides/tjf_v7_hard_override.css?v=7">
+<script>
+  window.TJF_FCM_VAPID_PUBLIC_KEY = "BAivtsZBFQ-lH4pntR3ooI1SEvuuH25UxK8pCnw10vtnQnzfQNkZxHKcaYkJQgS2RcrGIpcO0ULXiBif3Cem6zg";
+  window.FCM_VAPID_PUBLIC_KEY = "BAivtsZBFQ-lH4pntR3ooI1SEvuuH25UxK8pCnw10vtnQnzfQNkZxHKcaYkJQgS2RcrGIpcO0ULXiBif3Cem6zg";
+  window.__TJF_V7_PATCH_MARKER = "TJF V7 HARD FIX";
+</script>
+<script src="design_overrides/tjf_v7_hard_fix.js?v=7"></script>
+<script type="module" src="design_overrides/tjf_v7_fcm_hard_fix.js?v=7"></script>
+<!-- TJF V7 HARD FIX END -->
 
 </body>
 </html>
