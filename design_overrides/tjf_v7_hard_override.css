@@ -1,0 +1,277 @@
+
+/* TJF V7 HARD FIX: solid panel + mobile radar overrides */
+:root {
+  --bg: #102845 !important;
+  --panel: #183b61 !important;
+  --panel-2: #214d7c !important;
+  --panel-3: #2c5e92 !important;
+  --text: #f7fbff !important;
+  --accent: #5ee7ff !important;
+  --border: #81dbff !important;
+  --danger: #ff4d5e !important;
+  --warning: #ffbf3d !important;
+  --success: #3ee27a !important;
+  --info: #8ec7ff !important;
+  --pixel-shadow: #06182c !important;
+}
+
+html, body {
+  background-color: var(--bg) !important;
+  background-image: none !important;
+}
+
+.bg-overlay {
+  background: var(--bg) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.glass,
+.lf-sidebar,
+.nav-links,
+#radarAlertsPanel,
+.radar-controls,
+#radarAlertsList,
+#homeAlertsList,
+#supportModal .glass,
+#sysModal .glass,
+#authModal .glass {
+  background: var(--panel) !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 2px solid var(--border) !important;
+  border-radius: 0 !important;
+  box-shadow: 6px 6px 0 var(--pixel-shadow) !important;
+}
+
+.glass .glass,
+.glass [style*="background: rgba"],
+.glass [style*="background:rgba"],
+.lf-main [style*="background: rgba"],
+.lf-main [style*="background:rgba"],
+#dashboard [style*="background: rgba"],
+#dashboard [style*="background:rgba"] {
+  background: var(--panel-2) !important;
+  background-image: none !important;
+  border-color: var(--border) !important;
+  opacity: 1 !important;
+}
+
+.glass-btn,
+button,
+.lf-search-wrap button,
+.nav-item,
+.mobile-menu-btn,
+#mobileSettingsBtn {
+  border-radius: 0 !important;
+  background: #24588e !important;
+  color: var(--text) !important;
+  border: 2px solid var(--accent) !important;
+  box-shadow: 4px 4px 0 var(--pixel-shadow) !important;
+  text-align: center !important;
+  justify-content: center !important;
+}
+
+.nav-links .donate-btn,
+.donate-btn {
+  justify-content: center !important;
+  text-align: center !important;
+  align-items: center !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Dashboard spacing overhaul */
+#dashboard > div {
+  padding: 18px !important;
+  padding-bottom: 28px !important;
+  gap: 16px !important;
+  max-width: 1500px !important;
+  margin: 0 auto !important;
+}
+
+.home-panels-container {
+  display: grid !important;
+  grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  align-items: stretch !important;
+  width: 100% !important;
+}
+
+.home-panels-container > * {
+  min-width: 0 !important;
+  max-width: none !important;
+  width: auto !important;
+  margin: 0 !important;
+}
+
+.tjf-dashboard-forecast { grid-column: span 7 !important; }
+.tjf-dashboard-alerts { grid-column: span 5 !important; max-height: none !important; overflow-y: auto !important; }
+.tjf-dashboard-spc { grid-column: span 6 !important; }
+.tjf-dashboard-radar { grid-column: span 6 !important; }
+#homePinnedSection { grid-column: 1 / -1 !important; margin-bottom: 0 !important; }
+
+.tjf-dashboard-forecast,
+.tjf-dashboard-alerts,
+.tjf-dashboard-spc,
+.tjf-dashboard-radar {
+  height: 100% !important;
+  align-self: stretch !important;
+}
+
+/* SPC hard-fill classes applied by JS */
+.tjf-spc-card-filled {
+  background-image: none !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 4px 4px 0 var(--pixel-shadow) !important;
+  opacity: 1 !important;
+}
+
+.tjf-spc-card-filled * {
+  opacity: 1 !important;
+}
+
+.tjf-spc-risk-banner {
+  background-image: none !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 4px 4px 0 var(--pixel-shadow) !important;
+}
+
+.alert-badge {
+  opacity: 1 !important;
+  border: 2px solid #ffffff !important;
+  border-left-width: 8px !important;
+  background-image: none !important;
+  box-shadow: 4px 4px 0 var(--pixel-shadow) !important;
+  cursor: pointer;
+}
+.alert-tornado { background: #7f1d2a !important; color: #ffffff !important; }
+.alert-thunderstorm { background: #8a5600 !important; color: #ffffff !important; }
+.alert-flash-flood { background: #146c38 !important; color: #ffffff !important; }
+.alert-flood { background: #145f73 !important; color: #ffffff !important; }
+.alert-winter { background: #4843a5 !important; color: #ffffff !important; }
+.alert-wind { background: #796400 !important; color: #ffffff !important; }
+.alert-other { background: #3b4c60 !important; color: #ffffff !important; }
+
+/* Radar panel hard fixes */
+#radar .map-container,
+#fullRadarMap,
+#miniRadarMap {
+  background: #142f4f !important;
+}
+
+.radar-controls {
+  max-width: min(960px, calc(100vw - 24px)) !important;
+  width: auto !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: 18px !important;
+  transform: translateX(-50%) !important;
+  z-index: 7000 !important;
+  flex-wrap: wrap !important;
+}
+
+#radarAlertsPanel {
+  background: #183b61 !important;
+  color: var(--text) !important;
+}
+
+#radarAlertsList {
+  background: #214d7c !important;
+  max-height: calc(100vh - 220px) !important;
+  overflow-y: auto !important;
+}
+
+/* Keep control text from overflowing */
+.radar-controls label,
+.radar-controls div,
+.radar-controls span {
+  min-width: 0 !important;
+  white-space: normal !important;
+}
+
+/* Mobile radar controls + alerts no longer off-screen */
+@media (max-width: 768px) {
+  .home-panels-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+  }
+
+  .tjf-dashboard-forecast,
+  .tjf-dashboard-alerts,
+  .tjf-dashboard-spc,
+  .tjf-dashboard-radar,
+  #homePinnedSection {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  #dashboard > div {
+    padding: 12px !important;
+    padding-bottom: 32px !important;
+  }
+
+  .radar-controls {
+    position: fixed !important;
+    left: 8px !important;
+    right: 8px !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px) !important;
+    transform: none !important;
+    width: auto !important;
+    max-width: none !important;
+    max-height: 38vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    padding: 10px !important;
+    z-index: 9000 !important;
+  }
+
+  .radar-controls .glass-btn,
+  .radar-controls button,
+  .radar-controls label,
+  .radar-controls > div {
+    width: 100% !important;
+    justify-content: center !important;
+    border-left: none !important;
+    padding-left: 0 !important;
+    margin: 0 !important;
+  }
+
+  #radarAlertsPanel {
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 92vw !important;
+    max-width: 360px !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow-y: auto !important;
+    padding: 68px 14px calc(42vh + 18px) 14px !important;
+    transform: translateX(-105%) !important;
+    z-index: 9500 !important;
+  }
+
+  #radarAlertsPanel.open {
+    transform: translateX(0) !important;
+  }
+
+  #mobileSettingsBtn {
+    top: 74px !important;
+    right: 10px !important;
+    z-index: 9600 !important;
+  }
+
+  .nav-links .donate-btn,
+  .donate-btn {
+    justify-content: center !important;
+    text-align: center !important;
+    align-self: center !important;
+  }
+}
