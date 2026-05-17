@@ -10,7 +10,7 @@
     <meta name="theme-color" content="#0b0e11">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="TJFWeather">
+    <meta name="apple-mobile-web-app-BAivtsZBFQ-lH4pntR3ooI1SEvuuH25UxK8pCnw10vtnQnzfQNkZxHKcaYkJQgS2RcrGIpcO0ULXiBif3Cem6zg title" content="TJFWeather">
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -245,37 +245,36 @@
         }
 
         /* === TJF PIXEL SOLID THEME OVERRIDES START === */
-/* TJFWeather Pixel Solid Theme v3: lighter midnight-blue blocks, no transparent panels. */
+/* TJFWeather Pixel Solid Theme v2: midnight-blue solid panels, no glass blur. */
 :root {
-    --bg: #102a55 !important;
-    --panel: #17396f !important;
-    --panel-2: #1f4784 !important;
-    --panel-3: #28589d !important;
-    --panel-soft: #214b8f !important;
-    --text: #f6fbff !important;
-    --muted: #c3d3f3 !important;
-    --accent: #4fe3ff !important;
-    --accent-2: #88a5ff !important;
-    --border: #6fa6e8 !important;
-    --border-bright: #8bd8ff !important;
-    --shadow-pixel: rgba(3, 10, 28, 0.62) !important;
-    --danger: #ff5f80 !important;
-    --warning: #ffd86b !important;
-    --success: #61eba7 !important;
-    --info: #8bc6ff !important;
+    --bg: #050a18 !important;
+    --panel: #0d1834 !important;
+    --panel-2: #101f42 !important;
+    --panel-3: #152a56 !important;
+    --text: #f4f8ff !important;
+    --muted: #a8b7d8 !important;
+    --accent: #35d8ff !important;
+    --accent-2: #7c5cff !important;
+    --border: #2d4b82 !important;
+    --border-bright: #4c78c8 !important;
+    --shadow-pixel: rgba(0, 0, 0, 0.55) !important;
+    --danger: #ff4d6d !important;
+    --warning: #ffd166 !important;
+    --success: #54e39f !important;
+    --info: #73b7ff !important;
 }
 
 html, body {
     font-family: 'VT323', 'Pixelify Sans', monospace !important;
     font-size: 20px !important;
-    letter-spacing: 0.22px !important;
+    letter-spacing: 0.2px !important;
     background-color: var(--bg) !important;
     background-image:
-        linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px),
-        radial-gradient(circle at 12% 0%, rgba(79, 227, 255, 0.20), transparent 34%),
-        radial-gradient(circle at 88% 10%, rgba(136, 165, 255, 0.18), transparent 38%),
-        linear-gradient(180deg, #183d78 0%, #102a55 46%, #0b1d3d 100%) !important;
+        linear-gradient(rgba(53, 216, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(53, 216, 255, 0.045) 1px, transparent 1px),
+        radial-gradient(circle at 20% 0%, rgba(53, 216, 255, 0.16), transparent 30%),
+        radial-gradient(circle at 80% 15%, rgba(124, 92, 255, 0.14), transparent 34%),
+        linear-gradient(180deg, #050a18 0%, #071126 46%, #030716 100%) !important;
     background-size: 18px 18px, 18px 18px, auto, auto, auto !important;
     background-attachment: fixed !important;
     color: var(--text) !important;
@@ -298,7 +297,7 @@ h1, h2, h3, h4, h5, h6, .logo,
 }
 
 .bg-overlay {
-    background: #102a55 !important;
+    background: rgba(2, 6, 18, 0.18) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
 }
@@ -309,50 +308,52 @@ h1, h2, h3, h4, h5, h6, .logo,
 #radarAlertsPanel.glass,
 #homeLocalWeather.glass,
 .placeholder-banner.glass,
-.home-alerts-panel.glass,
-#lf-asos-container.glass,
-#lf-nws-container.glass {
+.home-alerts-panel.glass {
     background: var(--panel) !important;
-    background-image: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(0,0,0,0.055)) !important;
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(0,0,0,0.075)) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    border: 3px solid var(--border) !important;
-    border-radius: 6px !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 8px !important;
     box-shadow: 7px 7px 0 var(--shadow-pixel) !important;
 }
 
-.glass:hover { border-color: var(--border-bright) !important; }
+.glass:hover {
+    border-color: var(--border-bright) !important;
+}
 
 nav,
 nav[style] {
-    background: #17396f !important;
+    background: #071126 !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    border-bottom: 4px solid var(--border-bright) !important;
-    box-shadow: 0 6px 0 rgba(3, 10, 28, 0.65) !important;
+    border-bottom: 3px solid var(--border-bright) !important;
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.5) !important;
 }
 
 .logo {
     color: var(--text) !important;
-    text-shadow: 3px 3px 0 #061128 !important;
+    text-shadow: 3px 3px 0 #000 !important;
 }
 
 .nav-links,
-.nav-links[style] { background: #17396f !important; }
+.nav-links[style] {
+    background: #08142d !important;
+}
 
 .nav-item,
 .nav-item[style] {
-    background: #214b8f !important;
-    border: 3px solid #6fa6e8 !important;
+    background: #101f42 !important;
+    border: 2px solid #2d4b82 !important;
     color: var(--text) !important;
-    border-radius: 4px !important;
-    box-shadow: 4px 4px 0 rgba(3,10,28,0.62) !important;
-    text-shadow: 2px 2px 0 #061128 !important;
+    border-radius: 5px !important;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.55) !important;
+    text-shadow: 2px 2px 0 #000 !important;
 }
 
 .nav-item:hover,
 .nav-item.active {
-    background: #2b62af !important;
+    background: #153066 !important;
     color: #ffffff !important;
     border-color: var(--accent) !important;
     transform: translate(-1px, -1px) !important;
@@ -362,21 +363,21 @@ nav[style] {
 .glass-btn[style],
 .lf-search-wrap button,
 .lf-search-wrap button[style] {
-    background: #265aa8 !important;
+    background: #12306c !important;
     color: #ffffff !important;
-    border: 3px solid var(--accent) !important;
-    border-radius: 4px !important;
-    box-shadow: 5px 5px 0 #061128 !important;
+    border: 2px solid var(--accent) !important;
+    border-radius: 5px !important;
+    box-shadow: 5px 5px 0 #02040d !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    text-shadow: 2px 2px 0 #061128 !important;
+    text-shadow: 2px 2px 0 #000 !important;
     text-transform: uppercase !important;
 }
 
 .glass-btn:hover,
 .lf-search-wrap button:hover {
-    background: #3170cf !important;
-    box-shadow: 3px 3px 0 #061128 !important;
+    background: #17418d !important;
+    box-shadow: 3px 3px 0 #02040d !important;
     transform: translate(2px, 2px) !important;
 }
 
@@ -385,11 +386,11 @@ textarea,
 select,
 .lf-search-wrap input,
 .lf-search-wrap input[style] {
-    background: #0b1d3d !important;
+    background: #050a18 !important;
     color: var(--text) !important;
-    border: 3px solid var(--border) !important;
+    border: 2px solid var(--border) !important;
     border-radius: 4px !important;
-    box-shadow: inset 3px 3px 0 rgba(3,10,28,0.55) !important;
+    box-shadow: inset 3px 3px 0 rgba(0,0,0,0.55) !important;
 }
 
 input:focus,
@@ -400,202 +401,53 @@ select:focus,
     outline: none !important;
 }
 
-/* Forecast blocks: solid fills everywhere, not glass. */
 .lf-hour-col,
 .lf-hour-col[style],
 .lf-daily-col,
 .lf-daily-col[style],
 .alert-badge,
 .alert-badge[style] {
-    background: var(--panel-2) !important;
-    border-radius: 5px !important;
-    box-shadow: 5px 5px 0 rgba(3,10,28,0.48) !important;
+    background: #091633 !important;
+    border-radius: 6px !important;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.45) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-}
-
-.lf-hour-col,
-.lf-hour-col[style],
-.lf-daily-col,
-.lf-daily-col[style] {
-    border: 2px solid #5e90d7 !important;
 }
 
 .alert-badge {
-    border-width: 3px !important;
-    border-left-width: 8px !important;
-}
-
-/* Radar: force the controls/sidebar/list to be solid. The radar image itself keeps its normal map opacity. */
-#radar {
-    background: #102a55 !important;
+    border-width: 2px !important;
+    border-left-width: 6px !important;
 }
 
 .map-container,
-.leaflet-container,
-.leaflet-pane,
-.leaflet-map-pane {
-    background: #102a55 !important;
-}
-
-#radarAlertsPanel,
-#radarAlertsPanel[style],
-#radarAlertsPanel.glass,
-.radar-controls,
-.radar-controls[style],
-#radarAlertsList,
-#radarAlertsList[style],
-#radarAlertsPanel > div,
-#radarAlertsPanel > div[style] {
-    background: #17396f !important;
-    background-image: none !important;
-    border-color: var(--border) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+.leaflet-container {
+    background: #050a18 !important;
 }
 
 .radar-controls,
 .radar-controls[style] {
-    border: 3px solid var(--border-bright) !important;
-    box-shadow: 7px 7px 0 rgba(3,10,28,0.62) !important;
-}
-
-/* Solid SPC cards after the v3 script patches renderSPCHTML. */
-.spc-risk-wrap {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 12px !important;
-    margin-bottom: 12px !important;
-}
-
-.spc-risk-summary {
-    border: 3px solid rgba(255,255,255,0.72) !important;
-    border-radius: 5px !important;
-    box-shadow: 5px 5px 0 rgba(3,10,28,0.55) !important;
-    padding: 10px 12px !important;
-}
-
-.spc-hazard-card {
-    border-radius: 5px !important;
-    min-height: 142px !important;
-    text-shadow: none !important;
-}
-
-.spc-hazard-chip {
-    border-radius: 4px !important;
-    box-shadow: inset 2px 2px 0 rgba(255,255,255,0.12), 3px 3px 0 rgba(3,10,28,0.35) !important;
-}
-
-.spc-no-severe-card {
-    background: var(--panel-2) !important;
-    border: 3px solid var(--border) !important;
-    border-radius: 5px !important;
-    box-shadow: 5px 5px 0 rgba(3,10,28,0.55) !important;
-    opacity: 1 !important;
-}
-
-/* Dashboard: use a predictable grid so panels line up and empty space is minimized. */
-#dashboard > div {
-    padding: 22px !important;
-    max-width: 1480px !important;
-    margin: 0 auto !important;
-    gap: 18px !important;
-}
-
-.home-panels-container {
-    display: grid !important;
-    grid-template-columns: minmax(320px, 1.15fr) minmax(300px, 1fr) minmax(280px, 0.85fr) !important;
-    grid-template-areas:
-        "main main alerts"
-        "spc radar alerts"
-        "pinned pinned pinned" !important;
-    align-items: stretch !important;
-    gap: 18px !important;
-    width: 100% !important;
-}
-
-.home-panels-container > .glass {
-    min-width: 0 !important;
-    max-width: none !important;
-    width: 100% !important;
-    height: 100% !important;
-}
-
-.home-alerts-panel {
-    grid-area: alerts !important;
-    max-height: none !important;
-    min-height: 100% !important;
-}
-
-.dashboard-main-panel { grid-area: main !important; }
-.dashboard-spc-panel { grid-area: spc !important; }
-.dashboard-radar-panel { grid-area: radar !important; }
-#homePinnedSection {
-    grid-area: pinned !important;
-    width: 100% !important;
-    margin: 0 !important;
-}
-
-.dashboard-main-panel,
-.dashboard-spc-panel,
-.dashboard-radar-panel,
-.home-alerts-panel {
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-#homeLocalWeather {
-    flex: 1 1 auto !important;
-}
-
-.dashboard-radar-panel > div:last-child,
-.dashboard-radar-panel #miniRadarMap {
-    flex: 1 1 auto !important;
-    min-height: 260px !important;
-}
-
-#miniRadarMap,
-#fullRadarMap {
-    background: #102a55 !important;
+    background: #08142d !important;
+    border: 2px solid var(--border-bright) !important;
+    box-shadow: 7px 7px 0 rgba(0,0,0,0.55) !important;
 }
 
 #supportModal,
 #sysModal,
 #authModal {
-    background: #102a55 !important;
+    background: rgba(2, 6, 18, 0.82) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
 }
 
 ::-webkit-scrollbar { width: 14px; height: 14px; }
-::-webkit-scrollbar-track { background: #0b1d3d; }
-::-webkit-scrollbar-thumb { background: #2b62af; border: 2px solid #0b1d3d; }
-::-webkit-scrollbar-thumb:hover { background: #4fe3ff; }
-
-@media (max-width: 1150px) {
-    .home-panels-container {
-        grid-template-columns: 1fr 1fr !important;
-        grid-template-areas:
-            "main main"
-            "alerts spc"
-            "radar radar"
-            "pinned pinned" !important;
-    }
-}
+::-webkit-scrollbar-track { background: #050a18; }
+::-webkit-scrollbar-thumb { background: #1d3d7e; border: 2px solid #050a18; }
+::-webkit-scrollbar-thumb:hover { background: #35d8ff; }
 
 @media (max-width: 768px) {
     html, body { font-size: 19px !important; }
-    .glass, .glass[style] { box-shadow: 5px 5px 0 rgba(3,10,28,0.6) !important; }
+    .glass, .glass[style] { box-shadow: 5px 5px 0 rgba(0,0,0,0.55) !important; }
     .splash-container h1 { font-size: 52px !important; }
-    #dashboard > div { padding: 14px !important; }
-    .home-panels-container {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 14px !important;
-    }
-    .home-alerts-panel { min-height: auto !important; }
-    .dashboard-radar-panel > div:last-child,
-    .dashboard-radar-panel #miniRadarMap { min-height: 220px !important; }
 }
 
         /* === TJF PIXEL SOLID THEME OVERRIDES END === */
@@ -1107,87 +959,6 @@ html, body {
 }
 
         /* === TJF PIXEL SOLID THEME V5 END === */
-
-        /* === TJF CLEAN GOOD-STATE FINAL FIXES START === */
-        :root { --tjf-clean-version: clean-good-state-v10; }
-
-        /* Keep radar controls fully on-screen on mobile. */
-        @media (max-width: 768px) {
-            .radar-controls,
-            .radar-controls.glass,
-            .radar-controls[style] {
-                position: fixed !important;
-                left: 50% !important;
-                right: auto !important;
-                bottom: 12px !important;
-                top: auto !important;
-                transform: translateX(-50%) !important;
-                width: calc(100vw - 24px) !important;
-                max-width: calc(100vw - 24px) !important;
-                max-height: 42vh !important;
-                overflow-y: auto !important;
-                overflow-x: hidden !important;
-                display: flex !important;
-                flex-direction: column !important;
-                align-items: stretch !important;
-                justify-content: flex-start !important;
-                gap: 8px !important;
-                padding: 10px !important;
-                z-index: 8600 !important;
-                box-sizing: border-box !important;
-            }
-            .radar-controls label,
-            .radar-controls > div,
-            .radar-controls button {
-                width: 100% !important;
-                max-width: 100% !important;
-                min-width: 0 !important;
-                border-left: 0 !important;
-                padding-left: 0 !important;
-                justify-content: center !important;
-                text-align: center !important;
-                box-sizing: border-box !important;
-            }
-            #radarAlertsPanel,
-            #radarAlertsPanel[style] {
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                right: auto !important;
-                width: min(92vw, 380px) !important;
-                max-width: min(92vw, 380px) !important;
-                height: 100dvh !important;
-                max-height: 100dvh !important;
-                overflow-y: auto !important;
-                transform: translateX(-105%) !important;
-                z-index: 9000 !important;
-                box-sizing: border-box !important;
-                border-radius: 0 8px 8px 0 !important;
-            }
-            #radarAlertsPanel.open,
-            #radarAlertsPanel.open[style] {
-                transform: translateX(0) !important;
-            }
-            #mobileSettingsBtn,
-            #mobileSettingsBtn[style] {
-                top: 76px !important;
-                right: 12px !important;
-                z-index: 8800 !important;
-            }
-        }
-
-        /* Keep the mobile nav donation button centered. */
-        @media (max-width: 1000px) {
-            .nav-links .donate-btn,
-            .nav-links .donate-btn[style] {
-                justify-content: center !important;
-                align-items: center !important;
-                text-align: center !important;
-                margin-left: auto !important;
-                margin-right: auto !important;
-            }
-        }
-        /* === TJF CLEAN GOOD-STATE FINAL FIXES END === */
     </style>
 </head>
 
@@ -1341,14 +1112,14 @@ html, body {
     <!-- RADAR TAB -->
     <div id="radar" class="tab-content">
         <div id="fullRadarMap" class="map-container"></div>
-        <div id="radarAlertsPanel" class="glass" style="position:absolute; top:15px; right:15px; z-index:1600; padding:14px 16px; width:280px; max-height:65vh; overflow-y:auto; display:flex; flex-direction:column; background: #17396f;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; background: #102a55; padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+        <div id="radarAlertsPanel" class="glass" style="position:absolute; top:15px; right:15px; z-index:1600; padding:14px 16px; width:280px; max-height:65vh; overflow-y:auto; display:flex; flex-direction:column; background: rgba(11, 14, 17, 0.85);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; background: rgba(0,0,0,0.4); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
                 <div style="font-size:12px; text-transform:uppercase; letter-spacing:1px; font-weight:700; color: var(--danger); display: flex; align-items: center; gap: 8px;">
                     <i class="ph-fill ph-warning-circle" style="font-size: 16px;"></i> Active Alerts
                 </div>
                 <button class="close-btn" style="display:block; background:none; border:none; color:#fff; font-size:24px; cursor:pointer;" onclick="window.toggleMobileSettings()">&times;</button>
             </div>
-            <div id="radarAlertsList" style="flex:1; background: #102a55; border-radius: 10px; padding: 10px; border: 1px solid rgba(255,255,255,0.05);">
+            <div id="radarAlertsList" style="flex:1; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 10px; border: 1px solid rgba(255,255,255,0.05);">
                 <div style="opacity:0.4; font-size:12px;"><i class="ph ph-spinner ph-spin"></i> Loading...</div>
             </div>
             <div style="text-align:right; margin-top:12px; border-top:1px solid var(--border); padding-top:8px;">
@@ -2356,7 +2127,7 @@ html, body {
 
         function renderSPCHTML(spc) {
             if (spc.rawLvl === 0) return `
-                <div class="spc-no-severe-card" style="padding: 12px 14px; font-size: 16px; font-weight: 700; margin-bottom: 12px; color:#fff;">No Severe Weather Expected</div>
+                <div class="spc-no-severe-card tjf-panel-depth-1" style="padding: 12px 14px; font-size: 16px; font-weight: 700; margin-bottom: 12px; color:#fff;">No Severe Weather Expected</div>
                 <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official Storm Prediction Center Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
             
             let riskBadge = spc.rawLvl === 1 ? "Thunderstorm" : `<span style="font-size: 2.5em; font-weight: 700; line-height: 0.8;">${spc.level}</span><span style="font-size: 1.2em; opacity: 0.7; margin-left: 2px;">/5</span>`;
@@ -2446,32 +2217,27 @@ html, body {
             let windDesc = getDescText('wind', windNum, windCig);
             let hailDesc = getDescText('hail', hailNum, hailCig);
 
-            const solidCardBg = (style, num, cig) => (num > 0 || cig) ? style.bg : '#244f96';
-            const solidCardText = (style, num, cig) => (num > 0 || cig) ? style.text : '#f6fbff';
-            const solidCardBorder = (style, num, cig) => (num > 0 || cig) ? style.border : '#6fa6e8';
-            const solidChipBg = (style, num, cig) => (num > 0 || cig) ? 'rgba(0,0,0,0.22)' : 'rgba(255,255,255,0.10)';
-
             return `
-                <div class="spc-risk-wrap" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 12px;">
-                    <div class="spc-risk-summary" style="display: flex; align-items: center; gap: 12px; background: ${spc.bgColor}; color: ${spc.textColor};">
-                        <div style="font-weight: 700; font-size: 15px; display: flex; align-items: baseline; gap: 2px;">${riskBadge}</div>
-                        <div style="font-weight: 700; font-size: 16px; color: inherit;">${spc.name}</div>
+                <div class="spc-risk-wrap tjf-panel-depth-1" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="background: ${spc.bgColor}; color: ${spc.textColor}; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 15px; display: flex; align-items: baseline; gap: 2px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);">${riskBadge}</div>
+                        <div style="font-weight: 700; font-size: 16px; color: ${spc.bgColor}; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">${spc.name}</div>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px;">
-                        <div class="spc-hazard-card" style="background: ${solidCardBg(torStyle, torNum, torCig)}; color: ${solidCardText(torStyle, torNum, torCig)}; border: 3px solid ${solidCardBorder(torStyle, torNum, torCig)}; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: 5px 5px 0 rgba(3,10,28,0.55);">
-                            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 8px; font-weight: bold; color: inherit;">Tornado</div>
-                            <div class="spc-hazard-chip" style="font-size: 24px; font-weight: 700; background: ${solidChipBg(torStyle, torNum, torCig)}; color: inherit; padding: 4px 8px; display: inline-block; margin: 0 auto 8px auto; border: 2px solid rgba(255,255,255,0.35);">${displayString(torVal)}</div>
-                            <div style="font-size: 11px; line-height: 1.4; color: inherit;">${torDesc}</div>
+                        <div style="background: rgba(0,0,0,0.2); border: 1px solid ${torStyle.border}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${torNum > 0 || torCig ? 'inset 0 0 15px '+torStyle.border+'33' : 'none'};">
+                            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Tornado</div>
+                            <div style="font-size: 24px; font-weight: 700; background: ${torStyle.bg}; color: ${torStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${displayString(torVal)}</div>
+                            <div style="font-size: 11px; line-height: 1.4; color: #fff;">${torDesc}</div>
                         </div>
-                        <div class="spc-hazard-card" style="background: ${solidCardBg(windStyle, windNum, windCig)}; color: ${solidCardText(windStyle, windNum, windCig)}; border: 3px solid ${solidCardBorder(windStyle, windNum, windCig)}; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: 5px 5px 0 rgba(3,10,28,0.55);">
-                            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 8px; font-weight: bold; color: inherit;">Wind</div>
-                            <div class="spc-hazard-chip" style="font-size: 24px; font-weight: 700; background: ${solidChipBg(windStyle, windNum, windCig)}; color: inherit; padding: 4px 8px; display: inline-block; margin: 0 auto 8px auto; border: 2px solid rgba(255,255,255,0.35);">${displayString(windVal)}</div>
-                            <div style="font-size: 11px; line-height: 1.4; color: inherit;">${windDesc}</div>
+                        <div style="background: rgba(0,0,0,0.2); border: 1px solid ${windStyle.border}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${windNum > 0 || windCig ? 'inset 0 0 15px '+windStyle.border+'33' : 'none'};">
+                            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Wind</div>
+                            <div style="font-size: 24px; font-weight: 700; background: ${windStyle.bg}; color: ${windStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${displayString(windVal)}</div>
+                            <div style="font-size: 11px; line-height: 1.4; color: #fff;">${windDesc}</div>
                         </div>
-                        <div class="spc-hazard-card" style="background: ${solidCardBg(hailStyle, hailNum, hailCig)}; color: ${solidCardText(hailStyle, hailNum, hailCig)}; border: 3px solid ${solidCardBorder(hailStyle, hailNum, hailCig)}; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: 5px 5px 0 rgba(3,10,28,0.55);">
-                            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 8px; font-weight: bold; color: inherit;">Hail</div>
-                            <div class="spc-hazard-chip" style="font-size: 24px; font-weight: 700; background: ${solidChipBg(hailStyle, hailNum, hailCig)}; color: inherit; padding: 4px 8px; display: inline-block; margin: 0 auto 8px auto; border: 2px solid rgba(255,255,255,0.35);">${displayString(hailVal)}</div>
-                            <div style="font-size: 11px; line-height: 1.4; color: inherit;">${hailDesc}</div>
+                        <div style="background: rgba(0,0,0,0.2); border: 1px solid ${hailStyle.border}; border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: ${hailNum > 0 || hailCig ? 'inset 0 0 15px '+hailStyle.border+'33' : 'none'};">
+                            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; font-weight: bold; color: #fff;">Hail</div>
+                            <div style="font-size: 24px; font-weight: 700; background: ${hailStyle.bg}; color: ${hailStyle.text}; padding: 4px 8px; border-radius: 6px; display: inline-block; margin: 0 auto 8px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">${displayString(hailVal)}</div>
+                            <div style="font-size: 11px; line-height: 1.4; color: #fff;">${hailDesc}</div>
                         </div>
                     </div>
                 </div>
@@ -3904,6 +3670,56 @@ html, body {
             }
         };
 
+        window.enablePushNotifications = async function(options = {}) {
+            const silent = !!options.silent;
+            if (!('Notification' in window)) {
+                if (!silent) window.showSysMessage("This browser does not support notifications.");
+                return false;
+            }
+            if (!window.isSecureContext && location.hostname !== 'localhost') {
+                if (!silent) window.showSysMessage("Background notifications require HTTPS. GitHub Pages is OK when loaded with https://");
+                return false;
+            }
+            if (window.isIOSDevice && window.isIOSDevice() && window.isStandalonePWA && !window.isStandalonePWA()) {
+                if (!silent) window.showSysMessage("iPhone/iPad setup:\n\n1) Open this site in Safari.\n2) Tap Share.\n3) Tap Add to Home Screen.\n4) Open TJFWeather from the Home Screen icon.\n5) Log in, choose notification settings, and tap Grant Permission again.");
+                return false;
+            }
+            if (!auth || !auth.currentUser || auth.currentUser.isAnonymous) {
+                if (!silent) window.openAuthModal("Please log in or register before enabling background notifications. The server needs your saved cities and device token.");
+                return false;
+            }
+            if (!FCM_VAPID_PUBLIC_KEY || FCM_VAPID_PUBLIC_KEY.startsWith('REPLACE_')) {
+                if (!silent) window.showSysMessage("Firebase Cloud Messaging is not fully configured yet. Replace FCM_VAPID_PUBLIC_KEY in index.html with your Firebase Web Push certificate public key.");
+                return false;
+            }
+
+            const reg = await window.registerServiceWorker();
+            if (!reg) {
+                if (!silent) window.showSysMessage("The service worker could not be registered. Make sure sw.js is committed next to index.html.");
+                return false;
+            }
+
+            let permission = Notification.permission;
+            if (permission !== 'granted') permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                if (!silent) window.showSysMessage("Notification permission was not granted. You can enable it later in browser/system settings.");
+                return false;
+            }
+
+            try {
+                const token = await getCurrentPushToken();
+                if (!token) throw new Error('No FCM token returned.');
+                await savePushToken(token, null);
+                if (window.loadNotifSettingsUI) window.loadNotifSettingsUI();
+                if (!silent) window.showSysMessage("This device is enrolled for TJFWeather background push. The Alerts and Daily Briefing checkboxes control what gets sent.");
+                return true;
+            } catch (e) {
+                console.error('Background notification enrollment failed:', e);
+                if (!silent) window.showSysMessage("Background notification setup failed. Check the VAPID key, FCM Registration API, Firestore rules, and service worker file.");
+                return false;
+            }
+        };
+
         window.enableBackgroundAlerts = async function(options = {}) {
             window.notifSettings.alertsEnabled = true;
             localStorage.setItem('tjf_notif_settings', JSON.stringify(window.notifSettings));
@@ -4245,12 +4061,6 @@ html, body {
     })();
     </script>
     <!-- TJF V5 DYNAMIC VISUAL FIXES END -->
-
-
-    <script>
-    window.__TJF_CLEAN_GOOD_STATE = 'clean-good-state-v10-2026-05-16';
-    window.TJF_FCM_VAPID_PUBLIC_KEY = 'BAivtsZBFQ-lH4pntR3ooI1SEvuuH25UxK8pCnw10vtnQnzfQNkZxHKcaYkJQgS2RcrGIpcO0ULXiBif3Cem6zg';
-    </script>
 
 </body>
 </html>
