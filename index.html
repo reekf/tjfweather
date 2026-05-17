@@ -10,7 +10,7 @@
     <meta name="theme-color" content="#0b0e11">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="TJFWeather">
+    <meta name="apple-mobile-web-app-BAivtsZBFQ-lH4pntR3ooI1SEvuuH25UxK8pCnw10vtnQnzfQNkZxHKcaYkJQgS2RcrGIpcO0ULXiBif3Cem6zg title" content="TJFWeather">
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -739,6 +739,226 @@ html, body {
 
         /* === TJF PIXEL SOLID PANELS V4 END === */
 
+
+        /* === TJF PIXEL SOLID THEME V5 START === */
+/* TJFWeather Pixel Solid Theme v5: filled SPC cards, tighter dashboard, radar interaction fixes. */
+:root {
+    --bg: #2f6fab !important;
+    --bg-deep: #244f83 !important;
+    --panel: #397bb8 !important;
+    --panel-2: #4a8dcc !important;
+    --panel-3: #5b9fe0 !important;
+    --panel-4: #72b4f4 !important;
+    --panel-dark: #2a5f97 !important;
+    --panel-inset: #214f83 !important;
+    --text: #f8fcff !important;
+    --muted: #e2f0ff !important;
+    --accent: #8df7ff !important;
+    --accent-2: #c7d7ff !important;
+    --border: #c3efff !important;
+    --border-soft: #9cd3ff !important;
+    --border-bright: #ecfbff !important;
+    --shadow-pixel: rgba(9, 28, 68, 0.68) !important;
+}
+
+html, body {
+    background-color: var(--bg) !important;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.075) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.075) 1px, transparent 1px),
+        radial-gradient(circle at 14% 6%, rgba(141, 247, 255, 0.26), transparent 34%),
+        radial-gradient(circle at 86% 10%, rgba(199, 215, 255, 0.22), transparent 36%),
+        linear-gradient(180deg, #4d91cc 0%, #3575b2 48%, #244f83 100%) !important;
+}
+
+/* Stronger solid panel fill for every panelish surface. */
+.glass,
+.glass[style],
+.tjf-panel-depth-1,
+.tjf-panel-depth-1[style],
+.tjf-panel-depth-2,
+.tjf-panel-depth-2[style],
+.lf-hour-col,
+.lf-daily-col,
+.alert-badge,
+#radarAlertsList,
+#homeLocalWeather,
+#homeForecastFootnote > div,
+#homeNextTemps .lf-hour-col,
+#homePinnedCards > .glass,
+.current-detailed-wrapper > .glass {
+    opacity: 1 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Filled SPC category rows and hazard cards. Runtime JS adds these classes to dynamic SPC HTML. */
+.spc-category-filled,
+.spc-category-filled[style] {
+    background: var(--tjf-spc-fill, var(--panel-3)) !important;
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(0,0,0,0.10)) !important;
+    color: var(--tjf-spc-text, #ffffff) !important;
+    border: 3px solid rgba(255,255,255,0.88) !important;
+    border-radius: 6px !important;
+    padding: 12px !important;
+    box-shadow: 5px 5px 0 rgba(9,28,68,0.62) !important;
+}
+
+.spc-category-filled > div:first-child,
+.spc-category-filled > div:first-child[style] {
+    border: 2px solid rgba(255,255,255,0.70) !important;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.32) !important;
+}
+
+.spc-hazard-filled,
+.spc-hazard-filled[style] {
+    background: var(--tjf-spc-fill, var(--panel-3)) !important;
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.13), rgba(0,0,0,0.14)) !important;
+    color: var(--tjf-spc-text, #ffffff) !important;
+    border: 3px solid rgba(255,255,255,0.82) !important;
+    border-radius: 6px !important;
+    box-shadow: 5px 5px 0 rgba(9,28,68,0.58) !important;
+    min-height: 148px !important;
+}
+
+.spc-hazard-filled *:not(a):not(button),
+.spc-category-filled *:not(a):not(button) {
+    color: inherit !important;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.35) !important;
+}
+
+.spc-hazard-chip-filled,
+.spc-hazard-chip-filled[style] {
+    background: rgba(255,255,255,0.22) !important;
+    color: inherit !important;
+    border: 2px solid rgba(255,255,255,0.75) !important;
+    box-shadow: inset 2px 2px 0 rgba(255,255,255,0.15), 3px 3px 0 rgba(0,0,0,0.28) !important;
+}
+
+.spc-no-severe-card,
+.spc-no-severe-card[style] {
+    background: #537fab !important;
+    color: #ffffff !important;
+    border: 3px solid rgba(255,255,255,0.70) !important;
+    opacity: 1 !important;
+}
+
+/* Dashboard v5: compact two-column layout with no forced stretch/blank panel height. */
+#dashboard > div {
+    padding: 16px !important;
+    max-width: 1280px !important;
+    margin: 0 auto !important;
+    gap: 16px !important;
+}
+
+.home-panels-container {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.28fr) minmax(320px, 0.72fr) !important;
+    gap: 16px !important;
+    align-items: start !important;
+    align-content: start !important;
+    width: 100% !important;
+}
+
+.home-panels-container > .glass {
+    height: auto !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    align-self: start !important;
+}
+
+.dashboard-main-panel { grid-column: 1 !important; grid-row: 1 !important; padding: 22px !important; }
+.home-alerts-panel { grid-column: 2 !important; grid-row: 1 !important; max-height: 430px !important; overflow-y: auto !important; }
+.dashboard-spc-panel { grid-column: 1 !important; grid-row: 2 !important; }
+.dashboard-radar-panel { grid-column: 2 !important; grid-row: 2 !important; }
+#homePinnedSection { grid-column: 1 / -1 !important; grid-row: 3 !important; margin: 0 !important; width: 100% !important; }
+
+.dashboard-main-panel,
+.dashboard-spc-panel,
+.dashboard-radar-panel,
+.home-alerts-panel {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+#homeLocalWeather,
+#homeLocalWeather[style] {
+    flex: 0 0 auto !important;
+    margin-top: 10px !important;
+}
+
+#homeNextTemps > div,
+#homePinnedCards {
+    gap: 10px !important;
+}
+
+#homeNextTemps > div {
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+}
+
+#homeNextTemps .lf-hour-col {
+    min-width: 118px !important;
+    flex: 1 1 118px !important;
+    padding: 12px 10px !important;
+}
+
+.dashboard-spc-panel > div + div {
+    padding-top: 12px !important;
+    margin-top: 12px !important;
+}
+
+.dashboard-radar-panel > div:last-child,
+.dashboard-radar-panel #miniRadarMap {
+    min-height: 230px !important;
+}
+
+/* Radar zoom UX: tiles upscale after RainViewer's native limit instead of disappearing. */
+#fullRadarMap .leaflet-tile-pane img,
+#miniRadarMap .leaflet-tile-pane img {
+    image-rendering: pixelated !important;
+}
+
+.alert-badge[role="button"] {
+    cursor: pointer !important;
+}
+.alert-badge[role="button"]:hover,
+.alert-badge[role="button"]:focus {
+    outline: 3px solid var(--border-bright) !important;
+    transform: translate(-1px, -1px) !important;
+}
+
+/* Mobile dropdown centering fix for Support Me. */
+@media (max-width: 1000px) {
+    .nav-links .donate-btn,
+    .nav-links .donate-btn[style] {
+        justify-content: center !important;
+        align-items: center !important;
+        text-align: center !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        width: 90% !important;
+    }
+}
+
+@media (max-width: 980px) {
+    .home-panels-container {
+        grid-template-columns: 1fr !important;
+    }
+    .dashboard-main-panel,
+    .home-alerts-panel,
+    .dashboard-spc-panel,
+    .dashboard-radar-panel,
+    #homePinnedSection {
+        grid-column: 1 !important;
+        grid-row: auto !important;
+    }
+    .home-alerts-panel { max-height: none !important; }
+}
+
+        /* === TJF PIXEL SOLID THEME V5 END === */
     </style>
 </head>
 
@@ -2066,7 +2286,8 @@ html, body {
             }
             let icon = "ph-warning";
             if(cls === 'alert-tornado') icon = "ph-wind"; else if(cls === 'alert-thunderstorm') icon = "ph-cloud-lightning"; else if(cls === 'alert-winter') icon = "ph-snowflake";
-            return `<div class="alert-badge ${cls}"><i class="ph-fill ${icon}" style="font-size: 20px; margin-top: 2px;"></i><div><div class="ab-title">${f.properties.event}</div><div class="ab-area">${area}</div>${expText}</div></div>`;
+            const alertId = encodeURIComponent((f.properties && (f.properties.id || `${f.properties.event || ''}|${f.properties.areaDesc || ''}|${f.properties.expires || ''}`)) || f.id || '');
+            return `<div class=\"alert-badge ${cls}\" role=\"button\" tabindex=\"0\" data-alert-id=\"${alertId}\" onclick=\"window.centerMapOnAlert && window.centerMapOnAlert('${alertId}')\" onkeydown=\"if(event.key==='Enter'||event.key===' '){event.preventDefault(); window.centerMapOnAlert && window.centerMapOnAlert('${alertId}');}\"><i class="ph-fill ${icon}" style="font-size: 20px; margin-top: 2px;"></i><div><div class="ab-title">${f.properties.event}</div><div class="ab-area">${area}</div>${expText}</div></div>`;
         }
 
         window.loadNWSAlerts = async function() {
@@ -2105,6 +2326,42 @@ html, body {
             if (relevant.length > 0) box.innerHTML = relevant.map(alertBadgeHTML).join('');
             else box.innerHTML = '<div style="opacity:0.4; font-size:13px; font-style: italic;">No active alerts for this location.</div>';
         }
+
+
+        window.centerMapOnAlert = function(alertIdEncoded) {
+            try {
+                const alertId = decodeURIComponent(alertIdEncoded || '');
+                const alerts = window.nwsAlerts || [];
+                const target = alerts.find(f => {
+                    const props = f.properties || {};
+                    const fallback = `${props.event || ''}|${props.areaDesc || ''}|${props.expires || ''}`;
+                    return String(props.id || f.id || fallback) === alertId;
+                });
+                if (!target || !target.geometry || !window.L) return;
+                const targetLayer = L.geoJSON(target);
+                const bounds = targetLayer.getBounds();
+                if (!bounds || !bounds.isValid()) return;
+
+                const go = () => {
+                    if (!window._mapFull) return;
+                    window._mapFull.fitBounds(bounds, { padding: [42, 42], maxZoom: 8 });
+                    if (window.innerWidth <= 768) {
+                        const panel = document.getElementById('radarAlertsPanel');
+                        if (panel) panel.classList.remove('open');
+                    }
+                };
+
+                if (!document.getElementById('radar')?.classList.contains('active')) {
+                    const navBtn = document.getElementById('navRadarBtn');
+                    if (window.showTab) window.showTab('radar', navBtn || null);
+                    setTimeout(go, 220);
+                } else {
+                    go();
+                }
+            } catch (e) {
+                console.warn('Could not center alert on map', e);
+            }
+        };
 
         window.renderAlertPanels = function() {
             const sortedAlerts = [...(window.nwsAlerts || [])].sort((a, b) => {
@@ -2147,7 +2404,15 @@ html, body {
                 return { color: colorMap[cls] || '#aaa', weight: isWarning ? 3 : 2, fillOpacity: 0, opacity: 0.95 };
             };
 
-            const onEachFn = (feature, layer) => { layer.bindTooltip(`<b>${feature.properties.event}</b><br/><small>${(feature.properties.areaDesc || '').split(';')[0]}</small>`, { sticky: true }); };
+            const onEachFn = (feature, layer) => {
+                layer.bindTooltip(`<b>${feature.properties.event}</b><br/><small>${(feature.properties.areaDesc || '').split(';')[0]}</small>`, { sticky: true });
+                layer.on('click', () => {
+                    const props = feature.properties || {};
+                    const alertId = encodeURIComponent(props.id || feature.id || `${props.event || ''}|${props.areaDesc || ''}|${props.expires || ''}`);
+                    if (window.centerMapOnAlert) window.centerMapOnAlert(alertId);
+                    else if (window._mapFull && layer.getBounds) window._mapFull.fitBounds(layer.getBounds(), { padding: [42, 42], maxZoom: 8 });
+                });
+            };
             
             window.alertPolygonLayer = L.layerGroup([
                 L.geoJSON({ type: 'FeatureCollection', features: severeFeatures }, { pane: 'severeAlertsPane', style: styleFn, onEachFeature: onEachFn }),
@@ -2181,7 +2446,7 @@ html, body {
 
                 rvFrames.forEach((frame) => {
                     let url = `${data.host}${frame.path}/256/{z}/{x}/{y}/6/1_1.png`;
-                    let radarOpts = { opacity: 0, pane: 'radarPane', keepBuffer: 8, updateWhenZooming: false };
+                    let radarOpts = { opacity: 0, pane: 'radarPane', keepBuffer: 8, updateWhenZooming: false, maxNativeZoom: 7, maxZoom: 12 };
                     if (window._mapFull) mainRadarLayers.push(L.tileLayer(url, radarOpts).addTo(window._mapFull));
                     if (window._mapMini) miniRadarLayers.push(L.tileLayer(url, radarOpts).addTo(window._mapMini));
                 });
@@ -3266,7 +3531,7 @@ html, body {
         // REQUIRED FOR FULLY BACKGROUND ALERTS:
         // Firebase Console -> Project Settings -> Cloud Messaging -> Web Push certificates -> Generate key pair.
         // Paste the PUBLIC key below. This is not a secret.
-        const FCM_VAPID_PUBLIC_KEY = "REPLACE_WITH_FIREBASE_WEB_PUSH_CERTIFICATE_KEY_PAIR_PUBLIC_KEY";
+        const FCM_VAPID_PUBLIC_KEY = "BAivtsZBFQ-lH4pntR3ooI1SEvuuH25UxK8pCnw10vtnQnzfQNkZxHKcaYkJQgS2RcrGIpcO0ULXiBif3Cem6zg";
 
         let firebaseConfig = Object.keys(myFirebaseConfig).length > 0 ? myFirebaseConfig : null;
         
@@ -3699,6 +3964,103 @@ html, body {
     })();
     </script>
     <!-- TJF SOLID PANEL TAGGER V4 END -->
+
+
+    <!-- TJF V5 DYNAMIC VISUAL FIXES START -->
+    <script>
+    (function tjfV5DynamicVisualFixes() {
+        const panelBlue = '#5b9fe0';
+        const darkTextColors = ['rgb(0, 0, 0)', '#000', '#000000', 'black'];
+
+        function isTransparent(color) {
+            if (!color) return true;
+            const c = String(color).trim().toLowerCase();
+            return c === 'transparent' || c === 'rgba(0, 0, 0, 0)' || c === 'rgba(0,0,0,0)';
+        }
+        function readableTextFor(bg, fallback) {
+            if (!bg || isTransparent(bg)) return fallback || '#ffffff';
+            const m = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+            if (!m) return fallback || '#ffffff';
+            const r = Number(m[1]), g = Number(m[2]), b = Number(m[3]);
+            const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+            return yiq >= 150 ? '#061a33' : '#ffffff';
+        }
+        function tagDashboardCards() {
+            const container = document.querySelector('.home-panels-container');
+            if (!container) return;
+            [...container.children].forEach(el => {
+                if (!(el instanceof HTMLElement)) return;
+                const text = (el.textContent || '').toLowerCase();
+                if (el.classList.contains('home-alerts-panel') || text.includes('active weather alerts')) return;
+                if (el.querySelector('#homeLocalWeather') || text.includes('national weather service dashboard')) el.classList.add('dashboard-main-panel');
+                if (text.includes('storm prediction center outlook') || el.querySelector('#spcTodayHome') || el.querySelector('#spcTomHome')) el.classList.add('dashboard-spc-panel');
+                if (el.querySelector('#miniRadarMap') || text.includes('local composite radar')) el.classList.add('dashboard-radar-panel');
+            });
+        }
+        function directDivChildren(el) {
+            return [...(el?.children || [])].filter(child => child instanceof HTMLElement && child.tagName === 'DIV');
+        }
+        function fillSPC(root) {
+            if (!root) return;
+
+            // Category row: contains the level badge and the category name.
+            root.querySelectorAll('div').forEach(row => {
+                if (!(row instanceof HTMLElement)) return;
+                const kids = directDivChildren(row);
+                if (kids.length < 2) return;
+                const text = (row.textContent || '').toLowerCase();
+                const looksCategory = /marginal|slight|enhanced|moderate|high risk|general thunderstorm|no severe/.test(text) && !/tornado\s*wind\s*hail/.test(text);
+                if (!looksCategory) return;
+                const badge = kids[0];
+                const badgeStyle = getComputedStyle(badge);
+                let fill = badgeStyle.backgroundColor;
+                let textColor = badgeStyle.color;
+                if (isTransparent(fill)) fill = panelBlue;
+                if (!textColor || isTransparent(textColor)) textColor = readableTextFor(fill, '#ffffff');
+                row.classList.add('spc-category-filled');
+                row.style.setProperty('--tjf-spc-fill', fill);
+                row.style.setProperty('--tjf-spc-text', textColor);
+            });
+
+            // Hazard cards: first child label says Tornado, Wind, or Hail; second significant child is usually the probability chip.
+            root.querySelectorAll('div').forEach(card => {
+                if (!(card instanceof HTMLElement)) return;
+                const kids = directDivChildren(card);
+                if (kids.length < 2) return;
+                const label = (kids[0].textContent || '').trim().toLowerCase();
+                if (!['tornado', 'wind', 'hail'].includes(label)) return;
+                const chip = kids.find(k => /^(\d+%|sig|0%)$/i.test((k.textContent || '').trim())) || kids[1];
+                const chipStyle = getComputedStyle(chip);
+                let fill = chipStyle.backgroundColor;
+                let textColor = chipStyle.color;
+                if (isTransparent(fill)) {
+                    fill = label === 'tornado' ? '#328158' : '#5b83b9';
+                    textColor = '#ffffff';
+                }
+                card.classList.add('spc-hazard-filled', `spc-hazard-${label}`);
+                chip.classList.add('spc-hazard-chip-filled');
+                card.style.setProperty('--tjf-spc-fill', fill);
+                card.style.setProperty('--tjf-spc-text', textColor || readableTextFor(fill, '#ffffff'));
+            });
+        }
+        function run() {
+            tagDashboardCards();
+            ['#spcTodayHome', '#spcTomHome', '#lfSpcToday', '#lfSpcTom', '#lf-spc-container'].forEach(sel => {
+                document.querySelectorAll(sel).forEach(fillSPC);
+            });
+        }
+        let scheduled = false;
+        function schedule() {
+            if (scheduled) return;
+            scheduled = true;
+            requestAnimationFrame(() => { scheduled = false; run(); });
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedule);
+        else schedule();
+        new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true });
+    })();
+    </script>
+    <!-- TJF V5 DYNAMIC VISUAL FIXES END -->
 
 </body>
 </html>
