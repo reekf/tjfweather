@@ -618,128 +618,6 @@
                 box-shadow: 4px 4px 0 rgba(1,5,14,0.75) !important;
             }
         }
-
-
-        /* === TJF SAFE TARGETED CLEANUP 2026-05-18 START === */
-        /* Dashboard: no reserved blank column/row when pinned locations are hidden. */
-        .dashboard-radar-panel,
-        .dashboard-radar-panel[style] {
-            grid-column: 1 / -1 !important;
-            grid-row: 2 !important;
-            width: 100% !important;
-            min-width: 0 !important;
-        }
-        #homePinnedSection,
-        #homePinnedSection[style] {
-            grid-column: 1 / -1 !important;
-            grid-row: 3 !important;
-            width: 100% !important;
-            max-width: 100% !important;
-        }
-        #homePinnedSection[style*="display:none"],
-        #homePinnedSection[style*="display: none"] { display: none !important; }
-
-        /* Prominent retro section headers, including SPC outlook labels. */
-        .dashboard-spc-panel > div > div:first-child,
-        #lf-spc-container .glass > div:first-child,
-        #lf-enviro-container > .glass > div:first-child,
-        #lf-mos-container .glass > div:first-child,
-        #lf-daily-container .glass > div:first-child,
-        #lf-hourly-container .glass > div:first-child,
-        .current-detailed-wrapper .glass > div:first-child,
-        .tjf-section-header {
-            display: flex !important;
-            align-items: center !important;
-            gap: 8px !important;
-            margin: 0 0 14px 0 !important;
-            padding: 9px 12px !important;
-            width: 100% !important;
-            background: #071b37 !important;
-            color: var(--accent) !important;
-            border: 3px solid var(--border-bright) !important;
-            border-left-width: 9px !important;
-            border-radius: 4px !important;
-            box-shadow: 4px 4px 0 rgba(1,5,14,0.72) !important;
-            font-family: var(--font-display) !important;
-            font-size: 12px !important;
-            font-weight: 700 !important;
-            letter-spacing: 1.4px !important;
-            line-height: 1.25 !important;
-            opacity: 1 !important;
-            text-transform: uppercase !important;
-        }
-
-        /* SPC risk/probability cards: outline by risk color, do not fill the whole card. */
-        .spc-risk-summary,
-        .spc-risk-summary[style] {
-            background: var(--panel-2) !important;
-            color: #f4fbff !important;
-            border: 3px solid var(--spc-outline, var(--border-bright)) !important;
-            border-left-width: 10px !important;
-            border-radius: 5px !important;
-            box-shadow: 5px 5px 0 rgba(1,5,14,0.60) !important;
-            padding: 10px 12px !important;
-        }
-        .spc-risk-badge-mini {
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            min-width: 58px !important;
-            padding: 5px 8px !important;
-            background: rgba(0,0,0,0.25) !important;
-            color: #fff !important;
-            border: 2px solid var(--spc-outline, var(--border-bright)) !important;
-            border-radius: 4px !important;
-            font-family: var(--font-display) !important;
-            font-weight: 700 !important;
-            text-shadow: 2px 2px 0 #01050e !important;
-        }
-        .spc-hazard-card,
-        .spc-hazard-card[style] {
-            background: var(--panel-2) !important;
-            color: #f4fbff !important;
-            border: 3px solid var(--spc-hazard-outline, var(--border)) !important;
-            border-left-width: 8px !important;
-            min-height: 118px !important;
-            box-shadow: 5px 5px 0 rgba(1,5,14,0.58) !important;
-        }
-        .spc-hazard-chip,
-        .spc-hazard-chip[style] {
-            background: rgba(0,0,0,0.22) !important;
-            color: #fff !important;
-            border-color: var(--spc-hazard-outline, rgba(255,255,255,0.35)) !important;
-        }
-        .spc-no-severe-card,
-        .spc-no-severe-card[style] {
-            background: var(--panel-2) !important;
-            color: #f4fbff !important;
-            border-color: #2d74bd !important;
-        }
-
-        /* Retro AQI/allergy gauge containers. */
-        .env-gauge {
-            background: var(--panel-2) !important;
-            border: 3px solid #285f9e !important;
-            border-radius: 5px !important;
-            box-shadow: 5px 5px 0 rgba(1,5,14,0.58) !important;
-            min-width: 135px !important;
-        }
-        .env-gauge-label {
-            font-family: var(--font-display) !important;
-            color: var(--accent) !important;
-            font-size: 12px !important;
-            letter-spacing: 1px !important;
-            opacity: 1 !important;
-            text-shadow: 2px 2px 0 #01050e !important;
-            text-transform: uppercase !important;
-        }
-        .env-gauge-value {
-            font-family: var(--font-display) !important;
-            text-shadow: 2px 2px 0 #01050e !important;
-        }
-        .env-gauge svg circle:first-child { stroke: rgba(84,200,255,0.22) !important; }
-        /* === TJF SAFE TARGETED CLEANUP 2026-05-18 END === */
-
         /* === TJF RETRO CLEAN VISUAL SYSTEM END === */
 
     </style>
@@ -802,7 +680,7 @@
 
                     <div id="homeLocalWeather" class="glass"
                         style="background: rgba(0,210,255,0.05); border: 1px solid var(--accent); padding: 20px; cursor:pointer; transition: transform 0.2s;"
-                        onclick="window.openHomeForecastCity && window.openHomeForecastCity();"
+                        onclick="window.showTab('localforecast', document.querySelector('.nav-item:nth-child(3)')); if(window.lfSelectedCity) window.selectLFCity(window.lfSelectedCity, true);"
                         onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
                         <div id="homeLocationName" style="opacity:0.6; font-size:11px; font-weight: 700; letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; color: var(--accent); word-break: break-word; line-height: 1.4;">
                             Official National Weather Service Forecast &mdash; Locating...
@@ -1037,9 +915,6 @@
                             </button>
                             <button class="glass-btn" style="flex:1; background:rgba(255,255,255,0.1)!important; border-color:var(--border)!important;" onclick="window.testNotification()">
                                 <i class="ph-fill ph-paper-plane-tilt"></i> Test Device
-                            </button>
-                            <button class="glass-btn" style="flex:1; background:#132f5b!important; border-color:var(--accent)!important;" onclick="window.showPushDebugStatus()">
-                                <i class="ph-fill ph-bug"></i> Push Status
                             </button>
                         </div>
                     </div>
@@ -1493,9 +1368,7 @@
                     L.geoJSON(topojson.feature(us, us.objects.counties), { pane: 'bordersPane', interactive: false, style: getCountyStyle }).addTo(m);
                     L.geoJSON(topojson.feature(us, us.objects.states), { pane: 'bordersPane', interactive: false, style: getStateStyle }).addTo(m);
                 });
-                window.loadNWSAlerts({ preferLive: true });
-                if (window.alertRefreshInterval) clearInterval(window.alertRefreshInterval);
-                window.alertRefreshInterval = setInterval(() => window.loadNWSAlerts({ preferLive: true }), 60000);
+                window.loadNWSAlerts();
             });
         };
 
@@ -1543,24 +1416,26 @@
             let percentage = 0;
             let displayVal = value;
             if (isTextValue) {
-                if (value === "Low") percentage = 18;
-                else if (value === "Moderate") percentage = 55;
-                else if (value === "High") percentage = 92;
+                if (value === "Low") percentage = 15;
+                else if (value === "Moderate") percentage = 50;
+                else if (value === "High") percentage = 90;
             } else {
-                percentage = Math.min(100, (Number(value) / 200) * 100);
+                percentage = Math.min(100, (value / 200) * 100); 
             }
-            let radius = 34;
+            
+            let radius = 36;
             let circumference = 2 * Math.PI * radius;
             let offset = circumference - (percentage / 100) * circumference;
+
             return `
-                <div class="env-gauge" style="padding:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; flex:1;">
-                    <div class="env-gauge-label">${label}</div>
-                    <div style="position:relative; width: 82px; height: 82px; margin: 0 auto;">
-                        <svg width="82" height="82" viewBox="0 0 82 82" style="transform: rotate(-90deg); image-rendering: pixelated;">
-                            <circle cx="41" cy="41" r="${radius}" fill="transparent" stroke="rgba(84,200,255,0.22)" stroke-width="8" />
-                            <circle cx="41" cy="41" r="${radius}" fill="transparent" stroke="${color}" stroke-width="8" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="square" style="transition: stroke-dashoffset 0.6s steps(6);" />
+                <div class="glass" style="padding:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; flex:1; min-width:150px; background: rgba(0,0,0,0.2);">
+                    <div style="font-size:14px; text-transform:uppercase; opacity:0.8; font-weight:700;">${label}</div>
+                    <div style="position:relative; width: 80px; height: 80px; margin: 0 auto;">
+                        <svg width="80" height="80" viewBox="0 0 80 80" style="transform: rotate(-90deg);">
+                            <circle cx="40" cy="40" r="${radius}" fill="transparent" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
+                            <circle cx="40" cy="40" r="${radius}" fill="transparent" stroke="${color}" stroke-width="8" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-out;" />
                         </svg>
-                        <div class="env-gauge-value" style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:${isTextValue ? '13px' : '20px'}; color:${color};">${displayVal}</div>
+                        <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:${isTextValue ? '14px' : '20px'}; color:${color};">${displayVal}</div>
                     </div>
                 </div>`;
         };
@@ -1912,73 +1787,127 @@
         }
 
         function renderSPCHTML(spc) {
-            const outlookLink = `<div class="spc-outlook-row"><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View SPC Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
             if (spc.rawLvl === 0) return `
                 <div class="spc-no-severe-card" style="padding: 12px 14px; font-size: 16px; font-weight: 700; margin-bottom: 12px; color:#fff;">No Severe Weather Expected</div>
-                ${outlookLink}`;
-            let riskBadge = spc.rawLvl === 1 ? "TSTM" : `${spc.level}/5`;
+                <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official Storm Prediction Center Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
+            
+            let riskBadge = spc.rawLvl === 1 ? "Thunderstorm" : `<span style="font-size: 2.5em; font-weight: 700; line-height: 0.8;">${spc.level}</span><span style="font-size: 1.2em; opacity: 0.7; margin-left: 2px;">/5</span>`;
+            
             let getRiskStyle = (val, isCig, type) => {
-                let c = '#285f9e';
+                let b = 'transparent', t = '#ffffff', c = 'rgba(255,255,255,0.1)';
                 if (type === 'tor') {
-                    if (val >= 60) c = '#104e8b'; else if (val >= 45) c = '#912cee'; else if (val >= 30) c = '#ff00ff'; else if (val >= 15) c = '#ff0000'; else if (val >= 10) c = '#ffc800'; else if (val >= 5) c = '#8b4726'; else if (val >= 2) c = '#008b00';
+                    if (val >= 60)      { b = '#104e8b'; t = '#ffffff'; c = b; } // Blue
+                    else if (val >= 45) { b = '#912cee'; t = '#ffffff'; c = b; } // Purple
+                    else if (val >= 30) { b = '#ff00ff'; t = '#ffffff'; c = b; } // Pink/Magenta
+                    else if (val >= 15) { b = '#ff0000'; t = '#ffffff'; c = b; } // Red
+                    else if (val >= 10) { b = '#ffc800'; t = '#000000'; c = b; } // Yellow
+                    else if (val >= 5)  { b = '#8b4726'; t = '#ffffff'; c = b; } // Brown
+                    else if (val >= 2)  { b = '#008b00'; t = '#ffffff'; c = b; } // Green
                 } else {
-                    if (val >= 60) c = '#912cee'; else if (val >= 45) c = '#ff00ff'; else if (val >= 30) c = '#ff0000'; else if (val >= 15) c = '#ffc800'; else if (val >= 5) c = '#8b4726';
+                    if (val >= 60)      { b = '#912cee'; t = '#ffffff'; c = b; } // Purple
+                    else if (val >= 45) { b = '#ff00ff'; t = '#ffffff'; c = b; } // Pink/Magenta
+                    else if (val >= 30) { b = '#ff0000'; t = '#ffffff'; c = b; } // Red
+                    else if (val >= 15) { b = '#ffc800'; t = '#000000'; c = b; } // Yellow
+                    else if (val >= 5)  { b = '#8b4726'; t = '#ffffff'; c = b; } // Brown
                 }
-                if (isCig && val === 0) c = '#ffd166';
-                return { border: c };
+                
+                // isCig styling removed to keep normal categorical color
+                
+                return { bg: b, text: t, border: c };
             };
+
             let formatVal = (v) => {
-                let s = String(v || '').replace(/\s*\((CIG|SIG).*\)/, '').replace(/%/g, '');
-                if (s.includes('CIG') || s.includes('SIG')) return 'SIG';
-                return s ? s : '0';
+                let s = v.replace(/\s*\((CIG|SIG).*\)/, '').replace(/%/g, '');
+                if (s.includes('CIG') || s.includes('SIG')) return "SIG";
+                return s ? s : "0";
             };
-            let torVal = formatVal(spc.tor), windVal = formatVal(spc.wind), hailVal = formatVal(spc.hail);
-            let torCig = String(spc.tor || '').match(/(CIG\d*(?:\.\d+)?|SIG)/)?.[0]?.replace('SIG', 'CIG') || null;
-            let windCig = String(spc.wind || '').match(/(CIG\d*(?:\.\d+)?|SIG)/)?.[0]?.replace('SIG', 'CIG') || null;
-            let hailCig = String(spc.hail || '').match(/(CIG\d*(?:\.\d+)?|SIG)/)?.[0]?.replace('SIG', 'CIG') || null;
-            let torNum = parseInt(torVal) || 0, windNum = parseInt(windVal) || 0, hailNum = parseInt(hailVal) || 0;
-            let torStyle = getRiskStyle(torNum, torCig, 'tor'), windStyle = getRiskStyle(windNum, windCig, 'wind'), hailStyle = getRiskStyle(hailNum, hailCig, 'hail');
+
+            let torVal = formatVal(spc.tor);
+            let windVal = formatVal(spc.wind);
+            let hailVal = formatVal(spc.hail);
+
+            let torCigMatch = spc.tor.match(/(CIG\d*(?:\.\d+)?|SIG)/);
+            let windCigMatch = spc.wind.match(/(CIG\d*(?:\.\d+)?|SIG)/);
+            let hailCigMatch = spc.hail.match(/(CIG\d*(?:\.\d+)?|SIG)/);
+
+            let torCig = torCigMatch ? torCigMatch[0].replace('SIG', 'CIG') : null;
+            let windCig = windCigMatch ? windCigMatch[0].replace('SIG', 'CIG') : null;
+            let hailCig = hailCigMatch ? hailCigMatch[0].replace('SIG', 'CIG') : null;
+
+            let torNum = parseInt(torVal) || 0;
+            let windNum = parseInt(windVal) || 0;
+            let hailNum = parseInt(hailVal) || 0;
+
+            let torStyle = getRiskStyle(torNum, torCig, 'tor');
+            let windStyle = getRiskStyle(windNum, windCig, 'wind');
+            let hailStyle = getRiskStyle(hailNum, hailCig, 'hail');
+
             let displayString = (val) => val === 'SIG' ? 'SIG' : val + '%';
+
             let getDescText = (type, val, cigTag) => {
-                let text = '';
+                let text = "";
                 if (type === 'tor') {
-                    if (val >= 15) text = 'Numerous tornadoes possible'; else if (val >= 5) text = 'A few tornadoes possible'; else if (val >= 2) text = 'Isolated tornado possible';
-                    if (cigTag) text += (text ? '<br>' : '') + `<span style="color:var(--warning); font-weight:700; display:block; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: EF2+ tornadoes possible</span>`;
+                    if (val >= 15) text = "Numerous tornadoes possible";
+                    else if (val >= 5) text = "A few tornadoes possible";
+                    else if (val >= 2) text = "Isolated tornado possible";
+                    if (cigTag) text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:700; display:flex; text-align:center; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: Up to EF2+ tornadoes possible</span>`;
                 } else if (type === 'wind') {
-                    if (val >= 30) text = 'Widespread damaging winds possible'; else if (val >= 15) text = 'Scattered damaging winds possible'; else if (val >= 5) text = 'Isolated damaging winds possible';
-                    if (cigTag) text += (text ? '<br>' : '') + `<span style="color:var(--warning); font-weight:700; display:block; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: 75+ mph winds possible</span>`;
+                    if (val >= 30) text = "Widespread damaging winds possible";
+                    else if (val >= 15) text = "Scattered damaging winds possible";
+                    else if (val >= 5) text = "Isolated damaging winds possible";
+                    if (cigTag) text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:700; display:flex; text-align:center; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: Up to 75+ mph winds possible</span>`;
                 } else if (type === 'hail') {
-                    if (val >= 30) text = 'Widespread large hail possible'; else if (val >= 15) text = 'Scattered large hail possible'; else if (val >= 5) text = 'Isolated large hail possible';
+                    if (val >= 30) text = "Widespread large hail possible";
+                    else if (val >= 15) text = "Scattered large hail possible";
+                    else if (val >= 5) text = "Isolated large hail possible";
                     if (cigTag) {
                         let match = cigTag.match(/(\d+(?:\.\d+)?)/);
-                        let sizeNum = (match && match[1] !== '1') ? match[1] : '2.0';
+                        // CIG1 translates to 2.0 inches (Hen Egg)
+                        let sizeNum = (match && match[1] !== "1") ? match[1] : "2.0"; 
                         let sizeStr = window.getHailTranslation ? window.getHailTranslation(sizeNum) : sizeNum + '"';
                         let objMatch = sizeStr.match(/\((.*?)\)/);
                         let objName = objMatch ? objMatch[1].toLowerCase() : sizeStr;
-                        text += (text ? '<br>' : '') + `<span style="color:var(--warning); font-weight:700; display:block; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: up to ${objName} sized hail possible</span>`;
+                        text += (text ? "<br>" : "") + `<span style="color:var(--warning); font-weight:700; display:flex; text-align:center; align-items:center; justify-content:center; gap:4px; margin-top:6px;"><i class="ph-fill ph-warning"></i> Significant: Up to ${objName} sized hail possible</span>`;
                     }
                 }
-                return text || "<span style='opacity:0.75'>No significant risk</span>";
+                if (!text && !cigTag) text = "<span style='opacity:0.4'>No significant risk</span>";
+                return text;
             };
-            const hazardCard = (label, val, style, desc) => `
-                <div class="spc-hazard-card" style="--spc-hazard-outline:${style.border}; padding: 14px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start;">
-                    <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.95; margin-bottom: 8px; font-weight: bold; color: var(--accent);">${label}</div>
-                    <div class="spc-hazard-chip" style="font-size: 22px; font-weight: 700; padding: 4px 8px; display: inline-block; margin: 0 auto 8px auto; border: 2px solid var(--spc-hazard-outline);">${displayString(val)}</div>
-                    <div style="font-size: 11px; line-height: 1.35; color: #d6e9ff;">${desc}</div>
-                </div>`;
+
+            let torDesc = getDescText('tor', torNum, torCig);
+            let windDesc = getDescText('wind', windNum, windCig);
+            let hailDesc = getDescText('hail', hailNum, hailCig);
+
+            const solidCardBg = (style, num, cig) => (num > 0 || cig) ? style.bg : '#244f96';
+            const solidCardText = (style, num, cig) => (num > 0 || cig) ? style.text : '#f6fbff';
+            const solidCardBorder = (style, num, cig) => (num > 0 || cig) ? style.border : '#6fa6e8';
+            const solidChipBg = (style, num, cig) => (num > 0 || cig) ? 'rgba(0,0,0,0.22)' : 'rgba(255,255,255,0.10)';
+
             return `
                 <div class="spc-risk-wrap" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 12px;">
-                    <div class="spc-risk-summary" style="display: flex; align-items: center; gap: 12px; --spc-outline:${spc.bgColor};">
-                        <div class="spc-risk-badge-mini">${riskBadge}</div>
-                        <div style="font-weight: 700; font-size: 16px; color: #f4fbff;">${spc.name}</div>
+                    <div class="spc-risk-summary" style="display: flex; align-items: center; gap: 12px; background: ${spc.bgColor}; color: ${spc.textColor};">
+                        <div style="font-weight: 700; font-size: 15px; display: flex; align-items: baseline; gap: 2px;">${riskBadge}</div>
+                        <div style="font-weight: 700; font-size: 16px; color: inherit;">${spc.name}</div>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px;">
-                        ${hazardCard('Tornado', torVal, torStyle, getDescText('tor', torNum, torCig))}
-                        ${hazardCard('Wind', windVal, windStyle, getDescText('wind', windNum, windCig))}
-                        ${hazardCard('Hail', hailVal, hailStyle, getDescText('hail', hailNum, hailCig))}
+                        <div class="spc-hazard-card" style="background: ${solidCardBg(torStyle, torNum, torCig)}; color: ${solidCardText(torStyle, torNum, torCig)}; border: 3px solid ${solidCardBorder(torStyle, torNum, torCig)}; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: 5px 5px 0 rgba(3,10,28,0.55);">
+                            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 8px; font-weight: bold; color: inherit;">Tornado</div>
+                            <div class="spc-hazard-chip" style="font-size: 24px; font-weight: 700; background: ${solidChipBg(torStyle, torNum, torCig)}; color: inherit; padding: 4px 8px; display: inline-block; margin: 0 auto 8px auto; border: 2px solid rgba(255,255,255,0.35);">${displayString(torVal)}</div>
+                            <div style="font-size: 11px; line-height: 1.4; color: inherit;">${torDesc}</div>
+                        </div>
+                        <div class="spc-hazard-card" style="background: ${solidCardBg(windStyle, windNum, windCig)}; color: ${solidCardText(windStyle, windNum, windCig)}; border: 3px solid ${solidCardBorder(windStyle, windNum, windCig)}; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: 5px 5px 0 rgba(3,10,28,0.55);">
+                            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 8px; font-weight: bold; color: inherit;">Wind</div>
+                            <div class="spc-hazard-chip" style="font-size: 24px; font-weight: 700; background: ${solidChipBg(windStyle, windNum, windCig)}; color: inherit; padding: 4px 8px; display: inline-block; margin: 0 auto 8px auto; border: 2px solid rgba(255,255,255,0.35);">${displayString(windVal)}</div>
+                            <div style="font-size: 11px; line-height: 1.4; color: inherit;">${windDesc}</div>
+                        </div>
+                        <div class="spc-hazard-card" style="background: ${solidCardBg(hailStyle, hailNum, hailCig)}; color: ${solidCardText(hailStyle, hailNum, hailCig)}; border: 3px solid ${solidCardBorder(hailStyle, hailNum, hailCig)}; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; box-shadow: 5px 5px 0 rgba(3,10,28,0.55);">
+                            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 8px; font-weight: bold; color: inherit;">Hail</div>
+                            <div class="spc-hazard-chip" style="font-size: 24px; font-weight: 700; background: ${solidChipBg(hailStyle, hailNum, hailCig)}; color: inherit; padding: 4px 8px; display: inline-block; margin: 0 auto 8px auto; border: 2px solid rgba(255,255,255,0.35);">${displayString(hailVal)}</div>
+                            <div style="font-size: 11px; line-height: 1.4; color: inherit;">${hailDesc}</div>
+                        </div>
                     </div>
                 </div>
-                ${outlookLink}`;
+                <div><a href="https://www.spc.noaa.gov" target="_blank" rel="noopener noreferrer" class="glass-btn" style="display:inline-flex; align-items:center; gap:6px; text-decoration: none; background: rgba(241, 196, 15, 0.15)!important; color: #f1c40f!important; border-color: rgba(241, 196, 15, 0.5)!important; font-size: 12px; padding: 8px 12px;">View Official Storm Prediction Center Outlook <i class="ph ph-arrow-up-right"></i></a></div>`;
         }
 
         window.updateHomeSPC = function() {
@@ -2027,28 +1956,13 @@
             return `<div class=\"alert-badge ${cls}\" role=\"button\" tabindex=\"0\" data-alert-id=\"${alertId}\" onclick=\"window.centerMapOnAlert && window.centerMapOnAlert('${alertId}')\" onkeydown=\"if(event.key==='Enter'||event.key===' '){event.preventDefault(); window.centerMapOnAlert && window.centerMapOnAlert('${alertId}');}\"><i class="ph-fill ${icon}" style="font-size: 20px; margin-top: 2px;"></i><div><div class="ab-title">${f.properties.event}</div><div class="ab-area">${area}</div>${expText}</div></div>`;
         }
 
-        window.loadNWSAlerts = async function(options = {}) {
-            const preferLive = options.preferLive !== false;
-            let data = null;
-            let source = 'none';
+        window.loadNWSAlerts = async function() {
             try {
-                if (preferLive) {
-                    const liveRes = await fetchWithTimeout('https://api.weather.gov/alerts/active?status=actual&t=' + Date.now(), { cache: 'no-store', timeout: 6500 });
-                    if (liveRes.ok) { data = await liveRes.json(); source = 'live-nws-api'; }
-                }
-            } catch (e) { console.warn('Live NWS alerts fetch failed; falling back to static cache.', e); }
-            if (!data) {
-                try {
-                    const res = await fetchWithTimeout('static/nws_alerts.json?t=' + Date.now(), { cache: 'no-cache', timeout: 5000 });
-                    if (res.ok) { data = await res.json(); source = 'static-cache'; }
-                } catch (e) { console.warn('Static NWS alerts fetch failed.', e); }
-            }
-            const now = new Date();
-            window.nwsAlerts = (data && Array.isArray(data.features) ? data.features : []).filter(f => {
-                if (f.properties && f.properties.expires) return new Date(f.properties.expires) > now;
-                return true;
-            });
-            window.lastAlertsRefresh = { at: new Date().toISOString(), source, count: window.nwsAlerts.length };
+                const res = await fetchWithTimeout('static/nws_alerts.json?t=' + Date.now(), { cache: 'no-cache', timeout: 5000 });
+                const data = await res.json();
+                const now = new Date();
+                window.nwsAlerts = (data.features || []).filter(f => { if (f.properties && f.properties.expires) return new Date(f.properties.expires) > now; return true; });
+            } catch (e) { window.nwsAlerts = []; }
 
             if (window.usCounties) {
                 window.nwsAlerts.forEach(f => {
@@ -2385,27 +2299,9 @@
             } catch(e) {}
         }
 
-
-
-        window.openHomeForecastCity = function() {
-            const nav = document.querySelector('.nav-item[onclick*="localforecast"]');
-            const label = (document.getElementById('homeLocationName')?.innerText || '')
-                .replace('Official National Weather Service Forecast — ', '')
-                .replace('Official National Weather Service Forecast - ', '')
-                .trim();
-            const id = window.currentHomeCityId || (label ? label.replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '') : 'Current_Location');
-            const display = window.currentHomeCityDisplay || label || 'Current Location';
-            const lat = Number(window.currentHomeLat || 42.03);
-            const lon = Number(window.currentHomeLon || -93.62);
-            window.showTab('localforecast', nav || null);
-            const existing = LF_CITIES.find(c => c.id === id || c.display === display);
-            if (existing) window.selectLFCity(existing.id, false);
-            else window.addAndSelectCity(id, display, lat, lon, false);
-        };
-
         window.setupHomeLocation = async function() {
             window.currentHomeLat = 42.03; window.currentHomeLon = -93.62;
-            window.currentHomeCityId = "Ames"; window.currentHomeCityDisplay = "Ames, IA";
+            window.currentHomeCityId = "Ames_IA";
             document.getElementById('homeLocationName').innerText = `Official National Weather Service Forecast — Ames, IA`;
             window.loadHomeNWS(42.03, -93.62, false); window.updateHomeAlerts(42.03, -93.62); window.updateHomeSPC();
             if(window.renderPinnedCities) window.renderPinnedCities();
@@ -2433,7 +2329,6 @@
                                 let s = ptData.properties.relativeLocation.properties.state;
                                 let mCity = LF_CITIES.find(city => city.display.includes(c) && city.display.includes(s));
                                 window.currentHomeCityId = mCity ? mCity.id : `${c}_${s}`;
-                                window.currentHomeCityDisplay = mCity ? mCity.display : `${c}, ${s}`;
                             }
                         } catch(e) {}
                         
@@ -2641,9 +2536,6 @@
 
         window.selectLFCity = async function(cityId, noPush = false) {
             window.lfSelectedCity = cityId;
-            if (!window.lastAlertsRefresh || (Date.now() - new Date(window.lastAlertsRefresh.at).getTime()) > 45000) {
-                window.loadNWSAlerts?.({ preferLive: true });
-            }
             if (!noPush) window.history.pushState(null, '', '#localforecast?city=' + encodeURIComponent(cityId));
             
             clearTimeout(searchTimeout);
@@ -3479,24 +3371,6 @@
             }
         };
 
-
-
-        window.showPushDebugStatus = function() {
-            const token = localStorage.getItem('tjf_fcm_token');
-            const status = [
-                `Signed in: ${!!(auth && auth.currentUser && !auth.currentUser.isAnonymous)}`,
-                `Notification permission: ${('Notification' in window) ? Notification.permission : 'unsupported'}`,
-                `FCM token saved on this device: ${token ? 'yes' : 'no'}`,
-                `Alerts enabled: ${!!window.notifSettings?.alertsEnabled}`,
-                `Briefings enabled: ${!!window.notifSettings?.briefsEnabled}`,
-                `Morning: ${window.notifSettings?.morningTime || '07:00'}`,
-                `Evening: ${window.notifSettings?.eveningTime || '18:00'}`,
-                `Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone || 'unknown'}`,
-                `Last alert refresh: ${window.lastAlertsRefresh ? `${window.lastAlertsRefresh.source}, ${window.lastAlertsRefresh.count} alerts at ${window.lastAlertsRefresh.at}` : 'not loaded yet'}`
-            ].join('\n');
-            window.showSysMessage(status);
-        };
-
         // The Grant Permission button enrolls the device; checkboxes decide alert/briefing types.
         window.requestNotificationPermission = function() {
             return window.enablePushNotifications({ silent: false });
@@ -3647,7 +3521,7 @@
 
 
     <script>
-    window.__TJF_CLEAN_GOOD_STATE = 'final-retro-clean-2026-05-18-targeted';
+    window.__TJF_CLEAN_GOOD_STATE = 'final-retro-clean-2026-05-17';
     window.TJF_FCM_VAPID_PUBLIC_KEY = 'BAivtsZBFQ-lH4pntR3ooI1SEvuuH25UxK8pCnw10vtnQnzfQNkZxHKcaYkJQgS2RcrGIpcO0ULXiBif3Cem6zg';
     </script>
 

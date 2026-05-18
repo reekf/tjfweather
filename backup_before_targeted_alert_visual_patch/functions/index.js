@@ -174,8 +174,7 @@ exports.checkPinnedCityAlerts = onSchedule({
     if (cities.length === 0) {
       await tokenDoc.ref.set({
         lastAlertCheckAt: admin.firestore.FieldValue.serverTimestamp(),
-        lastAlertCheckStatus: 'No pinned cities or saved current location.',
-        lastAlertCheckTokenEnabled: true
+        lastAlertCheckStatus: 'No pinned cities or saved current location.'
       }, { merge: true });
       continue;
     }
@@ -229,8 +228,7 @@ exports.checkPinnedCityAlerts = onSchedule({
     const update = {
       lastAlertCheckAt: admin.firestore.FieldValue.serverTimestamp(),
       lastAlertCheckStatus: `Checked ${cities.length} location(s). Sent ${newlySeen.length}.`,
-      lastAlertCheckCityCount: cities.length,
-      lastAlertCheckTokenEnabled: true
+      lastAlertCheckCityCount: cities.length
     };
     if (newlySeen.length > 0) {
       update.seenAlertIds = Array.from(seenSet).slice(-200);
@@ -273,10 +271,10 @@ function parseHHMM(value, fallback) {
 }
 
 function isDue(nowMinute, targetMinute) {
-  // The scheduler runs every 5 minutes, but Cloud Scheduler can run late during cold starts.
-  // Use a wider window so daily/evening briefings are not skipped by a few minutes of jitter.
+  // The scheduler runs every 5 minutes, but it may not execute exactly on the minute.
+  // Send once when the function runs at or within 6 minutes after the requested time.
   const diff = nowMinute - targetMinute;
-  return diff >= 0 && diff < 16;
+  return diff >= 0 && diff < 6;
 }
 
 async function fetchForecastForLocation(location) {
@@ -365,8 +363,7 @@ exports.sendDailyBriefings = onSchedule({
       await tokenDoc.ref.set({
         lastBriefCheckAt: admin.firestore.FieldValue.serverTimestamp(),
         lastBriefCheckLocalTime: parts.hhmm,
-        lastBriefCheckStatus: 'Not due.',
-        lastBriefCheckTokenEnabled: true
+        lastBriefCheckStatus: 'Not due.'
       }, { merge: true });
       continue;
     }

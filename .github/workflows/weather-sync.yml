@@ -2,9 +2,20 @@ name: TJFWeather Data Sync
 
 on:
   schedule:
-    # Runs at minute 15 and 45 of every hour for fast updates
-    - cron: '15,45 * * * *' 
-  workflow_dispatch: # Allows you to trigger it manually
+    # Fast lightweight alerts-only refresh.
+    - cron: '*/5 * * * *'
+    # Full NWS/MOS/ASOS/SPC refresh twice per hour.
+    - cron: '15,45 * * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Run mode'
+        required: false
+        default: 'full'
+        type: choice
+        options:
+          - full
+          - alerts-only
 
 jobs:
   build-and-cache:
@@ -21,16 +32,39 @@ jobs:
           cache: 'pip'
 
       - name: Install Python Packages
-        run: |
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
-      - name: Run Weather Engine (NWS, MOS, ASOS, Alerts)
-        run: python build_cache.py
+      - name: Decide cache mode
+        id: mode
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "mode=${{ inputs.mode }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event.schedule }}" == "15,45 * * * *" ]]; then
+            echo "mode=full" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=alerts-only" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run Weather Engine
+        shell: bash
+        run: |
+          if [[ "${{ steps.mode.outputs.mode }}" == "alerts-only" ]]; then
+            python build_cache.py --alerts-only
+          else
+            python build_cache.py
+          fi
 
       - name: Commit and Push New Data
+        shell: bash
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add static/
-          git commit -m "Automated Weather Data Sync [NWS & MOS]" || echo "No changes to commit"
+          if [[ "${{ steps.mode.outputs.mode }}" == "alerts-only" ]]; then
+            git add static/nws_alerts.json static/nws_alerts_meta.json
+            git commit -m "Automated Alert Cache Sync" || echo "No alert changes to commit"
+          else
+            git add static/
+            git commit -m "Automated Weather Data Sync [NWS & MOS]" || echo "No changes to commit"
+          fi
           git push
