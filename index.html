@@ -742,6 +742,26 @@
 
         /* === TJF RETRO CLEAN VISUAL SYSTEM END === */
 
+
+        /* === TJF MCS ALERT/RADAR PATCH 2026-05-18 START === */
+        .spc-risk-badge-mini .spc-risk-number,
+        .spc-risk-badge-mini .spc-risk-denom,
+        .spc-risk-badge-mini .spc-risk-slash {
+            display: inline-block !important;
+            font-family: 'Pixelify Sans', 'VT323', monospace !important;
+            line-height: 1 !important;
+        }
+        .spc-risk-badge-mini .spc-risk-number { font-size: 1.22em !important; }
+        .spc-risk-badge-mini .spc-risk-slash,
+        .spc-risk-badge-mini .spc-risk-denom { font-size: 0.92em !important; opacity: 0.92 !important; }
+        .leaflet-tile-pane img,
+        .leaflet-overlay-pane img,
+        .leaflet-tile {
+            transition: opacity 0.12s linear !important;
+            will-change: opacity, transform !important;
+        }
+        /* === TJF MCS ALERT/RADAR PATCH 2026-05-18 END === */
+
     </style>
 </head>
 
@@ -1916,7 +1936,7 @@
             if (spc.rawLvl === 0) return `
                 <div class="spc-no-severe-card" style="padding: 12px 14px; font-size: 16px; font-weight: 700; margin-bottom: 12px; color:#fff;">No Severe Weather Expected</div>
                 ${outlookLink}`;
-            let riskBadge = spc.rawLvl === 1 ? "TSTM" : `${spc.level}/5`;
+            let riskBadge = spc.rawLvl === 1 ? "TSTM" : `<span class="spc-risk-number">${spc.level}</span><span class="spc-risk-slash">/</span><span class="spc-risk-denom">5</span>`;
             let getRiskStyle = (val, isCig, type) => {
                 let c = '#285f9e';
                 if (type === 'tor') {
@@ -2029,22 +2049,61 @@
 
         window.loadNWSAlerts = async function(options = {}) {
             const preferLive = options.preferLive !== false;
-            let data = null;
+            const stateCodes = ['IA','IL','IN','OH','MI','WI','MN','MO','KY','TN','AR','OK','KS','NE','SD','ND'];
+            const severeEvents = [
+                'Tornado Warning', 'Tornado Watch',
+                'Severe Thunderstorm Warning', 'Severe Thunderstorm Watch',
+                'Flash Flood Warning', 'Special Weather Statement'
+            ];
+            const uniq = new Map();
             let source = 'none';
+            let liveSucceeded = false;
+            const addFeatures = (data, src) => {
+                if (!data || !Array.isArray(data.features)) return;
+                data.features.forEach(f => {
+                    const p = f.properties || {};
+                    const key = String(p.id || f.id || [p.event, p.sent, p.effective, p.expires, p.areaDesc].filter(Boolean).join('|'));
+                    if (key && !uniq.has(key)) uniq.set(key, f);
+                });
+                source = source === 'none' ? src : `${source}+${src}`;
+            };
+            const fetchAlertJson = async (url, timeout = 6500) => {
+                const res = await fetchWithTimeout(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now(), {
+                    cache: 'no-store',
+                    headers: { 'Accept': 'application/geo+json' },
+                    timeout
+                });
+                if (!res.ok) throw new Error(`NWS alerts HTTP ${res.status}`);
+                return res.json();
+            };
             try {
                 if (preferLive) {
-                    const liveRes = await fetchWithTimeout('https://api.weather.gov/alerts/active?status=actual&t=' + Date.now(), { cache: 'no-store', timeout: 6500 });
-                    if (liveRes.ok) { data = await liveRes.json(); source = 'live-nws-api'; }
+                    const primary = await fetchAlertJson('https://api.weather.gov/alerts/active?status=actual', 8500);
+                    addFeatures(primary, 'live-national');
+                    liveSucceeded = true;
+
+                    // Severe convective products sometimes appear faster/cleaner through state or event feeds
+                    // than through the full national browser request, especially during active MCS days.
+                    const urls = [
+                        ...stateCodes.map(s => `https://api.weather.gov/alerts/active?status=actual&area=${s}`),
+                        ...severeEvents.map(e => `https://api.weather.gov/alerts/active?status=actual&event=${encodeURIComponent(e)}`)
+                    ];
+                    const batches = [];
+                    for (let i = 0; i < urls.length; i += 6) batches.push(urls.slice(i, i + 6));
+                    for (const batch of batches) {
+                        const results = await Promise.allSettled(batch.map(u => fetchAlertJson(u, 6000)));
+                        results.forEach((r, i) => { if (r.status === 'fulfilled') addFeatures(r.value, batch[i].includes('&area=') ? 'state-feeds' : 'event-feeds'); });
+                    }
                 }
             } catch (e) { console.warn('Live NWS alerts fetch failed; falling back to static cache.', e); }
-            if (!data) {
+            if (!liveSucceeded && uniq.size === 0) {
                 try {
                     const res = await fetchWithTimeout('static/nws_alerts.json?t=' + Date.now(), { cache: 'no-cache', timeout: 5000 });
-                    if (res.ok) { data = await res.json(); source = 'static-cache'; }
+                    if (res.ok) { addFeatures(await res.json(), 'static-cache'); }
                 } catch (e) { console.warn('Static NWS alerts fetch failed.', e); }
             }
             const now = new Date();
-            window.nwsAlerts = (data && Array.isArray(data.features) ? data.features : []).filter(f => {
+            window.nwsAlerts = Array.from(uniq.values()).filter(f => {
                 if (f.properties && f.properties.expires) return new Date(f.properties.expires) > now;
                 return true;
             });
@@ -2198,7 +2257,7 @@
 
                 rvFrames.forEach((frame) => {
                     let url = `${data.host}${frame.path}/256/{z}/{x}/{y}/6/1_1.png`;
-                    let radarOpts = { opacity: 0, pane: 'radarPane', keepBuffer: 8, updateWhenZooming: false, maxNativeZoom: 7, maxZoom: 12 };
+                    let radarOpts = { opacity: 0, pane: 'radarPane', keepBuffer: 14, updateWhenZooming: true, updateWhenIdle: false, updateInterval: 80, maxNativeZoom: 7, maxZoom: 12, crossOrigin: true };
                     if (window._mapFull) mainRadarLayers.push(L.tileLayer(url, radarOpts).addTo(window._mapFull));
                     if (window._mapMini) miniRadarLayers.push(L.tileLayer(url, radarOpts).addTo(window._mapMini));
                 });
@@ -2210,9 +2269,13 @@
 
                 radarInterval = setInterval(() => {
                     if (!isRadarPlaying || mainRadarLayers.length === 0 || window.isRadarInteracting) return;
-                    mainRadarLayers[rvIndex].setOpacity(0); miniRadarLayers[rvIndex].setOpacity(0);
+                    const prevIndex = rvIndex;
                     rvIndex = (rvIndex + 1) % rvFrames.length;
                     mainRadarLayers[rvIndex].setOpacity(0.85); miniRadarLayers[rvIndex].setOpacity(0.85);
+                    setTimeout(() => {
+                        if (prevIndex !== rvIndex && mainRadarLayers[prevIndex]) mainRadarLayers[prevIndex].setOpacity(0);
+                        if (prevIndex !== rvIndex && miniRadarLayers[prevIndex]) miniRadarLayers[prevIndex].setOpacity(0);
+                    }, 120);
                     let t = new Date(rvFrames[rvIndex].time * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
                     document.getElementById('radarTimeDisplay').innerText = t;
                     let mrt = document.getElementById('miniRadarTime'); if (mrt) mrt.innerText = t;

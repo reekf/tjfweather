@@ -140,21 +140,47 @@ def fetch_spc_outlooks():
 
 
 def update_nws_alerts():
-    print("\n[2/5] Fetching active National Weather Service Alerts...")
+    print("
+[2/5] Fetching active National Weather Service Alerts...")
     try:
-        res = robust_nws_fetch_backend("https://api.weather.gov/alerts/active?status=actual")
-        if res:
+        state_codes = ['IA','IL','IN','OH','MI','WI','MN','MO','KY','TN','AR','OK','KS','NE','SD','ND']
+        severe_events = [
+            'Tornado Warning', 'Tornado Watch',
+            'Severe Thunderstorm Warning', 'Severe Thunderstorm Watch',
+            'Flash Flood Warning', 'Special Weather Statement'
+        ]
+        urls = ["https://api.weather.gov/alerts/active?status=actual"]
+        urls += [f"https://api.weather.gov/alerts/active?status=actual&area={s}" for s in state_codes]
+        urls += ["https://api.weather.gov/alerts/active?status=actual&event=" + requests.utils.quote(e) for e in severe_events]
+
+        merged = {}
+        sources_ok = []
+        for url in urls:
+            data = robust_nws_fetch_backend(url)
+            if not data or not isinstance(data, dict) or not isinstance(data.get('features'), list):
+                continue
+            sources_ok.append(url)
+            for f in data.get('features', []):
+                p = f.get('properties', {}) if isinstance(f, dict) else {}
+                key = str(p.get('id') or f.get('id') or '|'.join(str(p.get(k, '')) for k in ['event','sent','effective','expires','areaDesc']))
+                if key and key not in merged:
+                    merged[key] = f
+            time.sleep(0.12)
+
+        if merged:
+            res = {"type": "FeatureCollection", "features": list(merged.values())}
             os.makedirs('static', exist_ok=True)
             with open("static/nws_alerts.json", "w") as f:
                 json.dump(res, f)
             meta = {
                 "cached_at": datetime.datetime.utcnow().isoformat() + "Z",
-                "source": "api.weather.gov/alerts/active?status=actual",
-                "feature_count": len(res.get("features", [])) if isinstance(res, dict) else None
+                "source": "merged national/state/severe-event NWS API feeds",
+                "source_count": len(sources_ok),
+                "feature_count": len(res.get("features", []))
             }
             with open("static/nws_alerts_meta.json", "w") as f:
                 json.dump(meta, f)
-            print(f"  ✓ Alerts successfully updated! {meta['feature_count']} active alert feature(s).")
+            print(f"  ✓ Alerts successfully updated! {meta['feature_count']} active alert feature(s) from {meta['source_count']} feed(s).")
             return True
         print("  [X] NWS alerts response was empty; leaving existing cache in place.")
         return False
