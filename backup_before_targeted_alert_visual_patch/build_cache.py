@@ -5,7 +5,6 @@ import requests
 import datetime
 import re
 import random
-import argparse
 
 CITIES = [
     {"name": "New York", "lat": 40.71, "lon": -74.00, "rank": 1, "icao": "KLGA"},
@@ -147,20 +146,9 @@ def update_nws_alerts():
             os.makedirs('static', exist_ok=True)
             with open("static/nws_alerts.json", "w") as f:
                 json.dump(res, f)
-            meta = {
-                "cached_at": datetime.datetime.utcnow().isoformat() + "Z",
-                "source": "api.weather.gov/alerts/active?status=actual",
-                "feature_count": len(res.get("features", [])) if isinstance(res, dict) else None
-            }
-            with open("static/nws_alerts_meta.json", "w") as f:
-                json.dump(meta, f)
-            print(f"  ✓ Alerts successfully updated! {meta['feature_count']} active alert feature(s).")
-            return True
-        print("  [X] NWS alerts response was empty; leaving existing cache in place.")
-        return False
+            print("  ✓ Alerts successfully updated!")
     except Exception as e:
         print(f"  [X] Error fetching alerts: {e}")
-        return False
 
 
 def fetch_asos_current_conditions():
@@ -360,27 +348,19 @@ def cache_mos_forecasts(nbm_data):
     print("  ✓ Model Output Statistics Fetch Complete.")
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Build TJFWeather static cache files.')
-    parser.add_argument('--alerts-only', action='store_true', help='Only refresh static/nws_alerts.json and static/nws_alerts_meta.json.')
-    args = parser.parse_args()
-
     print("==================================================")
     print("   TJFWeather Github Actions Pipeline Started     ")
     print("==================================================")
-
-    if args.alerts_only:
-        ok = update_nws_alerts()
-        print("\nAlerts-only pipeline finished successfully." if ok else "\nAlerts-only pipeline finished with no cache update.")
-        raise SystemExit(0 if ok else 1)
-
+    
     fetch_spc_outlooks()
     update_nws_alerts()
     fetch_asos_current_conditions()
-
+    
+    # Capture NBM data to feed into the MOS fallback engine
     nbm_data_cache = cache_nws_point_forecasts()
     if nbm_data_cache:
         cache_mos_forecasts(nbm_data_cache)
     else:
         print("  [X] Skipping MOS cache due to missing NBM baseline.")
-
+    
     print("\nPipeline finished successfully. Exiting for GitHub commit.")
