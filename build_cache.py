@@ -140,8 +140,7 @@ def fetch_spc_outlooks():
 
 
 def update_nws_alerts():
-    print("
-[2/5] Fetching active National Weather Service Alerts...")
+    print("\n[2/5] Fetching active National Weather Service Alerts...")
     try:
         state_codes = ['IA','IL','IN','OH','MI','WI','MN','MO','KY','TN','AR','OK','KS','NE','SD','ND']
         severe_events = [
